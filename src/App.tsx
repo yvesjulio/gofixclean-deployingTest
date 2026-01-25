@@ -1,10 +1,12 @@
+import Landingpage from "./pages/LandingPage";
+
 
 function App() {
   
 
   return (
     <>
-      <div className="bg-red-500">Hello</div>
+    <Landingpage/>
         
     </>
   )
