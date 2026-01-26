@@ -37,43 +37,42 @@ function Process() {
 
   return (
     <div className="text-center px-4 md:px-0 pt-16 pb-16">
-      {/* Badge */}
+     
       <div className="flex justify-center">
         <div className="flex items-center gap-2 px-6 py-2 border border-white/40 rounded-xl bg-[#B1CDC8] font-medium text-[#025E4C] mb-6">
           <span>Simple Process</span>
         </div>
       </div>
 
-      {/* Heading */}
+    
       <h2 className="text-2xl md:text-3xl font-bold mb-4">
         How GoFix<span className="text-[#FF6B35]">&</span>Clean Works
       </h2>
 
-      {/* Description */}
+      
       <p className="text-[#696969] text-sm md:text-base max-w-xl mx-auto leading-relaxed mb-10">
         Getting quality service is just a few clicks away. Our platform <br className="hidden md:block" /> makes it easy to find, book, and pay for services.
       </p>
 
-      {/* Categories Flex */}
+     
         <div className="flex flex-wrap justify-center gap-6">
       {categories.map((cat, index) => (
     <div
       key={index}
       className="relative bg-white rounded-lg border border-gray-100 p-6 shadow hover:shadow-md transition cursor-pointer w-64 flex flex-col"
     >
-      {/* Number on the border */}
+    
       <div className="absolute -top-3 -right-3 w-12 h-12 flex items-center justify-center shadow-sm rounded-full bg-[#FF6B35] text-white font-bold">
         {String(index + 1).padStart(2, "0")}
       </div>
 
-      {/* Icon */}
       <div
         className={`w-12 h-12 rounded-lg mb-4 ${cat.bgColor} flex items-center justify-center`}
       >
         {cat.icon}
       </div>
 
-      {/* Title & Description */}
+   
       <h3 className="font-bold text-lg mb-2 text-start">{cat.title}</h3>
       <p className="text-[#828282] text-sm mb-3 text-start">{cat.description}</p>
     </div>

@@ -9,14 +9,14 @@ function Navbar() {
     <>
       <nav className="flex items-center justify-between px-6 md:px-16 py-4  bg-white">
         
-        {/* Logo */}
+       
         <img
           src="/images/logo.png"
           alt="GoFix&Clean Logo"
           className="h-7"
         />
 
-        {/* navigation */}
+      
         <div className="hidden md:flex items-center gap-10 text-[#025E4C] font-medium">
           <p className="cursor-pointer hover:text-[#FF6B35] transition">
             Find a service
@@ -42,7 +42,7 @@ function Navbar() {
           </button>
         </div>
 
-        {/* Mobile icon */}
+       
         <div className="md:hidden text-[#025E4C]">
           {menuOpen ? (
             <HiX
@@ -58,7 +58,7 @@ function Navbar() {
         </div>
       </nav>
 
-      {/* menu */}
+      
       {menuOpen && (
         <div className="md:hidden bg-white px-6 py-6 text-[#025E4C]  space-y-6">
           <div className="flex items-center gap-2 font-medium">
