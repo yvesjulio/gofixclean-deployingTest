@@ -7,10 +7,10 @@ function Footer() {
   return (
     <footer className="bg-[#3E3E3E] text-white px-6 md:px-16 py-12">
 
-      {/* Top footer */}
+     
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
 
-        {/* Logo */}
+      
         <div>
           <h2 className="text-2xl font-bold mb-3">
             GoFix<span className="text-[#FF6B35]">&</span>Clean
@@ -26,17 +26,17 @@ function Footer() {
               <SlSocialFacebook />
             </div>
 
-            <div className="p-3 bg-[#696969] rounded-full hover:bg-[#FF6B35] transition cursor-pointer">
+            <div className="p-3  rounded-full  transition cursor-pointer">
               <LuLinkedin />
             </div>
 
-            <div className="p-3 bg-[#696969] rounded-full hover:bg-[#FF6B35] transition cursor-pointer">
+            <div className="p-3 rounded-full  transition cursor-pointer">
               <SlSocialFacebook />
             </div>
           </div>
         </div>
 
-        {/* Services */}
+       
         <div>
           <h3 className="font-semibold mb-4 text-xl">Services</h3>
           <ul className="space-y-2 text-gray-300 text-sm">
@@ -48,7 +48,7 @@ function Footer() {
           </ul>
         </div>
 
-        {/* Company */}
+       
         <div>
           <h3 className="font-semibold mb-4 text-xl">Company</h3>
           <ul className="space-y-2 text-gray-300 text-sm">
@@ -60,7 +60,6 @@ function Footer() {
           </ul>
         </div>
 
-        {/* Contact */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-xl">Contact Us</h3>
@@ -89,7 +88,7 @@ function Footer() {
         </div>
       </div>
 
-      {/* Bottom footer */}
+     
       <div className="border-t border-gray-600 mt-10 pt-6 text-sm text-gray-400">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <p>© {new Date().getFullYear()} GoFix&Clean. All rights reserved.</p>
