@@ -58,11 +58,12 @@ function Professionals() {
         ))}
       </div>
 
-      <div className="text-center mt-12 mb-16">
-        <p className="text-sm sm:text-base text-[#025E4C] font-medium">
-          Find service near you
-        </p>
-      </div>
+    <div className="text-center mt-12 mb-16">
+  <p className="text-sm sm:text-base text-[#025E4C] font-medium cursor-pointer hover:underline">
+    Find service near you
+  </p>
+</div>
+
 
 
       <div className="grid grid-cols-1 md:grid-cols-2  gap-y-6 gap-x-12">

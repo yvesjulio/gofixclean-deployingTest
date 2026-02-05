@@ -16,7 +16,7 @@ function Choose() {
   ];
 
   return (
-    <section className="px-4 sm:px-6 lg:px-16 pt-20 sm:pt-24 md:pt-28 pb-16 ">
+    <section className="px-4 sm:px-6 lg:px-16 pt-20 sm:pt-24 md:pt-28 pb-16">
      
       <div className="flex justify-center mb-6">
         <div className="flex items-center gap-2 px-5 py-1.5 border border-white/40 rounded-xl bg-[#EAEFEE] font-medium text-[#025E4C]">
@@ -24,22 +24,25 @@ function Choose() {
         </div>
       </div>
 
-
+    
       <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center">Why Choose Us?</h2>
       <p className="text-[#696969] text-sm sm:text-base max-w-xl mx-auto leading-relaxed mb-10 text-center">
         We're committed to providing the best service experience. Here's what sets us apart from the rest.
       </p>
 
-
-<div className="flex justify-center">
+    
+    <div className="flex justify-center">
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl">
     {categories.map((cat, index) => (
       <div
         key={index}
-        className="bg-white rounded-lg border border-gray-100 p-4 shadow hover:shadow-md transition flex flex-col"
+        className="group bg-white rounded-lg border border-gray-200 p-4 shadow flex flex-col
+                   hover:border-t hover:border-r hover:border-b
+                   hover:border-t-[#64b8a7] hover:border-r-[#64b8a7] hover:border-b-[#64b8a7]
+                   transition"
       >
         <div
-          className={`w-12 h-12 rounded-lg mb-3 ${cat.bgColor} flex items-center justify-center`}
+          className={`w-12 h-12 rounded-lg mb-3 flex items-center justify-center ${cat.bgColor} group-hover:bg-[#1bddb6] transition`}
         >
           {cat.icon}
         </div>
@@ -49,9 +52,6 @@ function Choose() {
     ))}
   </div>
 </div>
-
-
-
 
     </section>
   );
