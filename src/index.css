@@ -1,1 +1,6 @@
+@config "../tailwind.config.cjs";
 @import "tailwindcss";
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}

@@ -17,7 +17,7 @@ function Professionals() {
       description:
         "Join thousands of service providers earning money on Tasker. Set your own rates, manage your schedule, grow your business.",
       button: "Become a provider",
-      icon: <FiGift className="text-2xl text-[#025E4C]" />,
+      icon: <FiGift className="text-2xl text-brandText" />,
       bgColor: "bg-[#B1CDC8]",
       showArrow: false, 
     },
@@ -40,7 +40,7 @@ function Professionals() {
         {["Gasabo","Kicukiro","Remera","Kimihurura","Kacyiru","Gisozi"].map((loc, i) => (
           <p
             key={i}
-            className="w-full sm:w-auto px-6 py-2 bg-[#E5ECEA] text-[#025645] rounded-lg text-center"
+            className="w-full sm:w-auto px-6 py-2 bg-[#E5ECEA] text-brandText rounded-lg text-center"
           >
             {loc}
           </p>
@@ -51,7 +51,7 @@ function Professionals() {
         {["Nyamirambo","Kanombe","Masaka"].map((loc, i) => (
           <p
             key={i}
-            className="w-full sm:w-auto px-6 py-2 bg-[#E5ECEA] text-[#025645] rounded-lg text-center"
+            className="w-full sm:w-auto px-6 py-2 bg-[#E5ECEA] text-brandText rounded-lg text-center"
           >
             {loc}
           </p>
@@ -59,7 +59,7 @@ function Professionals() {
       </div>
 
     <div className="text-center mt-12 mb-16">
-  <p className="text-sm sm:text-base text-[#025E4C] font-medium cursor-pointer hover:underline">
+  <p className="text-sm sm:text-base text-brandText font-medium cursor-pointer hover:underline">
     Find service near you
   </p>
 </div>
@@ -71,7 +71,7 @@ function Professionals() {
           <div
             key={index}
             className={`rounded-lg border p-6 transition cursor-pointer ${
-              index === 0 ? "bg-[#025E4C] text-white border-[#025E4C]" : "bg-white border-[#357E70]"
+              index === 0 ? "bg-brandText text-white border-brandText" : "bg-white border-brandText/30"
             }`}
           >
            
@@ -93,8 +93,8 @@ function Professionals() {
             <button
               className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm ${
                 cat.showArrow
-                  ? "bg-[#FF6B35] text-white hover:bg-[#e65a28]"
-                  : "border border-[#025E4C] text-[#025E4C] hover:bg-[#025E4C] hover:text-white"
+                  ? "bg-brandOrange text-white hover:bg-brandOrange/90"
+                  : "border border-brandText text-brandText hover:bg-brandText hover:text-white"
               }`}
             >
               {cat.button} {cat.showArrow && <FiArrowRight />}

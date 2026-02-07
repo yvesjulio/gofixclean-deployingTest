@@ -69,7 +69,7 @@ function Testimonials() {
           onClick={prevTestimonial}
           disabled={currentIndex === 0} 
           className={`absolute -left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full shadow flex items-center justify-center transition ${
-            currentIndex === 0 ? "bg-gray-300" : "bg-[#ECECEC] hover:bg-[#FF6B35]"
+            currentIndex === 0 ? "bg-gray-300" : "bg-[#ECECEC] hover:bg-brandOrange"
           }`}
         >
           <IoChevronBack size={24} />
@@ -81,8 +81,8 @@ function Testimonials() {
           disabled={currentIndex === providers.length - 1} 
           className={`absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full shadow flex items-center justify-center transition ${
             currentIndex === providers.length - 1
-              ? "bg-gray-300 hover:bg-[#FF6B35]"
-              : "bg-[#ECECEC] hover:bg-[#FF6B35]"
+              ? "bg-gray-300 hover:bg-brandOrange"
+              : "bg-[#ECECEC] hover:bg-brandOrange"
           }`}
         >
           <IoChevronForward size={24} />

@@ -59,7 +59,7 @@ function Rated() {
     </p>
   </div>
 
-  <div className="flex items-center text-sm sm:text-base text-[#025E4C] font-medium cursor-pointer hover:underline mt-4 md:mt-0">
+  <div className="flex items-center text-sm sm:text-base text-brandText font-medium cursor-pointer hover:underline mt-4 md:mt-0">
     <span>View all providers</span>
     <TiArrowRight className="ml-1 text-lg" />
   </div>
@@ -74,7 +74,7 @@ function Rated() {
             className="relative bg-white rounded-xl shadow hover:shadow-md transition overflow-hidden w-full flex flex-col"
           >
           
-            <span className="absolute top-3 right-3 font-light bg-[#025E4C] text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full flex items-center gap-1 sm:gap-2 z-10">
+            <span className="absolute top-3 right-3 font-light bg-brandText text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full flex items-center gap-1 sm:gap-2 z-10">
               <GrStatusGood className="text-[10px] sm:text-[14px]" />
               Top rated
             </span>
@@ -87,11 +87,11 @@ function Rated() {
           
             <div className="p-4 sm:p-5 flex flex-col grow">
               <h3 className="font-bold text-base sm:text-lg">{person.name}</h3>
-              <p className="text-xs sm:text-sm text-[#FF6B35] mb-2">{person.job}</p>
+              <p className="text-xs sm:text-sm text-brandOrange mb-2">{person.job}</p>
 
           
                   <div className="flex items-center gap-1 mb-1 text-xs sm:text-sm">
-                <FaStar className="text-orange-400" />
+                <FaStar className="text-brandYellow" />
                 <span className="text-[#7B7F7E]">{person.rating}</span>
                 <span className="text-[#C5C5C5]">({person.reviews})</span>
               </div>
@@ -105,7 +105,7 @@ function Rated() {
                 {person.services.map((service, i) => (
                   <span
                     key={i}
-                    className="text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-md bg-[#E6EFED] font-medium text-[#025E4C]"
+                    className="text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-md bg-[#E6EFED] font-medium text-brandText"
                   >
                     {service}
                   </span>

@@ -37,15 +37,15 @@ function Hero() {
   }, [text, isDeleting, wordIndex]);
 
   return (
-    <section className="bg-[#025E4C] text-white px-6 md:px-16 pt-15 md:pt-22.5 pb-16 text-center">
+    <section className="bg-brandText text-brandWhite px-6 md:px-9 pt-9 md:pt-14 pb-16 text-center">
       <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/40 rounded-xl mb-6 bg-white/20 text-sm font-light text-gray-200">
-        <VscWorkspaceTrusted className="text-2xl text-white" />
+        <VscWorkspaceTrusted className="text-2xl text-brandWhite" />
         <span className="text-sm">Verified & Trusted Providers</span>
       </div>
 
       <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4 text-[#ECECEC]">
         Find Trusted{" "}
-        <span className="text-[#FF6B35]">
+        <span className="text-brandOrange">
           {text}
           <span className="animate-pulse">|</span>
         </span>
@@ -58,11 +58,11 @@ function Hero() {
         Quality home services made simple, safe, and affordable.
       </p>
       <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-12 mb-12">
-        <button className="bg-[#FF6B35] text-white px-6 py-3 rounded-md transition-all duration-400 ease-out hover:bg-[#e05e2e] hover:scale-[1.03]">
+        <button className="bg-brandOrange text-brandWhite px-6 py-3 rounded-md transition-all duration-400 ease-out hover:bg-[#e05e2e] hover:scale-[1.03]">
           Find a provider
         </button>
 
-        <button className="bg-white px-6 py-3 rounded-md font-medium text-[#025E4C] transition-all duration-400 ease-out hover:scale-[1.03]">
+        <button className="bg-brandWhite px-6 py-3 rounded-md font-medium text-brandText transition-all duration-400 ease-out hover:scale-[1.03]">
           Become a provider
         </button>
       </div>
@@ -71,7 +71,7 @@ function Hero() {
         
         <div>
           <div className="flex items-center justify-center gap-2 text-lg font-bold">
-            <HiStar className="text-2xl text-[#F59E0B]" />
+            <HiStar className="text-2xl text-brandYellow" />
             <span className="text-3xl">4.9</span>
           </div>
           <p className="text-sm text-[#C5C5C5] mt-1">Average ratings</p>

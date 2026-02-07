@@ -16,7 +16,7 @@ function Choose() {
   ];
 
   return (
-    <section className="px-4 sm:px-6 lg:px-16 pt-20 sm:pt-24 md:pt-28 pb-16">
+    <section className="px-4 pb-16">
      
       <div className="flex justify-center mb-6">
         <div className="flex items-center gap-2 px-5 py-1.5 border border-white/40 rounded-xl bg-[#EAEFEE] font-medium text-[#025E4C]">
