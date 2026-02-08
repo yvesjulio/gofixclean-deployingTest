@@ -3,7 +3,7 @@ import { VscWorkspaceTrusted } from "react-icons/vsc";
 import { HiStar } from "react-icons/hi2";
 import { GoClock } from "react-icons/go";
 
-const words = ["Plumber", "Electrician"];
+const words = ["Plumber", "Electrician", "Cleaner", "Handyman", "Gardener"];
 
 function Hero() {
   const [text, setText] = useState("");
@@ -31,7 +31,7 @@ function Hero() {
     if (isDeleting && text === "") {
       setIsDeleting(false);
       setWordIndex((prev) => (prev + 1) % words.length);
-    }
+    } 
 
     return () => clearTimeout(timeout);
   }, [text, isDeleting, wordIndex]);
@@ -42,6 +42,7 @@ function Hero() {
         <VscWorkspaceTrusted className="text-2xl text-brandWhite" />
         <span className="text-sm">Verified & Trusted Providers</span>
       </div>
+       
 
       <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4 text-[#ECECEC]">
         Find Trusted{" "}
@@ -50,8 +51,9 @@ function Hero() {
           <span className="animate-pulse">|</span>
         </span>
         <br />
-        Near You
+        Near You 
       </h1>
+
       <p className="text-[#C5C5C5] mx-auto mb-8 max-w-3xl">
         Connect with certified plumbers, electricians, cleaners, and more.
         <br />
@@ -76,7 +78,6 @@ function Hero() {
           </div>
           <p className="text-sm text-[#C5C5C5] mt-1">Average ratings</p>
         </div>
-
      
         <div>
           <div className="flex items-center justify-center gap-2 text-lg font-bold">

@@ -59,7 +59,7 @@ function Professionals() {
       </div>
 
     <div className="text-center mt-12 mb-16">
-  <p className="text-sm sm:text-base text-brandText font-medium cursor-pointer hover:underline">
+  <p className="text-sm sm:text-base text-brandText font-bold cursor-pointer hover:underline">
     Find service near you
   </p>
 </div>

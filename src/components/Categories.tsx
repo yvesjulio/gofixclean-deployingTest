@@ -8,50 +8,56 @@ function Categories() {
       title: "Plumbing",
       description: "Pipes, taps and water systems",
       count: "350+ providers",
-      icon: <FiTool className="text-2xl text-black" />,
-      bgColor: "bg-[#FED7D7]",
+      icon: <FiTool />,
+      bgColor: "bg-[#FED7D8]",
+      iconColor: "text-[#E53E3E]",
     },
     {
       title: "Electrical",
-      description: "wiring, repairs & installation",
+      description: "Wiring, repairs & installation",
       count: "200+ providers",
-      icon: <FaLaptopCode className="text-2xl text-black" />,
+      icon: <FaLaptopCode />,
       bgColor: "bg-[#CEC0FB]",
+      iconColor: "text-[#6B46C1]", 
     },
     {
       title: "Cleaning",
       description: "Home & Office Cleaning",
       count: "150+ providers",
-      icon: <FaPaintBrush className="text-2xl text-black" />,
+      icon: <FaPaintBrush />,
       bgColor: "bg-[#A3FABC]",
+      iconColor: "text-[#059669]", 
     },
     {
       title: "Cooking",
       description: "Personal Chefs & Catering",
       count: "120+ providers",
-      icon: <FaTruck className="text-2xl text-black" />,
+      icon: <FaTruck />,
       bgColor: "bg-[#F9DCAE]",
+      iconColor: "text-[#D97706]",
     },
     {
       title: "Gardening",
       description: "Pipes, taps and water systems",
       count: "80+ providers",
-      icon: <FiMonitor className="text-2xl text-black" />,
+      icon: <FiMonitor />,
       bgColor: "bg-[#A5D2F8]",
+      iconColor: "text-[#2563EB]", 
     },
     {
       title: "Handyman",
       description: "General Repairs & Fixes",
       count: "300+ providers",
-      icon: <FiShoppingCart className="text-2xl text-black" />,
+      icon: <FiShoppingCart />,
       bgColor: "bg-[#F9ABF4]",
+      iconColor: "text-[#C026D3]", 
     },
   ];
 
   return (
-    <section className="px-6 md:px-16 py-12 bg-[#DFE7E5]">
+    <section className="px-6 md:px-16 py-12 bg-[#e4ebe9]">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-        <div className="mb-4 md:mb-0">
+        <div>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             Browse by Category
           </h2>
@@ -61,33 +67,43 @@ function Categories() {
           </p>
         </div>
 
-        <div className="flex items-center text-sm text-[#025E4C] font-medium cursor-pointer hover:underline">
+        <div className="group flex items-center text-sm text-[#025E4C] font-medium cursor-pointer transition hover:text-[#158b74]">
           <p>View all categories</p>
-          <TiArrowRight className="ml-1 text-lg" />
+          <TiArrowRight className="ml-1 text-lg transition-transform group-hover:translate-x-2" />
         </div>
       </div>
 
+      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {categories.map((cat, index) => (
-         <div
-  key={index}
-  className="group bg-white rounded-lg p-6 shadow-sm cursor-pointer
-             border border-transparent border-l-0
-             hover:border-t hover:border-t-[#64b8a7]
-             hover:border-r hover:border-r-[#91dacc]
-             hover:border-b hover:border-b-[#91dacc]
-             hover:shadow-xl transition"
->
-  <div
-    className={`w-12 h-12 flex items-center justify-center rounded-lg mb-4 ${cat.bgColor}`}
-  >
-    {cat.icon}
-  </div>
-  <h3 className="font-bold text-lg mb-1">{cat.title}</h3>
-  <p className="text-gray-400 text-sm mb-2">{cat.description}</p>
-  <p className="text-[#025E4C] font-medium text-sm">{cat.count}</p>
-</div>
+          <div
+            key={index}
+            className="group bg-white rounded-lg p-6 cursor-pointer
+                       border border-gray-300
+                       shadow-sm
+                       transition-all duration-300
+                       hover:shadow-xl
+                       hover:border-t hover:border-t-[#64b8a7]
+                       hover:border-r hover:border-r-[#91dacc]
+                       hover:border-b hover:border-b-[#91dacc]
+                       hover:border-l hover:border-l-[#64b8a7]"
+          >
+            <div
+              className={`w-12 h-12 flex items-center justify-center rounded-lg mb-4 ${cat.bgColor}`}
+            >
+              <span className={`text-2xl ${cat.iconColor}`}>
+                {cat.icon}
+              </span>
+            </div>
 
+            <h3 className="font-bold text-lg mb-1">{cat.title}</h3>
+            <p className="text-gray-400 text-sm mb-2">
+              {cat.description}
+            </p>
+            <p className="text-[#025E4C] font-medium text-sm">
+              {cat.count}
+            </p>
+          </div>
         ))}
       </div>
     </section>

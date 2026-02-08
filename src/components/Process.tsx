@@ -9,28 +9,24 @@ function Process() {
       description:
         "Enter your service need and location. Browse through verified providers with real reviews and ratings.",
       icon: <FiSearch className="text-2xl text-brandText" />,
-      bgColor: "bg-[#91DFC5]",
     },
     {
       title: "Choose a Provider",
       description:
         "Compare profiles, check availability, and select the best professional for your specific needs.",
       icon: <FaUserCheck className="text-2xl text-brandText" />,
-      bgColor: "bg-[#91DFC5]",
     },
     {
       title: "Book & Schedule",
       description:
         "Pick a convenient date and time. Get instant confirmation and chat directly with your provider.",
       icon: <FaRegCalendarCheck className="text-2xl text-brandText" />,
-      bgColor: "bg-[#91DFC5]",
     },
     {
       title: "Get it Done & Review",
       description:
         "Your provider arrives and completes the job. Pay securely and share your experience.",
       icon: <GoStar className="text-2xl text-brandText" />,
-      bgColor: "bg-[#91DFC5]",
     },
   ];
 
@@ -41,31 +37,43 @@ function Process() {
           <span>Simple Process</span>
         </div>
       </div>
+
       <h2 className="text-2xl md:text-3xl font-bold mb-4">
         How GoFix<span className="text-brandOrange">&</span>Clean Works
       </h2>
-      <p className="text-[#696969] text-base md:text-base max-w-xl mx-auto leading-relaxed mb-10">
-        Getting quality service is just a few clicks away. Our platform <br className="hidden md:block" /> 
+
+      <p className="text-[#696868] max-w-xl mx-auto leading-relaxed mb-10">
+        Getting quality service is just a few clicks away. Our platform <br className="hidden md:block" />
         makes it easy to find, book, and pay for services.
       </p>
+
       <div className="flex flex-wrap justify-center gap-6">
         {categories.map((cat, index) => (
           <div
             key={index}
-            className="relative bg-white rounded-lg border border-gray-100 
-                       shadow hover:shadow-md transition cursor-pointer
+            className="group relative bg-white rounded-lg border border-gray-100
+                       shadow hover:shadow-md transition-all duration-300 cursor-pointer
                        w-77 sm:w-64 p-8 sm:p-6 flex flex-col"
           >
+           
             <div className="absolute -top-3 -right-3 w-12 h-12 flex items-center justify-center shadow-sm rounded-full bg-brandOrange text-white font-bold">
               {String(index + 1).padStart(2, "0")}
             </div>
 
-            <div className={`w-12 h-12 rounded-lg mb-4 ${cat.bgColor} flex items-center justify-center`}>
+          
+            <div
+              className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center
+                         bg-[#a5ecd5]
+                         transition-colors duration-300
+                         group-hover:bg-[#5FCFB2]"
+            >
               {cat.icon}
             </div>
 
             <h3 className="font-bold text-lg mb-2 text-start">{cat.title}</h3>
-            <p className="text-[#828282] text-base sm:text-sm mb-3 text-start">{cat.description}</p>
+            <p className="text-[#828282] text-base sm:text-sm text-start">
+              {cat.description}
+            </p>
           </div>
         ))}
       </div>

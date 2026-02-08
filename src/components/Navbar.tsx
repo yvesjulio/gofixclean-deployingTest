@@ -22,12 +22,12 @@ function Navbar() {
 
       
         <div className="hidden md:flex items-center gap-6">
-          <div className="flex items-center gap-2 cursor-pointer">
-            <TfiWorld className="text-lg" />
-            <span className="hover:text-brandOrange">ENG</span>
+          <div className="flex items-center gap-2 text-sm px-3 py-2 hover:text-white rounded-xl hover:bg-brandOrange cursor-pointer">
+            <TfiWorld className="text-sm" />
+            <span >ENG</span>
           </div>
 
-          <p className="cursor-pointer hover:text-brandOrange transition">
+          <p className="cursor-pointer rounded-xl px-3 py-2 hover:bg-brandOrange hover:text-white  transition">
             Sign in
           </p>
 

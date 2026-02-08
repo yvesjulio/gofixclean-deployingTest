@@ -12,11 +12,16 @@ function Footer() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const footer = document.querySelector("footer");
-      if (!footer) return;
-      const footerTop = footer.getBoundingClientRect().top;
-      const windowHeight = window.innerHeight;
-      setShowTopBtn(footerTop < windowHeight + 100);
+      const scrollPosition = window.scrollY; 
+      const pageHeight = document.body.scrollHeight; 
+      const windowHeight = window.innerHeight; 
+
+      
+      if (scrollPosition + windowHeight / 2 >= pageHeight / 2) {
+        setShowTopBtn(true);
+      } else {
+        setShowTopBtn(false);
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -58,7 +63,6 @@ function Footer() {
         <img src="/images/whatsapp.png" alt="WhatsApp" className="h-10 w-10" />
       </a>
 
-     
       <style>
         {`
           @keyframes forwardBackward {
@@ -70,6 +74,7 @@ function Footer() {
 
       <footer className="bg-[#3E3E3E] text-white px-6 md:px-16 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+         
           <div>
             <div className="flex items-center gap-3 mb-3">
               <span className="bg-white px-2 py-1 font-bold text-[#025E4C] rounded-xl">
@@ -84,17 +89,17 @@ function Footer() {
               Connecting households with trusted service providers. Quality services at your fingertips.
             </p>
 
-            <div className="flex gap-3">
-              <div className="p-3 bg-[#696969] rounded-full cursor-pointer">
+            <div className="flex gap-2">
+              <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
                 <SlSocialFacebook />
               </div>
-              <div className="p-3 bg-[#696969] rounded-full cursor-pointer">
+              <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
                 <FaXTwitter />
               </div>
-              <div className="p-3 bg-[#696969] rounded-full cursor-pointer">
+              <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
                 <FaInstagram />
               </div>
-              <div className="p-3 bg-[#696969] rounded-full cursor-pointer">
+              <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
                 <LuLinkedin />
               </div>
             </div>
@@ -104,41 +109,40 @@ function Footer() {
           <div>
             <h3 className="font-semibold mb-4 text-xl">Services</h3>
             <ul className="space-y-2 text-gray-300 text-sm">
-              <li>Plumbers</li>
-              <li>Electricians</li>
-              <li>Cleaners</li>
-              <li>Painters</li>
-              <li>Handymen</li>
+              <li className="hover:text-white cursor-pointer transition-colors">Plumbers</li>
+              <li className="hover:text-white cursor-pointer transition-colors">Electricians</li>
+              <li className="hover:text-white cursor-pointer transition-colors">Cleaners</li>
+              <li className="hover:text-white cursor-pointer transition-colors">Painters</li>
+              <li className="hover:text-white cursor-pointer transition-colors">Handymen</li>
             </ul>
           </div>
 
-         
+        
           <div>
             <h3 className="font-semibold mb-4 text-xl">Company</h3>
             <ul className="space-y-2 text-gray-300 text-sm">
-              <li>About Us</li>
-              <li>Become a Provider</li>
-              <li>Blog</li>
-              <li>Careers</li>
-              <li>Contact</li>
+              <li className="hover:text-white cursor-pointer transition-colors">About Us</li>
+              <li className="hover:text-white cursor-pointer transition-colors">Become a Provider</li>
+              <li className="hover:text-white cursor-pointer transition-colors">Blog</li>
+              <li className="hover:text-white cursor-pointer transition-colors">Careers</li>
+              <li className="hover:text-white cursor-pointer transition-colors">Contact</li>
             </ul>
           </div>
 
           
           <div>
             <h3 className="font-semibold mb-4 text-xl">Contact Us</h3>
-            <div className="flex items-center gap-2 text-sm text-gray-300 mb-3">
-              <CiLocationOn />
-              <p>Kigali, Rwanda</p>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-300 mb-3">
-              <LuPhone />
-              <p>+250 788 123 456</p>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <CgMail />
-              <p>gofixandclean@gmail.com</p>
-            </div>
+            <ul className="space-y-2 text-gray-300 text-sm">
+              <li className="flex items-center gap-2 hover:text-white cursor-pointer transition-colors">
+                <CiLocationOn /> Kigali, Rwanda
+              </li>
+              <li className="flex items-center gap-2 hover:text-white cursor-pointer transition-colors">
+                <LuPhone /> +250 788 123 456
+              </li>
+              <li className="flex items-center gap-2 hover:text-white cursor-pointer transition-colors">
+                <CgMail /> gofixandclean@gmail.com
+              </li>
+            </ul>
           </div>
         </div>
 
