@@ -89,7 +89,7 @@ function Footer() {
               Connecting households with trusted service providers. Quality services at your fingertips.
             </p>
 
-            <div className="flex gap-2">
+            <div className="flex">
               <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
                 <SlSocialFacebook />
               </div>
