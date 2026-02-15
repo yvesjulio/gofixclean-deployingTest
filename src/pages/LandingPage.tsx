@@ -1,4 +1,5 @@
-import Navbar from "../components/Navbar";
+import React from "react";
+import Layout from "../components/Layout";
 import Hero from "../components/Hero";
 import Categories from "../components/Categories";
 import Process from "../components/Process";
@@ -7,23 +8,20 @@ import Rated from "../components/Rated";
 import Testimonials from "../components/Testimonials";
 import Questions from "../components/Questions";
 import Professionals from "../components/Professionals";
-import Footer from "../components/Footer";
 
-function Landingpage() {
+const Landingpage: React.FC = () => {
   return (
-    <div>
-        <Navbar />
-        <Hero />
-        <Categories />
-        <Process />
-        <Choose />
-       <Rated />
-       <Testimonials />
-       <Questions />
-       <Professionals />
-       <Footer />
-    </div>
-  )
-}
+    <Layout>
+      <Hero />
+      <Categories />
+      <Process />
+      <Choose />
+      <Rated />
+      <Testimonials />
+      <Questions />
+      <Professionals />
+    </Layout>
+  );
+};
 
 export default Landingpage;

@@ -37,7 +37,7 @@ function Hero() {
   }, [text, isDeleting, wordIndex]);
 
   return (
-    <section className="bg-brandText text-brandWhite px-6 md:px-9 pt-9 md:pt-14 pb-16 text-center">
+    <section className="bg-brandText text-brandWhite px-6 md:px-9  pt-16 pb-16 text-center">
       <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/40 rounded-xl mb-6 bg-white/20 text-sm font-light text-gray-200">
         <VscWorkspaceTrusted className="text-2xl text-brandWhite" />
         <span className="text-sm">Verified & Trusted Providers</span>
