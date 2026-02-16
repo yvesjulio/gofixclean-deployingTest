@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { SlSocialFacebook } from "react-icons/sl";
 import { LuLinkedin, LuPhone } from "react-icons/lu";
 import { CiLocationOn } from "react-icons/ci";
@@ -7,16 +8,17 @@ import { FiArrowUp } from "react-icons/fi";
 import { FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
-function Footer() {
+const Footer: React.FC = () => {
   const [showTopBtn, setShowTopBtn] = useState(false);
+
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY; 
-      const pageHeight = document.body.scrollHeight; 
-      const windowHeight = window.innerHeight; 
+      const scrollPosition = window.scrollY;
+      const pageHeight = document.body.scrollHeight;
+      const windowHeight = window.innerHeight;
 
-      
       if (scrollPosition + windowHeight / 2 >= pageHeight / 2) {
         setShowTopBtn(true);
       } else {
@@ -74,12 +76,9 @@ function Footer() {
 
       <footer className="bg-[#3E3E3E] text-white px-6 md:px-16 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-         
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <span className="bg-white px-2 py-1 font-bold text-[#025E4C] rounded-xl">
-                GF
-              </span>
+              <span className="bg-white px-2 py-1 font-bold text-[#025E4C] rounded-xl">GF</span>
               <h2 className="text-2xl font-bold">
                 GoFix<span className="text-[#FF6B35]">&</span>Clean
               </h2>
@@ -105,7 +104,6 @@ function Footer() {
             </div>
           </div>
 
-         
           <div>
             <h3 className="font-semibold mb-4 text-xl">Services</h3>
             <ul className="space-y-2 text-gray-300 text-sm">
@@ -117,19 +115,51 @@ function Footer() {
             </ul>
           </div>
 
-        
           <div>
             <h3 className="font-semibold mb-4 text-xl">Company</h3>
-            <ul className="space-y-2 text-gray-300 text-sm">
-              <li className="hover:text-white cursor-pointer transition-colors">About Us</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Become a Provider</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Blog</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Careers</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Contact</li>
+            <ul className="space-y-2 text-sm">
+              <li
+                className={`cursor-pointer transition-colors ${
+                  location.pathname === "/about" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
+                }`}
+              >
+                <Link to="/about">About Us</Link>
+              </li>
+
+              <li
+                className={`cursor-pointer transition-colors ${
+                  location.pathname === "/provider" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
+                }`}
+              >
+                <Link to="/provider">Become a Provider</Link>
+              </li>
+
+              <li
+                className={`cursor-pointer transition-colors ${
+                  location.pathname === "/blog" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
+                }`}
+              >
+                <Link to="/blog">Blog</Link>
+              </li>
+
+              <li
+                className={`cursor-pointer transition-colors ${
+                  location.pathname === "/careers" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
+                }`}
+              >
+                <Link to="/careers">Careers</Link>
+              </li>
+
+              <li
+                className={`cursor-pointer transition-colors ${
+                  location.pathname === "/contact" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
+                }`}
+              >
+                <Link to="/contact">Contact</Link>
+              </li>
             </ul>
           </div>
 
-          
           <div>
             <h3 className="font-semibold mb-4 text-xl">Contact Us</h3>
             <ul className="space-y-2 text-gray-300 text-sm">
@@ -146,7 +176,6 @@ function Footer() {
           </div>
         </div>
 
-       
         <div className="border-t border-gray-600 mt-10 pt-6 text-sm text-gray-400">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p>© {new Date().getFullYear()} GoFix&Clean. All rights reserved.</p>
@@ -159,6 +188,6 @@ function Footer() {
       </footer>
     </>
   );
-}
+};
 
 export default Footer;
