@@ -131,7 +131,7 @@ const Footer: React.FC = () => {
                   location.pathname === "/provider" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
                 }`}
               >
-                <Link to="/provider">Become a Provider</Link>
+                <Link to="/become-provider">Become a Provider</Link>
               </li>
 
               <li

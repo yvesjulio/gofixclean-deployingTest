@@ -2,7 +2,7 @@ import React from "react";
 
 const AboutUs: React.FC = () => {
   return (
-    <section className="bg-brandText text-brandWhite px-6 md:px-9 pt-16 md:pt-20 pb-16 text-center">
+    <section className="bg-brandText text-brandWhite px-6 md:px-9 pt-16 md:pt-12 pb-16 text-center">
       <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-6 text-[#ECECEC]">
         About GoFix<span className="text-brandOrange">&</span>Clean
       </h1>

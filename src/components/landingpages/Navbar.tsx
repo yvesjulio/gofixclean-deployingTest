@@ -31,6 +31,7 @@ function Navbar() {
             Find a service
           </NavLink>
 
+            
           <NavLink to="/become-provider" className={linkClass}>
             Become a provider
           </NavLink>

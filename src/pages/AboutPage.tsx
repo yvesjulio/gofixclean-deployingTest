@@ -1,5 +1,5 @@
 import React from "react";
-import Layout from "../components/Layout";
+import Layout from "../components/landingpages/Layout";
 import AboutUs from "../components/about/AboutUs";
 import Feedback from "../components/about/Feedback";
 import OurStory from "../components/about/OurStory";
