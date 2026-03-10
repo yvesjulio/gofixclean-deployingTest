@@ -4,9 +4,17 @@ import { LuClock3 } from "react-icons/lu";
 import { GoCreditCard } from "react-icons/go";
 import { LuHeadphones } from "react-icons/lu";
 import { FaRegHeart } from "react-icons/fa6";
+import { ReactElement } from "react";
 
-function Choose() {
-  const categories = [
+interface Category {
+  title: string;
+  description: string;
+  icon: ReactElement;
+  bgColor: string;
+}
+
+const Choose: React.FC = () => {
+  const categories: Category[] = [
     { title: "Verified Professionals", description: "Every provider undergoes thorough background checks and skill verification before joining our platform.", icon: <MdOutlineVerified className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
     { title: "Secure Payments", description: "Your payments are protected. Pay only after the job is done to your satisfaction with our secure system.", icon: <MdOutlineVerifiedUser className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
     { title: "Quick Response", description: "Get matched with available providers within minutes. Most requests receive responses in under 30 minutes.", icon: <LuClock3 className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
@@ -55,6 +63,6 @@ function Choose() {
 
     </section>
   );
-}
+};
 
 export default Choose;

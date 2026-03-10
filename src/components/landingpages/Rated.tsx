@@ -3,8 +3,19 @@ import { FaStar } from "react-icons/fa";
 import { GrStatusGood } from "react-icons/gr";
 import { IoLocationOutline } from "react-icons/io5";
 
-function Rated() {
-  const providers = [
+interface Provider {
+  name: string;
+  job: string;
+  rating: string;
+  reviews: string;
+  location: string;
+  price: string;
+  image: string;
+  services: string[];
+}
+
+const Rated: React.FC = () => {
+  const providers: Provider[] = [
     {
       name: "John Dril",
       job: "Plumbing expert",
@@ -43,7 +54,6 @@ function Rated() {
   return (
     <section className="bg-[#DFE7E5] min-h-screen flex flex-col px-4 sm:px-6 md:px-16 py-10 md:py-16">
       
-    
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div className="md:w-2/3">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-[#FFD1C0] text-xs sm:text-sm font-medium text-[#8C3B1D] mb-2">
@@ -66,7 +76,6 @@ function Rated() {
         </div>
       </div>
 
-     
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {providers.map((person, index) => (
           <div
@@ -75,13 +84,11 @@ function Rated() {
                        shadow transition-all duration-300
                        hover:-translate-y-2 hover:shadow-xl cursor-pointer"
           >
-           
             <span className="absolute top-3 right-3 bg-brandText text-white text-xs px-3 py-1 rounded-full flex items-center gap-1 z-10">
               <GrStatusGood className="text-[12px]" />
               Top rated
             </span>
 
-            
             <div className="overflow-hidden">
               <img
                 src={person.image}
@@ -92,7 +99,6 @@ function Rated() {
               />
             </div>
 
-           
             <div className="p-4 sm:p-5 flex flex-col grow">
               <h3 className="font-bold text-base sm:text-lg">
                 {person.name}
@@ -137,6 +143,6 @@ function Rated() {
       </div>
     </section>
   );
-}
+};
 
 export default Rated;

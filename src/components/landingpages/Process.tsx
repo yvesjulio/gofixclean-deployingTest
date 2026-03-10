@@ -1,9 +1,16 @@
 import { FiSearch } from "react-icons/fi";
 import { FaUserCheck, FaRegCalendarCheck } from "react-icons/fa";
 import { GoStar } from "react-icons/go";
+import { ReactElement } from "react";
 
-function Process() {
-  const categories = [
+interface ProcessCategory {
+  title: string;
+  description: string;
+  icon: ReactElement;
+}
+
+const Process: React.FC = () => {
+  const categories: ProcessCategory[] = [
     {
       title: "Search & Browse",
       description:
@@ -55,12 +62,10 @@ function Process() {
                        shadow hover:shadow-md transition-all duration-300 cursor-pointer
                        w-77 sm:w-64 p-8 sm:p-6 flex flex-col"
           >
-           
             <div className="absolute -top-3 -right-3 w-12 h-12 flex items-center justify-center shadow-sm rounded-full bg-brandOrange text-white font-bold">
               {String(index + 1).padStart(2, "0")}
             </div>
 
-          
             <div
               className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center
                          bg-[#a5ecd5]
@@ -79,6 +84,6 @@ function Process() {
       </div>
     </div>
   );
-}
+};
 
 export default Process;

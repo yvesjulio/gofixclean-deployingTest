@@ -1,9 +1,19 @@
 import { TiArrowRight } from "react-icons/ti";
 import { FiTool, FiMonitor, FiShoppingCart } from "react-icons/fi";
 import { FaPaintBrush, FaTruck, FaLaptopCode } from "react-icons/fa";
+import { ReactElement } from "react";
 
-function Categories() {
-  const categories = [
+interface Category {
+  title: string;
+  description: string;
+  count: string;
+  icon: ReactElement;
+  bgColor: string;
+  iconColor: string;
+}
+
+const Categories: React.FC = () => {
+  const categories: Category[] = [
     {
       title: "Plumbing",
       description: "Pipes, taps and water systems",
@@ -73,7 +83,6 @@ function Categories() {
         </div>
       </div>
 
-      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {categories.map((cat, index) => (
           <div
@@ -108,6 +117,6 @@ function Categories() {
       </div>
     </section>
   );
-}
+};
 
 export default Categories;

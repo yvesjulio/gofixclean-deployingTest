@@ -2,8 +2,16 @@ import { useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
-function Testimonials() {
-  const providers = [
+interface Provider {
+  name: string;
+  job: string;
+  image: string;
+  rating: number;
+  quote: string;
+}
+
+const Testimonials: React.FC = () => {
+  const providers: Provider[] = [
     {
       name: "John Dril",
       job: "Plumbing expert",
@@ -33,21 +41,20 @@ function Testimonials() {
     },
   ];
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
 
- 
   const prevTestimonial = () => {
-    setCurrentIndex((prev) => Math.max(prev - 1, 0));
+    setCurrentIndex((prev: number) => Math.max(prev - 1, 0));
   };
 
-
   const nextTestimonial = () => {
-    setCurrentIndex((prev) => Math.min(prev + 1, providers.length - 1));
+    setCurrentIndex((prev: number) =>
+      Math.min(prev + 1, providers.length - 1)
+    );
   };
 
   return (
     <section className="px-4 sm:px-6 md:px-16 py-16">
-      
       <div className="text-center max-w-3xl mx-auto mb-12">
         <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-2xl bg-[#B1CDC8] font-medium text-[#01342A] mb-4">
           Testimonials
@@ -62,12 +69,10 @@ function Testimonials() {
         </p>
       </div>
 
-     
       <div className="relative px-6 py-6 bg-[#E6EFED] rounded-xl max-w-5xl mx-auto flex flex-col gap-4 shadow-lg">
-       
         <button
           onClick={prevTestimonial}
-          disabled={currentIndex === 0} 
+          disabled={currentIndex === 0}
           className={`absolute -left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full shadow flex items-center justify-center transition ${
             currentIndex === 0 ? "bg-gray-300" : "bg-[#ECECEC] hover:bg-brandOrange"
           }`}
@@ -75,10 +80,9 @@ function Testimonials() {
           <IoChevronBack size={24} />
         </button>
 
-       
         <button
           onClick={nextTestimonial}
-          disabled={currentIndex === providers.length - 1} 
+          disabled={currentIndex === providers.length - 1}
           className={`absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full shadow flex items-center justify-center transition ${
             currentIndex === providers.length - 1
               ? "bg-gray-300 hover:bg-brandOrange"
@@ -88,7 +92,6 @@ function Testimonials() {
           <IoChevronForward size={24} />
         </button>
 
-      
         <div className="flex justify-start">
           <img
             src="/images/bet.png"
@@ -96,19 +99,18 @@ function Testimonials() {
             className="w-12 h-12"
           />
         </div>
+
         <div className="flex gap-1 text-2xl -mt-10 pl-7">
           {Array.from({ length: providers[currentIndex].rating }).map((_, i) => (
             <FaStar key={i} className="text-black" />
           ))}
         </div>
 
-       
         <p
           className="text-[#4B4B4B] text-sm sm:text-base mt-2 ml-6"
           dangerouslySetInnerHTML={{ __html: `"${providers[currentIndex].quote}"` }}
         />
 
-      
         <div className="flex items-center gap-4 mt-4 ml-6">
           <img
             src={providers[currentIndex].image}
@@ -123,7 +125,6 @@ function Testimonials() {
           </div>
         </div>
 
-       
         <div className="flex gap-4 justify-center mt-4">
           {providers.map((_, idx) => (
             <button
@@ -131,7 +132,7 @@ function Testimonials() {
               onClick={() => setCurrentIndex(idx)}
               className={`rounded-full transition ${
                 idx === currentIndex
-                  ? "bg-[#01342A] w-10 h-3" 
+                  ? "bg-[#01342A] w-10 h-3"
                   : "bg-[#D9D9D9] w-5 h-3"
               }`}
             />
@@ -140,6 +141,6 @@ function Testimonials() {
       </div>
     </section>
   );
-}
+};
 
 export default Testimonials;

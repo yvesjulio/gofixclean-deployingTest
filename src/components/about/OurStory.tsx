@@ -4,7 +4,7 @@ const OurStory: React.FC = () => {
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <div className="space-y-6 text-center md:text-left">
 
-          <p className="inline-block bg-[#B1CDC8] text-brandText px-8 py-2 rounded-xl font-semibold tracking-widest text-sm">
+          <p className="inline-block bg-[#1ab89b] text-brandText px-8 py-2 rounded-xl font-semibold tracking-widest text-sm">
             Our Story
           </p>
 

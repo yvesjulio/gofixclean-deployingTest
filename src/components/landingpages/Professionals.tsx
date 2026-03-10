@@ -1,8 +1,18 @@
 import { FaUserGroup } from "react-icons/fa6";
 import { FiGift, FiArrowRight } from "react-icons/fi";
+import { ReactNode } from "react";
 
-function Professionals() {
-  const categories = [
+interface Category {
+  title: string;
+  description: string;
+  button: string;
+  icon: ReactNode;
+  bgColor: string;
+  showArrow: boolean;
+}
+
+const Professionals: React.FC = () => {
+  const categories: Category[] = [
     {
       title: "Looking for a service?",
       description:
@@ -19,7 +29,7 @@ function Professionals() {
       button: "Become a provider",
       icon: <FiGift className="text-2xl text-brandText" />,
       bgColor: "bg-[#B1CDC8]",
-      showArrow: false, 
+      showArrow: false,
     },
   ];
 
@@ -35,9 +45,21 @@ function Professionals() {
         </p>
       </div>
 
-    
       <div className="flex flex-wrap justify-center gap-4 mb-6 font-medium">
-        {["Gasabo","Kicukiro","Remera","Kimihurura","Kacyiru","Gisozi"].map((loc, i) => (
+        {["Gasabo", "Kicukiro", "Remera", "Kimihurura", "Kacyiru", "Gisozi"].map(
+          (loc: string, i: number) => (
+            <p
+              key={i}
+              className="w-full sm:w-auto px-6 py-2 bg-[#E5ECEA] text-brandText rounded-lg text-center"
+            >
+              {loc}
+            </p>
+          )
+        )}
+      </div>
+
+      <div className="flex flex-wrap justify-center gap-4 mb-6 font-medium">
+        {["Nyamirambo", "Kanombe", "Masaka"].map((loc: string, i: number) => (
           <p
             key={i}
             className="w-full sm:w-auto px-6 py-2 bg-[#E5ECEA] text-brandText rounded-lg text-center"
@@ -47,49 +69,38 @@ function Professionals() {
         ))}
       </div>
 
-      <div className="flex flex-wrap justify-center gap-4 mb-6 font-medium">
-        {["Nyamirambo","Kanombe","Masaka"].map((loc, i) => (
-          <p
-            key={i}
-            className="w-full sm:w-auto px-6 py-2 bg-[#E5ECEA] text-brandText rounded-lg text-center"
-          >
-            {loc}
-          </p>
-        ))}
+      <div className="text-center mt-12 mb-16">
+        <p className="text-sm sm:text-base text-brandText font-bold cursor-pointer hover:underline">
+          Find service near you
+        </p>
       </div>
 
-    <div className="text-center mt-12 mb-16">
-  <p className="text-sm sm:text-base text-brandText font-bold cursor-pointer hover:underline">
-    Find service near you
-  </p>
-</div>
-
-
-
-      <div className="grid grid-cols-1 md:grid-cols-2  gap-y-6 gap-x-12">
-        {categories.map((cat, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+        {categories.map((cat: Category, index: number) => (
           <div
             key={index}
             className={`rounded-lg border p-6 transition cursor-pointer ${
-              index === 0 ? "bg-brandText text-white border-brandText" : "bg-white border-brandText/30"
+              index === 0
+                ? "bg-brandText text-white border-brandText"
+                : "bg-white border-brandText/30"
             }`}
           >
-           
             <div
               className={`w-12 h-12 flex items-center justify-center rounded-lg mb-4 ${cat.bgColor}`}
             >
               {cat.icon}
             </div>
 
-          
             <h3 className="font-bold text-2xl mb-2">{cat.title}</h3>
 
-          
-            <p className={`text-sm mb-4 ${index === 0 ? "text-[#C5C5C5]" : "text-gray-400"} wrap-break-word`}>
+            <p
+              className={`text-sm mb-4 ${
+                index === 0 ? "text-[#C5C5C5]" : "text-gray-400"
+              } wrap-break-word`}
+            >
               {cat.description}
             </p>
 
-          
             <button
               className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm ${
                 cat.showArrow
@@ -97,13 +108,14 @@ function Professionals() {
                   : "border border-brandText text-brandText hover:bg-brandText hover:text-white"
               }`}
             >
-              {cat.button} {cat.showArrow && <FiArrowRight />}
+              {cat.button}
+              {cat.showArrow && <FiArrowRight />}
             </button>
           </div>
         ))}
       </div>
     </section>
   );
-}
+};
 
 export default Professionals;
