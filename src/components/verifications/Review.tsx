@@ -11,17 +11,16 @@ function Review({ onBack }: ReviewProps) {
       </div>
       
       <div className="space-y-6">
-        {/* Add your review content here */}
         
         <div className="flex justify-between pt-4">
-          <button 
-            onClick={onBack}
-            className="bg-gray-500 text-white py-2 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300"
+           <button 
+          onClick={onBack}
+          className="bg-gray-200 text-gray-700 py-2 px-6 rounded-lg font-medium border border-gray-300 hover:bg-brandOrange hover:text-white transition-all duration-300 text-sm"
           >
-            Back
-          </button>
+          Back
+         </button>
           <button 
-            className="bg-green-600 text-white py-2 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300 hover:scale-[1.02] text-sm"
+            className="bg-brandText text-white py-2 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300 hover:scale-[1.02] text-sm"
           >
             Submit for Verification
           </button>

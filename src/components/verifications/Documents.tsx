@@ -15,12 +15,13 @@ function Documents({ onNext, onBack }: DocumentsProps) {
        
         
         <div className="flex justify-between pt-4">
-          <button 
-            onClick={onBack}
-            className="bg-gray-500 text-white py-2 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300"
-          >
-            Back
-          </button>
+        
+         <button 
+  onClick={onBack}
+  className="bg-gray-200 text-gray-700 py-2 px-6 rounded-lg font-medium border border-gray-300 hover:bg-brandOrange hover:text-white transition-all duration-300 text-sm"
+>
+  Back
+</button>
           <button 
             onClick={onNext}
             className="bg-brandText text-white py-2 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300 hover:scale-[1.02] text-sm"

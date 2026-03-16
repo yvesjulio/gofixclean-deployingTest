@@ -38,7 +38,6 @@ const Navbar: React.FC = () => {
   const handleLanguageChange = (language: Language) => {
     setCurrentLanguage(language);
     setLanguageOpen(false);
-    // Here you would implement actual language change logic
     console.log(`Language changed to: ${language.name}`);
   };
 
@@ -64,7 +63,7 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-6">
-          {/* Language Dropdown */}
+         
           <div className="relative">
             <div
               className="flex items-center gap-2 text-sm px-3 py-2 rounded-xl hover:bg-brandOrange hover:text-white cursor-pointer transition-colors"

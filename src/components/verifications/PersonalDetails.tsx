@@ -1,4 +1,4 @@
-import { FaCheck } from "react-icons/fa";
+import { GrStatusGood } from "react-icons/gr";
 
 interface PersonalDetailsProps {
   currentStep: 'personal' | 'documents' | 'review';
@@ -9,26 +9,25 @@ interface PersonalDetailsProps {
 function PersonalDetails({ currentStep, completedSteps, onStepClick }: PersonalDetailsProps) {
   const getStepStyle = (step: 'personal' | 'documents' | 'review') => {
     if (completedSteps.has(step)) {
-      return 'bg-green-500 text-white'; // Completed step - green with checkmark
+      return 'bg-brandText text-white'; 
     }
     if (currentStep === step) {
-      return 'bg-brandText text-white'; // Current step - brand color
+      return 'bg-brandText text-white'; 
     }
-    return 'bg-[#DFE7E5] text-brandText'; // Future step - light gray
+    return 'bg-[#DFE7E5] text-brandText'; 
   };
 
   const getStepContent = (step: 'personal' | 'documents' | 'review', stepNumber: string) => {
     if (completedSteps.has(step)) {
-      return <FaCheck className="text-sm" />; // Show checkmark for completed steps
+      return <GrStatusGood className="text-2xl" />; 
     }
-    return stepNumber; // Show number for incomplete steps
+    return stepNumber; 
   };
 
   return (
     <div>
       <section className="bg-white text-gray-700 px-6 md:px-9 max-w-3xl mx-auto pb-8 pt-8">
         <div className="flex items-center justify-between gap-4 w-full">
-          {/* Personal Info - Clickable */}
           <div 
             className="flex items-center gap-3 shrink-0 cursor-pointer"
             onClick={() => onStepClick('personal')}
@@ -47,7 +46,7 @@ function PersonalDetails({ currentStep, completedSteps, onStepClick }: PersonalD
           
           <div className="flex-1 h-px bg-gray-300 min-w-5"></div>
           
-          {/* Documents - Clickable */}
+
           <div 
             className="flex items-center gap-3 shrink-0 cursor-pointer"
             onClick={() => onStepClick('documents')}
@@ -66,7 +65,6 @@ function PersonalDetails({ currentStep, completedSteps, onStepClick }: PersonalD
 
           <div className="flex-1 h-px bg-gray-300 min-w-5"></div>
           
-          {/* Review - Clickable */}
           <div 
             className="flex items-center gap-3 shrink-0 cursor-pointer"
             onClick={() => onStepClick('review')}

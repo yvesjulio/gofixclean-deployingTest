@@ -114,7 +114,7 @@ const Testimonials: React.FC = () => {
         </p>
       </div>
 
-      <div className="relative px-6 py-6 bg-[#E6EFED] rounded-xl max-w-5xl mx-auto flex flex-col gap-4 shadow-lg min-h-[400px]">
+      <div className="relative px-6 py-6 bg-[#E6EFED] rounded-xl max-w-5xl mx-auto flex flex-col gap-4 shadow-lg min-h-100">
 
         <button
           onClick={prevTestimonial}

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface PersonalInfoProps {
   onNext: () => void;
+  onBack?: () => void; 
 }
 
 interface FormData {
@@ -24,28 +25,44 @@ interface FormErrors {
   aboutYou?: string;
 }
 
-function PersonalInfo({ onNext }: PersonalInfoProps) {
+function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
   const [showOtherService, setShowOtherService] = useState(false);
   const [selectedService, setSelectedService] = useState("");
-  const [formData, setFormData] = useState<FormData>({
-    fullLegalName: "",
-    phoneNumber: "",
-    residentialAddress: "",
-    nin: "",
-    serviceType: "",
-    otherService: "",
-    aboutYou: ""
+  const [formData, setFormData] = useState<FormData>(() => {
+    const savedData = localStorage.getItem('personalInfoFormData');
+    return savedData ? JSON.parse(savedData) : {
+      fullLegalName: "",
+      phoneNumber: "",
+      residentialAddress: "",
+      nin: "",
+      serviceType: "",
+      otherService: "",
+      aboutYou: ""
+    };
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  
+  useEffect(() => {
+    localStorage.setItem('personalInfoFormData', JSON.stringify(formData));
+  }, [formData]);
+
+ 
+  useEffect(() => {
+    if (formData.serviceType) {
+      setSelectedService(formData.serviceType);
+      setShowOtherService(formData.serviceType === "other");
+    }
+  }, []);
 
   const handleServiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedService(value);
     setShowOtherService(value === "other");
-    setFormData({ ...formData, serviceType: value });
+    setFormData({ ...formData, serviceType: value, otherService: value === "other" ? formData.otherService : "" });
     
-    // Clear service type error if value is selected
+  
     if (errors.serviceType) {
       setErrors({ ...errors, serviceType: undefined });
     }
@@ -55,7 +72,7 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     
-    // Clear error for this field when user types
+   
     if (errors[name as keyof FormErrors]) {
       setErrors({ ...errors, [name]: undefined });
     }
@@ -68,36 +85,34 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    // Validate Full Legal Name
     if (!formData.fullLegalName.trim()) {
       newErrors.fullLegalName = "Full legal name is required";
     }
 
-    // Validate Phone Number
+
     if (!formData.phoneNumber.trim()) {
       newErrors.phoneNumber = "Phone number is required";
     } else if (!/^\+?[0-9\s]{10,}$/.test(formData.phoneNumber)) {
       newErrors.phoneNumber = "Please enter a valid phone number";
     }
 
-    // Validate Residential Address
+
     if (!formData.residentialAddress.trim()) {
       newErrors.residentialAddress = "Residential address is required";
     }
 
-    // Validate NIN
     if (!formData.nin.trim()) {
       newErrors.nin = "NIN is required";
     }
 
-    // Validate Service Type
+
     if (!formData.serviceType) {
       newErrors.serviceType = "Please select a service type";
     } else if (formData.serviceType === "other" && !formData.otherService.trim()) {
       newErrors.otherService = "Please specify your service";
     }
 
-    // Validate About You
+    
     if (!formData.aboutYou.trim()) {
       newErrors.aboutYou = "Please tell us about your skills and experience";
     } else if (formData.aboutYou.length < 20) {
@@ -109,7 +124,7 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
   };
 
   const handleContinue = () => {
-    // Mark all fields as touched to show errors
+    
     const allFields = ['fullLegalName', 'phoneNumber', 'residentialAddress', 'nin', 'serviceType', 'aboutYou'];
     const touchedFields = allFields.reduce((acc, field) => ({ ...acc, [field]: true }), {});
     if (showOtherService) {
@@ -117,12 +132,20 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
     }
     setTouched(touchedFields);
 
-    // Validate form
+    
     if (validateForm()) {
-      onNext(); // Only proceed if form is valid
+      onNext(); 
     } else {
-      // Scroll to top to show errors
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const firstErrorField = document.querySelector('.border-red-500');
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
     }
   };
 
@@ -134,7 +157,6 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
       </div>
       
       <div className="space-y-6">
-        {/* Full Legal Name and Phone Number - Flex Row */}
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 space-y-2">
             <label className="text-sm font-medium text-gray-700 block">
@@ -176,8 +198,6 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
             )}
           </div>
         </div>
-
-        {/* Residential Address */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 block">
             Residential Address <span className="text-red-500">*</span>
@@ -197,8 +217,6 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
             <p className="text-red-500 text-xs mt-1">{errors.residentialAddress}</p>
           )}
         </div>
-
-        {/* NIN */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 block">
             NIN (National ID Number) <span className="text-red-500">*</span>
@@ -218,8 +236,6 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
             <p className="text-red-500 text-xs mt-1">{errors.nin}</p>
           )}
         </div>
-
-        {/* Service Type */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 block">
             Service Type <span className="text-red-500">*</span>
@@ -246,7 +262,6 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
             <p className="text-red-500 text-xs mt-1">{errors.serviceType}</p>
           )}
 
-          {/* Other Service Input - appears when "Other" is selected */}
           {showOtherService && (
             <div className="mt-3">
               <input
@@ -267,7 +282,6 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
           )}
         </div>
 
-        {/* About You */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 block">
             About You <span className="text-red-500">*</span>
@@ -288,20 +302,19 @@ function PersonalInfo({ onNext }: PersonalInfoProps) {
           )}
         </div>
 
-        {/* Error Summary */}
-        {Object.keys(errors).length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-600 text-sm font-medium">
-              Please fix the errors above before continuing.
-            </p>
-          </div>
-        )}
-
-        {/* Continue Button */}
-        <div className="flex justify-end pt-4">
+    
+        <div className="flex justify-between pt-4">
+          {onBack && (
+          <button 
+          onClick={handleBack}
+         className="bg-transparent text-gray-700 py-2 px-6 rounded-lg font-medium border border-gray-300 hover:border-brandOrange hover:text-brandOrange transition-all duration-300 text-sm"
+        >
+       Back
+       </button>
+          )}
           <button 
             onClick={handleContinue}
-            className="bg-brandText text-white py-2 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300 hover:scale-[1.02] text-sm"
+            className="bg-brandText text-white py-2 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300 hover:scale-[1.02] text-sm ml-auto"
           >
             Continue to documents
           </button>
