@@ -7,13 +7,40 @@ interface LinkClassProps {
   isActive: boolean;
 }
 
+type Language = {
+  code: string;
+  flag: string;
+  name: string;
+  nativeName: string;
+};
+
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [languageOpen, setLanguageOpen] = useState<boolean>(false);
+  const [currentLanguage, setCurrentLanguage] = useState<Language>({
+    code: "US",
+    flag: "🇺🇸",
+    name: "English",
+    nativeName: "English"
+  });
+
+  const languages: Language[] = [
+    { code: "US", flag: "🇺🇸", name: "English", nativeName: "English" },
+    { code: "FR", flag: "🇫🇷", name: "Français", nativeName: "Français" },
+    { code: "RW", flag: "🇷🇼", name: "Kinyarwanda", nativeName: "Kinyarwanda" }
+  ];
 
   const linkClass = ({ isActive }: LinkClassProps): string =>
     isActive
       ? "text-brandOrange font-semibold"
       : "text-brandText hover:text-brandOrange transition";
+
+  const handleLanguageChange = (language: Language) => {
+    setCurrentLanguage(language);
+    setLanguageOpen(false);
+    // Here you would implement actual language change logic
+    console.log(`Language changed to: ${language.name}`);
+  };
 
   return (
     <>
@@ -37,9 +64,40 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-6">
-          <div className="flex items-center gap-2 text-sm px-3 py-2 hover:text-white rounded-xl hover:bg-brandOrange cursor-pointer">
-            <TfiWorld className="text-sm" />
-            <span>ENG</span>
+          {/* Language Dropdown */}
+          <div className="relative">
+            <div
+              className="flex items-center gap-2 text-sm px-3 py-2 rounded-xl hover:bg-brandOrange hover:text-white cursor-pointer transition-colors"
+              onClick={() => setLanguageOpen(!languageOpen)}
+            >
+              <TfiWorld className="text-sm" />
+              <span>{currentLanguage.code}</span>
+            </div>
+
+            {languageOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setLanguageOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-200">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      className={`w-full flex items-center gap-3 px-3 py-1.5 transition-colors rounded-md ${
+                        currentLanguage.code === lang.code
+                          ? "text-brandOrange font-medium hover:bg-brandOrange hover:text-white"
+                          : "text-gray-700 hover:bg-brandOrange hover:text-white"
+                      }`}
+                      onClick={() => handleLanguageChange(lang)}
+                    >
+                      <span className="text-sm w-5 text-center">{lang.flag}</span>
+                      <span className="text-sm">{lang.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           <NavLink
@@ -80,15 +138,47 @@ const Navbar: React.FC = () => {
         </div>
       </nav>
 
+
       <div
         className={`md:hidden fixed top-16 left-0 w-full bg-white z-40 transition-transform duration-300 shadow-lg ${
           menuOpen ? "translate-y-0" : "-translate-y-full"
         }`}
       >
         <div className="px-6 py-6 text-brandText space-y-6">
-          <div className="flex items-center gap-2 font-medium">
-            <TfiWorld className="text-lg" />
-            <span>ENG</span>
+          
+          <div className="space-y-3">
+            <div
+              className="flex items-center justify-between gap-2 font-medium cursor-pointer"
+              onClick={() => setLanguageOpen(!languageOpen)}
+            >
+              <div className="flex items-center gap-2">
+                <TfiWorld className="text-lg" />
+                <span>{currentLanguage.code}</span>
+              </div>
+              <span className="text-xs">{languageOpen ? "▲" : "▼"}</span>
+            </div>
+
+            {languageOpen && (
+              <div className="space-y-1">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    className={`w-full flex items-center gap-3 py-2 px-3 rounded-md transition-colors ${
+                      currentLanguage.code === lang.code
+                        ? "bg-brandOrange text-white"
+                        : "hover:bg-brandOrange hover:text-white"
+                    }`}
+                    onClick={() => {
+                      handleLanguageChange(lang);
+                      setMenuOpen(false);
+                    }}
+                  >
+                    <span className="text-base w-6 text-center">{lang.flag}</span>
+                    <span className="text-sm">{lang.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <hr />

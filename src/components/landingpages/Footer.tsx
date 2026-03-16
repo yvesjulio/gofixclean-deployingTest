@@ -6,11 +6,10 @@ import { CiLocationOn } from "react-icons/ci";
 import { CgMail } from "react-icons/cg";
 import { FiArrowUp } from "react-icons/fi";
 import { FaInstagram } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
+import { PiTiktokLogo } from "react-icons/pi";
 
 const Footer: React.FC = () => {
   const [showTopBtn, setShowTopBtn] = useState(false);
-
   const location = useLocation();
 
   useEffect(() => {
@@ -32,6 +31,13 @@ const Footer: React.FC = () => {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleNavClick = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   };
 
   return (
@@ -93,7 +99,7 @@ const Footer: React.FC = () => {
                 <SlSocialFacebook />
               </div>
               <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
-                <FaXTwitter />
+                <PiTiktokLogo/>
               </div>
               <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
                 <FaInstagram />
@@ -123,7 +129,7 @@ const Footer: React.FC = () => {
                   location.pathname === "/about" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
                 }`}
               >
-                <Link to="/about">About Us</Link>
+                <Link to="/about" onClick={handleNavClick}>About Us</Link>
               </li>
 
               <li
@@ -131,7 +137,7 @@ const Footer: React.FC = () => {
                   location.pathname === "/provider" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
                 }`}
               >
-                <Link to="/become-provider">Become a Provider</Link>
+                <Link to="/become-provider" onClick={handleNavClick}>Become a Provider</Link>
               </li>
 
               <li
@@ -139,7 +145,7 @@ const Footer: React.FC = () => {
                   location.pathname === "/blog" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
                 }`}
               >
-                <Link to="/blog">Blog</Link>
+                <Link to="/blog" onClick={handleNavClick}>Blog</Link>
               </li>
 
               <li
@@ -147,7 +153,7 @@ const Footer: React.FC = () => {
                   location.pathname === "/careers" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
                 }`}
               >
-                <Link to="/careers">Careers</Link>
+                <Link to="/careers" onClick={handleNavClick}>Careers</Link>
               </li>
 
               <li
@@ -155,7 +161,7 @@ const Footer: React.FC = () => {
                   location.pathname === "/contact" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
                 }`}
               >
-                <Link to="/contact">Contact</Link>
+                <Link to="/contact" onClick={handleNavClick}>Contact</Link>
               </li>
             </ul>
           </div>

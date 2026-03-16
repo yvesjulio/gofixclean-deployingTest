@@ -1,5 +1,6 @@
 import React from "react";
 import { FaArrowRight } from "react-icons/fa6";
+import { NavLink } from "react-router-dom";
 
 const Income: React.FC = () => {
   return (
@@ -13,7 +14,9 @@ const Income: React.FC = () => {
       </p>
        <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-12 mb-12">
        <button className="flex items-center gap-2 bg-brandOrange text-brandWhite px-6 py-3 rounded-md transition-all duration-300 ease-out hover:bg-[#e05e2e] hover:scale-[1.03]">
-       <span>Get started</span>
+       <NavLink to="/signup" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+       <span className="cursor-pointer">Get started</span>
+      </NavLink>
        <FaArrowRight />
        </button>
 

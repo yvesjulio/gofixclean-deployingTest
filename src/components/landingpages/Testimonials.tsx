@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaStar } from "react-icons/fa";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
@@ -28,7 +28,7 @@ const Testimonials: React.FC = () => {
         "https://plus.unsplash.com/premium_photo-1681493771936-7d76691184d9?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       rating: 4,
       quote:
-        "Excellent service! Quick response and very professional.<br/>Highly recommend GoFix&Clean.",
+         "I don't have time to search for home service providers<br/>GoFix&Clean makes it easy to find trusted cleaners and handymen<br/>Love the video call feature!",
     },
     {
       name: "Mark Smith",
@@ -39,18 +39,61 @@ const Testimonials: React.FC = () => {
       quote:
         "They made gardening so easy! Friendly staff and trustworthy providers.<br/>Will use again.",
     },
+    {
+      name: "Jane Doe",
+      job: "Electrical Specialist",
+      image:
+        "https://plus.unsplash.com/premium_photo-1681493771936-7d76691184d9?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      rating: 4,
+      quote:
+        "Excellent service! Quick response and very professional.<br/>Highly recommend GoFix&Clean.",
+    },
   ];
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const prevTestimonial = () => {
-    setCurrentIndex((prev: number) => Math.max(prev - 1, 0));
+ 
+  const clearAutoSlide = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
   };
 
+ 
+  const startAutoSlide = () => {
+    clearAutoSlide(); 
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex((prevIndex) =>
+        prevIndex === providers.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 4000);
+  };
+
+
+  useEffect(() => {
+    startAutoSlide();
+    return () => clearAutoSlide();
+  }, []);
+
   const nextTestimonial = () => {
-    setCurrentIndex((prev: number) =>
-      Math.min(prev + 1, providers.length - 1)
+    clearAutoSlide(); 
+    setCurrentIndex((prev) =>
+      prev === providers.length - 1 ? 0 : prev + 1
     );
+  };
+
+  const prevTestimonial = () => {
+    clearAutoSlide(); 
+    setCurrentIndex((prev) =>
+      prev === 0 ? providers.length - 1 : prev - 1
+    );
+  };
+
+  const handleIndicatorClick = (idx: number) => {
+    clearAutoSlide(); 
+    setCurrentIndex(idx);
   };
 
   return (
@@ -59,9 +102,11 @@ const Testimonials: React.FC = () => {
         <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-2xl bg-[#B1CDC8] font-medium text-[#01342A] mb-4">
           Testimonials
         </div>
+
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
           What Our Customers Say
         </h2>
+
         <p className="text-[#696969] text-sm">
           Don't just take our word for it. Here's what real customers have to
           <br />
@@ -69,29 +114,23 @@ const Testimonials: React.FC = () => {
         </p>
       </div>
 
-      <div className="relative px-6 py-6 bg-[#E6EFED] rounded-xl max-w-5xl mx-auto flex flex-col gap-4 shadow-lg">
+      <div className="relative px-6 py-6 bg-[#E6EFED] rounded-xl max-w-5xl mx-auto flex flex-col gap-4 shadow-lg min-h-[400px]">
+
         <button
           onClick={prevTestimonial}
-          disabled={currentIndex === 0}
-          className={`absolute -left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full shadow flex items-center justify-center transition ${
-            currentIndex === 0 ? "bg-gray-300" : "bg-[#ECECEC] hover:bg-brandOrange"
-          }`}
+          className="absolute -left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full shadow flex items-center justify-center bg-[#ECECEC] hover:bg-brandOrange transition"
         >
           <IoChevronBack size={24} />
         </button>
 
         <button
           onClick={nextTestimonial}
-          disabled={currentIndex === providers.length - 1}
-          className={`absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full shadow flex items-center justify-center transition ${
-            currentIndex === providers.length - 1
-              ? "bg-gray-300 hover:bg-brandOrange"
-              : "bg-[#ECECEC] hover:bg-brandOrange"
-          }`}
+          className="absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full shadow flex items-center justify-center bg-[#ECECEC] hover:bg-brandOrange transition"
         >
           <IoChevronForward size={24} />
         </button>
 
+       
         <div className="flex justify-start">
           <img
             src="/images/bet.png"
@@ -100,23 +139,33 @@ const Testimonials: React.FC = () => {
           />
         </div>
 
-        <div className="flex gap-1 text-2xl -mt-10 pl-7">
-          {Array.from({ length: providers[currentIndex].rating }).map((_, i) => (
-            <FaStar key={i} className="text-black" />
-          ))}
+       
+        <div className="relative">
+          <div className="flex gap-1 text-2xl absolute -top-8 left-7">
+            {Array.from({ length: providers[currentIndex].rating }).map((_, i) => (
+              <FaStar key={i} className="text-black" />
+            ))}
+          </div>
         </div>
 
-        <p
-          className="text-[#4B4B4B] text-sm sm:text-base mt-2 ml-6"
-          dangerouslySetInnerHTML={{ __html: `"${providers[currentIndex].quote}"` }}
-        />
+     
+        <div className="pt-4">
+          <p
+            className="text-[#4B4B4B] text-sm sm:text-base ml-6"
+            dangerouslySetInnerHTML={{
+              __html: `"${providers[currentIndex].quote}"`,
+            }}
+          />
+        </div>
 
+       
         <div className="flex items-center gap-4 mt-4 ml-6">
           <img
             src={providers[currentIndex].image}
             alt={providers[currentIndex].name}
             className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover"
           />
+
           <div>
             <h3 className="font-bold text-base sm:text-lg">
               {providers[currentIndex].name}
@@ -125,19 +174,21 @@ const Testimonials: React.FC = () => {
           </div>
         </div>
 
+       
         <div className="flex gap-4 justify-center mt-4">
           {providers.map((_, idx) => (
             <button
               key={idx}
-              onClick={() => setCurrentIndex(idx)}
+              onClick={() => handleIndicatorClick(idx)}
               className={`rounded-full transition ${
                 idx === currentIndex
                   ? "bg-[#01342A] w-10 h-3"
-                  : "bg-[#D9D9D9] w-5 h-3"
+                  : "bg-[#D9D9D9] w-3 h-3"
               }`}
             />
           ))}
         </div>
+
       </div>
     </section>
   );

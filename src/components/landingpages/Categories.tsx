@@ -2,6 +2,7 @@ import { TiArrowRight } from "react-icons/ti";
 import { FiTool, FiMonitor, FiShoppingCart } from "react-icons/fi";
 import { FaPaintBrush, FaTruck, FaLaptopCode } from "react-icons/fa";
 import { ReactElement } from "react";
+import { NavLink } from "react-router-dom";
 
 interface Category {
   title: string;
@@ -78,7 +79,9 @@ const Categories: React.FC = () => {
         </div>
 
         <div className="group flex items-center text-sm text-[#025E4C] font-medium cursor-pointer transition hover:text-[#158b74]">
+          <NavLink to="/services" className="cursor-pointer">
           <p>View all categories</p>
+          </NavLink>
           <TiArrowRight className="ml-1 text-lg transition-transform group-hover:translate-x-2" />
         </div>
       </div>

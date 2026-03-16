@@ -4,7 +4,8 @@ import Income from "../components/provider/Income";
 import JoinUs from "../components/provider/JoinUs";
 import Work from "../components/provider/Work";
 import Requirements from "../components/provider/Requirements";
-import Ready from "../components/provider/Ready";
+import ReadyEarn from "../components/provider/ReadyEarn";
+
 
 
 const BecomeProviderPage: React.FC = () => {
@@ -14,7 +15,7 @@ const BecomeProviderPage: React.FC = () => {
      <JoinUs/>
      <Work/>
      <Requirements/>
-     <Ready/>
+     <ReadyEarn/>
     </Layout>
 
   );

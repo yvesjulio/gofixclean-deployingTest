@@ -8,6 +8,7 @@ import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import ResetPassword from "./components/ResetPassword";
 import WhatsAppButton from "./components/WhatsAppButton";
+import ProviderVerification from "./pages/ProviderVerifications";
 
 function AppWrapper() {
   const location = useLocation();
@@ -25,14 +26,15 @@ function AppWrapper() {
           <Route path="/about" element={<AboutPage />} /> 
           <Route path="/become-provider" element={<BecomeProviderPage />} />
 
-          {/* Auth pages */}
+          
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/resetpassword" element={<ResetPassword />} />
+          <Route path="/provider-verifications" element={<ProviderVerification />} />
         </Routes>
       </div>
 
-      {/* Same WhatsApp button everywhere you want */}
+     
       {showWhatsApp && <WhatsAppButton />}
     </>
   );

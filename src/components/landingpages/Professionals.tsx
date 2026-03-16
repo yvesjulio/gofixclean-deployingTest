@@ -1,6 +1,7 @@
 import { FaUserGroup } from "react-icons/fa6";
 import { FiGift, FiArrowRight } from "react-icons/fi";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 
 interface Category {
   title: string;
@@ -9,9 +10,19 @@ interface Category {
   icon: ReactNode;
   bgColor: string;
   showArrow: boolean;
+  to: string;
 }
 
 const Professionals: React.FC = () => {
+  const location = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }, []);
+
   const categories: Category[] = [
     {
       title: "Looking for a service?",
@@ -21,6 +32,7 @@ const Professionals: React.FC = () => {
       icon: <FaUserGroup className="text-2xl text-[#E6EFED]" />,
       bgColor: "bg-[#357E70]",
       showArrow: true,
+      to: "/services",
     },
     {
       title: "Want to Offer Services?",
@@ -30,8 +42,17 @@ const Professionals: React.FC = () => {
       icon: <FiGift className="text-2xl text-brandText" />,
       bgColor: "bg-[#B1CDC8]",
       showArrow: false,
+      to: "/become-provider",
     },
   ];
+
+
+  const handleNavClick = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
 
   return (
     <section className="px-4 sm:px-6 md:px-16 py-16">
@@ -70,20 +91,34 @@ const Professionals: React.FC = () => {
       </div>
 
       <div className="text-center mt-12 mb-16">
-        <p className="text-sm sm:text-base text-brandText font-bold cursor-pointer hover:underline">
+        <NavLink 
+          to="/services" 
+          onClick={handleNavClick}
+          className={({ isActive }) => 
+            `text-sm sm:text-base text-brandText font-bold cursor-pointer hover:underline inline-block ${
+              isActive ? 'underline' : ''
+            }`
+          }
+        >
           Find service near you
-        </p>
+        </NavLink>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
         {categories.map((cat: Category, index: number) => (
-          <div
+          <NavLink
             key={index}
-            className={`rounded-lg border p-6 transition cursor-pointer ${
-              index === 0
-                ? "bg-brandText text-white border-brandText"
-                : "bg-white border-brandText/30"
-            }`}
+            to={cat.to}
+            onClick={handleNavClick}
+            className={({ isActive }) => 
+              `rounded-lg border p-6 transition-all duration-300 cursor-pointer block ${
+                index === 0
+                  ? "bg-brandText text-white border-brandText"
+                  : "bg-white border-brandText/30"
+              } ${
+                isActive ? 'ring-2 ring-[#01342A] ring-offset-2' : ''
+              } hover:shadow-lg transform hover:-translate-y-1`
+            }
           >
             <div
               className={`w-12 h-12 flex items-center justify-center rounded-lg mb-4 ${cat.bgColor}`}
@@ -101,17 +136,17 @@ const Professionals: React.FC = () => {
               {cat.description}
             </p>
 
-            <button
-              className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm ${
+            <div
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm ${
                 cat.showArrow
                   ? "bg-brandOrange text-white hover:bg-brandOrange/90"
                   : "border border-brandText text-brandText hover:bg-brandText hover:text-white"
-              }`}
+              } transition-colors duration-300`}
             >
               {cat.button}
               {cat.showArrow && <FiArrowRight />}
-            </button>
-          </div>
+            </div>
+          </NavLink>
         ))}
       </div>
     </section>
