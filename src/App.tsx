@@ -9,33 +9,32 @@ import SignUp from "./components/SignUp";
 import ResetPassword from "./components/ResetPassword";
 import WhatsAppButton from "./components/WhatsAppButton";
 import ProviderVerification from "./pages/ProviderVerifications";
+import Footer from "./components/landingpages/Footer";
 
 function AppWrapper() {
   const location = useLocation();
-  const noNavbarPaths = ["/signin", "/signup", "/resetpassword"];
-  const showWhatsApp = noNavbarPaths.includes(location.pathname);
+  const authPaths = ["/signin", "/signup", "/resetpassword"];
+  const showNavbarAndFooter = !authPaths.includes(location.pathname);
 
   return (
     <>
-      {!noNavbarPaths.includes(location.pathname) && <Navbar />}
+      {showNavbarAndFooter && <Navbar />}
 
-      <div className={noNavbarPaths.includes(location.pathname) ? "" : "pt-16"}>
+      <div className={showNavbarAndFooter ? "pt-16" : ""}>
         <Routes>
           <Route path="/" element={<Landingpage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/about" element={<AboutPage />} /> 
           <Route path="/become-provider" element={<BecomeProviderPage />} />
-
-          
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/resetpassword" element={<ResetPassword />} />
           <Route path="/provider-verifications" element={<ProviderVerification />} />
         </Routes>
       </div>
-
-     
-      {showWhatsApp && <WhatsAppButton />}
+      {showNavbarAndFooter && <Footer />}
+      
+      <WhatsAppButton />
     </>
   );
 }

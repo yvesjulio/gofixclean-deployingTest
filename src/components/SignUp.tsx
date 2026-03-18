@@ -41,10 +41,7 @@ const SignUp: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
-    }
-
+    
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!validateEmail(formData.email)) {
@@ -92,6 +89,14 @@ const SignUp: React.FC = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
+    
+    
+    const allTouched: Record<string, boolean> = {
+      email: true,
+      password: true,
+      confirmPassword: true
+    };
+    setTouched(allTouched);
     
     if (validateForm()) {
       navigate("/provider-verifications");
