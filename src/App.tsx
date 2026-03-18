@@ -10,11 +10,13 @@ import ResetPassword from "./components/ResetPassword";
 import WhatsAppButton from "./components/WhatsAppButton";
 import ProviderVerification from "./pages/ProviderVerifications";
 import Footer from "./components/landingpages/Footer";
+import DashboardPages from "./pages/DashboardPages";
 
 function AppWrapper() {
   const location = useLocation();
   const authPaths = ["/signin", "/signup", "/resetpassword"];
-  const showNavbarAndFooter = !authPaths.includes(location.pathname);
+  const noLayoutPaths = ["/dashboard", ...authPaths];
+  const showNavbarAndFooter = !noLayoutPaths.includes(location.pathname);
 
   return (
     <>
@@ -30,11 +32,13 @@ function AppWrapper() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/resetpassword" element={<ResetPassword />} />
           <Route path="/provider-verifications" element={<ProviderVerification />} />
+          <Route path="/dashboard" element={<DashboardPages />} />
         </Routes>
       </div>
+      
       {showNavbarAndFooter && <Footer />}
       
-      <WhatsAppButton />
+      {location.pathname !== "/dashboard" && <WhatsAppButton />}
     </>
   );
 }
