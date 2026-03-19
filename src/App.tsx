@@ -9,7 +9,6 @@ import SignUp from "./components/SignUp";
 import ResetPassword from "./components/ResetPassword";
 import WhatsAppButton from "./components/WhatsAppButton";
 import ProviderVerification from "./pages/ProviderVerifications";
-import Footer from "./components/landingpages/Footer";
 import DashboardPages from "./pages/DashboardPages";
 
 function AppWrapper() {
@@ -36,7 +35,7 @@ function AppWrapper() {
         </Routes>
       </div>
       
-      {showNavbarAndFooter && <Footer />}
+  
       
       {location.pathname !== "/dashboard" && <WhatsAppButton />}
     </>

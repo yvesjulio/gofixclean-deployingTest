@@ -4,6 +4,7 @@ import Verification from "../components/verifications/Verification";
 import PersonalInfo from "../components/verifications/PersonalInfo";
 import Documents from "../components/verifications/Documents";
 import Review from "../components/verifications/Review";
+import Footer from "../components/landingpages/Footer";
 
 type Step = 'personal' | 'documents' | 'review';
 
@@ -52,8 +53,43 @@ function ProviderVerifications() {
           <Review onBack={() => handleBack('documents')} />
         )}
       </div>
+
+     
+      <a
+        href="https://wa.me/250791692126"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          zIndex: 50,
+          width: "60px",
+          height: "60px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          animation: "forwardBackward 1.5s ease-in-out infinite",
+        }}
+      >
+        <img src="/images/whatsapp.png" alt="WhatsApp" className="h-10 w-10" />
+      </a>
+
+      <style>
+        {`
+          @keyframes forwardBackward {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+          }
+        `}
+      </style>
+
+    
+      <Footer />
     </div>
   );
 }
 
 export default ProviderVerifications;
+
+

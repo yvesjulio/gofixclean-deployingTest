@@ -2,6 +2,7 @@ import { TiArrowRight } from "react-icons/ti";
 import { FaStar } from "react-icons/fa";
 import { GrStatusGood } from "react-icons/gr";
 import { IoLocationOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 interface Provider {
   name: string;
@@ -15,6 +16,8 @@ interface Provider {
 }
 
 const Rated: React.FC = () => {
+  const navigate = useNavigate();
+
   const providers: Provider[] = [
     {
       name: "John Dril",
@@ -51,6 +54,15 @@ const Rated: React.FC = () => {
     },
   ];
 
+  const handleViewAllClick = (): void => {
+    navigate('/services');
+  
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
   return (
     <section className="bg-[#DFE7E5] min-h-screen flex flex-col px-4 sm:px-6 md:px-16 py-10 md:py-16">
       
@@ -70,12 +82,23 @@ const Rated: React.FC = () => {
           </p>
         </div>
 
-        <div className="group flex items-center text-sm sm:text-base text-brandText font-medium cursor-pointer hover:underline">
+        <div 
+          onClick={handleViewAllClick}
+          className="group flex items-center text-sm sm:text-base text-brandText font-medium cursor-pointer hover:underline"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleViewAllClick();
+            }
+          }}
+        >
           <span>View all providers</span>
           <TiArrowRight className="ml-1 text-lg transition-transform duration-300 group-hover:translate-x-2" />
         </div>
       </div>
 
+    
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {providers.map((person, index) => (
           <div
