@@ -2,7 +2,7 @@ import { useState, FormEvent, ChangeEvent } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { FaArrowRightLong } from "react-icons/fa6";
+import { FaArrowLeftLong } from "react-icons/fa6"; 
 
 interface FormData {
   fullName: string;
@@ -42,7 +42,6 @@ const SignUp: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!validateEmail(formData.email)) {
@@ -72,7 +71,6 @@ const SignUp: React.FC = () => {
       [name]: value
     }));
 
-   
     if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({
         ...prev,
@@ -90,7 +88,6 @@ const SignUp: React.FC = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    
     
     const allTouched: Record<string, boolean> = {
       email: true,
@@ -115,14 +112,17 @@ const SignUp: React.FC = () => {
           className="absolute inset-0 w-full h-full object-cover"
         />
 
+      
         <button
           type="button"
           onClick={() => navigate("/")}
-          className="absolute top-4 right-4 md:top-4 md:right-8 text-white hover:text-brandOrange transition-colors"
+          className="absolute top-4 left-4 md:top-4 md:left-8 text-white hover:text-brandOrange transition-colors"
         >
-          < FaArrowRightLong  size={24} />
+          <FaArrowLeftLong size={24} />
         </button>
       </div>
+
+      
       <div className="flex-1 bg-[#EAEFEE] text-gray-700 flex items-center justify-center p-4 md:p-8">
         <div className="w-full max-w-md flex flex-col gap-2">
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaStar } from "react-icons/fa6";
 import { GrStatusGood } from "react-icons/gr";
 import { 
@@ -23,6 +23,8 @@ interface SidebarProps {
   userAvatar?: string;
   onLogout?: () => void;
   onNavigate?: (path: string) => void;
+  onSectionChange?: (section: string) => void;
+  activeSection?: string; 
   isOpen?: boolean;
   onToggle?: () => void;
 }
@@ -43,11 +45,30 @@ const Sidebar: React.FC<SidebarProps> = ({
   userAvatar = "https://images.unsplash.com/photo-1696505523865-84c7c9372901?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   onLogout = () => console.log('Logout clicked'),
   onNavigate = (path) => console.log(`Navigate to: ${path}`),
+  onSectionChange,
+  activeSection = 'Overview', 
   isOpen = true,
   onToggle
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState('overview');
+
+  
+  useEffect(() => {
+    const sectionToId: { [key: string]: string } = {
+      'Overview': 'overview',
+      'Jobs': 'jobs',
+      'Reviews': 'reviews',
+      'Earnings': 'earnings',
+      'Analytics': 'analytics',
+      'Notifications': 'notifications',
+      'Availability': 'availability',
+      'Settings': 'settings'
+    };
+    
+    const newActiveItem = sectionToId[activeSection] || 'overview';
+    setActiveItem(newActiveItem);
+  }, [activeSection]);
 
   const navItems: NavItem[] = [
     { id: 'overview', label: 'Overview', icon: <FiHome />, path: '/provider/dashboard' },
@@ -63,6 +84,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleNavClick = (item: NavItem) => {
     setActiveItem(item.id);
     onNavigate(item.path);
+    if (onSectionChange) {
+      onSectionChange(item.label);
+    }
     setIsMobileMenuOpen(false);
   };
 
@@ -76,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
       </button>
 
-     
+      
       {isMobileMenuOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
@@ -84,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-    
+     
       <aside
         className={`
           fixed top-0 left-0 h-screen bg-white z-50
@@ -96,6 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         `}
       >
         <div className="flex flex-col h-full">
+         
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               {isOpen ? (
@@ -156,11 +181,12 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
 
-          
+         
           <div className={`px-6 pt-4 pb-1 ${!isOpen && 'lg:px-3'}`}>
             {isOpen && <span className="text-xs text-gray-600 tracking-wider">Dashboard</span>}
           </div>
           
+         
           <div className={`flex-1 ${!isOpen ? 'lg:px-2' : 'lg:px-3'}`}>
             <nav className="py-2">
               <ul className="space-y-0.5">

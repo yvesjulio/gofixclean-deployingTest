@@ -8,13 +8,14 @@ import ReviewsDashboard from '../components/dashboard/ReviewsDashboard';
 import EarningsDashboard from '../components/dashboard/EarningDashboard';
 import AnalyticsDashboard from '../components/dashboard/AnalyticsDashboard';
 import AvailabilityDashboard from '../components/dashboard/AvailabilityDashboard';
-// import NotificationsDashboard from '../components/dashboard/NotificationsDashboard'; 
+import NotificationsDashboard from '../components/dashboard/NotificationsDashboard'; 
 import SettingsDashboard from '../components/dashboard/SettingsDashboard';
 
 function DashboardPages() {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentPage, setCurrentPage] = useState('overview');
+  const [activeSection, setActiveSection] = useState('Overview');
 
   const [userData] = useState({
     userName: "Jean Baptiste",
@@ -34,23 +35,36 @@ function DashboardPages() {
       return;
     }
 
+  
     if (path.includes('dashboard') || path.includes('overview')) {
       setCurrentPage('overview');
+      setActiveSection('Overview');
     } else if (path.includes('jobs')) {
       setCurrentPage('jobs');
+      setActiveSection('Jobs');
     } else if (path.includes('reviews')) {
       setCurrentPage('reviews');
+      setActiveSection('Reviews');
     } else if (path.includes('earnings')) {
       setCurrentPage('earnings');
+      setActiveSection('Earnings');
     } else if (path.includes('analytics')) {
       setCurrentPage('analytics');
+      setActiveSection('Analytics');
     } else if (path.includes('notifications')) {
       setCurrentPage('notifications');
+      setActiveSection('Notifications');
     } else if (path.includes('availability')) {
       setCurrentPage('availability');
+      setActiveSection('Availability');
     } else if (path.includes('settings')) {
       setCurrentPage('settings');
+      setActiveSection('Settings');
     }
+  };
+
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
   };
 
   const handleLogout = () => {
@@ -71,8 +85,8 @@ function DashboardPages() {
         return <EarningsDashboard userName={userData.userName} onNavigate={handleNavigate} />;
       case 'analytics':
         return <AnalyticsDashboard userName={userData.userName} onNavigate={handleNavigate} />;
-      // case 'notifications':
-      //   return <NotificationsDashboard userName={userData.userName} onNavigate={handleNavigate} />;
+      case 'notifications':
+        return <NotificationsDashboard userName={userData.userName} onNavigate={handleNavigate} />;
       case 'availability':
         return <AvailabilityDashboard userName={userData.userName} onNavigate={handleNavigate} />;
       case 'settings':
@@ -92,6 +106,8 @@ function DashboardPages() {
         userAvatar={userData.userAvatar}
         onLogout={handleLogout}
         onNavigate={handleNavigate}
+        onSectionChange={handleSectionChange}
+        activeSection={activeSection}
         isOpen={isSidebarOpen}
         onToggle={toggleSidebar}
       />
@@ -103,6 +119,7 @@ function DashboardPages() {
           userType={userData.userType}
           onToggleSidebar={toggleSidebar}
           isSidebarOpen={isSidebarOpen}
+          activeSection={activeSection}
         >
           {renderPage()}
         </Overview>

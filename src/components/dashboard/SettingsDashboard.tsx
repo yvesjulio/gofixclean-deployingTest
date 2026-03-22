@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { FiUser, FiBell, FiShield, FiGlobe, FiCamera, FiSave } from 'react-icons/fi';
 
+
 type TabType = 'personal' | 'notifications' | 'security' | 'language';
+
+interface Language {
+  code: string;
+  name: string;
+}
 
 function SettingsDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('personal');
+  const [languageOpen, setLanguageOpen] = useState(false); 
   const [formData, setFormData] = useState({
     fullName: 'Jean Baptiste',
     email: 'jean@example.com',
@@ -22,6 +29,17 @@ function SettingsDashboard() {
     reviewAlerts: true,
     promotionalEmails: false
   });
+
+  const [currentLanguage, setCurrentLanguage] = useState<Language>({
+    code: 'English',
+    name: 'English'
+  });
+
+  const languages: Language[] = [
+    { code: 'English', name: 'English' },
+    { code: 'Francais', name: 'Francais' },
+    { code: 'Kinyarwanda', name: 'Kinyarwanda' },
+  ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -46,13 +64,17 @@ function SettingsDashboard() {
     console.log('Upload photo clicked');
   };
 
+  const handleLanguageChange = (lang: Language) => {
+    setCurrentLanguage(lang);
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'personal':
         return (
-          <div className="bg-white rounded-xl p-8 border border-gray-200">
+          <div className="bg-white rounded-xl p-8 border border-gray-300">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Personal Information</h2>
-            <p className="text-gray-600 mb-8">Update your personal details</p>
+            <p className="text-gray-500 text-sm mb-8">Update your personal details</p>
 
           
             <div className="flex items-center gap-4 mb-8">
@@ -64,13 +86,13 @@ function SettingsDashboard() {
                 />
                 <button
                   onClick={handlePhotoUpload}
-                  className="absolute bottom-0 right-0 p-1.5 bg-white rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                  className="absolute bottom-0 right-0 p-1.5 bg-gray-200 text-sm rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
                 >
                   <FiCamera className="w-4 h-4 text-gray-600" />
                 </button>
               </div>
               <div>
-                <p className="font-semibold text-gray-900">Profile Photo</p>
+                <p className=" text-gray-800 text-sm">Profile Photo</p>
                 <p className="text-sm text-gray-500">JPG, PNG or GIF. Max 2MB.</p>
               </div>
             </div>
@@ -78,7 +100,7 @@ function SettingsDashboard() {
           
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brandText mb-2">
                   Full Name
                 </label>
                 <input
@@ -86,13 +108,13 @@ function SettingsDashboard() {
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
+                  className="w-full h-10 text-sm px-4 text-brandText py-3 bg-gray-200 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
                 />
               </div>
 
              
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brandText mb-2">
                   Email
                 </label>
                 <input
@@ -100,13 +122,13 @@ function SettingsDashboard() {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
+                  className="w-full px-4 py-3 h-10 text-sm text-brandText bg-gray-200 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
                 />
               </div>
 
           
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brandText mb-2">
                   Phone
                 </label>
                 <input
@@ -114,13 +136,13 @@ function SettingsDashboard() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
+                  className="w-full px-4 py-3 h-10 text-sm text-brandText bg-gray-200 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
                 />
               </div>
 
              
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-brandText mb-2">
                   Location
                 </label>
                 <input
@@ -128,14 +150,14 @@ function SettingsDashboard() {
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
+                  className="w-full px-4 py-3 h-10 text-sm text-brandText bg-gray-200 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
                 />
               </div>
             </div>
 
            
             <div className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-brandText mb-2">
                 Bio
               </label>
               <textarea
@@ -143,14 +165,14 @@ function SettingsDashboard() {
                 value={formData.bio}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent resize-none"
+                className="w-full px-4 py-3 bg-gray-100 text-sm text-brandText border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent resize-none"
               />
             </div>
 
           
             <button
               onClick={handleSaveChanges}
-              className="flex items-center gap-2 px-6 py-3 bg-brandText text-white rounded-lg hover:bg-opacity-90 transition-colors font-medium"
+              className="flex items-center gap-2 px-4 py-2 text-sm bg-brandText text-white rounded-lg hover:bg-opacity-90 transition-colors font-medium"
             >
               <FiSave className="w-5 h-5" />
               Save Changes
@@ -162,12 +184,12 @@ function SettingsDashboard() {
         return (
           <div className="bg-white rounded-xl p-8 border border-gray-200">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Notifications</h2>
-            <p className="text-gray-600 mb-8">Manage your notification preferences</p>
+            <p className="text-gray-600 text-sm mb-8">Manage your notification preferences</p>
 
             <div className="space-y-6">
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div>
-                  <p className="font-semibold text-gray-900">Email Notifications</p>
+                  <p className="font-semibold text-sm text-gray-900">Email Notifications</p>
                   <p className="text-sm text-gray-500">Receive notifications via email</p>
                 </div>
                 <button
@@ -187,7 +209,7 @@ function SettingsDashboard() {
 
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div>
-                  <p className="font-semibold text-gray-900">Push Notifications</p>
+                  <p className="font-semibold text-gray-900 text-sm">Push Notifications</p>
                   <p className="text-sm text-gray-500">Receive push notifications on your device</p>
                 </div>
                 <button
@@ -207,7 +229,7 @@ function SettingsDashboard() {
             
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div>
-                  <p className="font-semibold text-gray-900">SMS Notifications</p>
+                  <p className="font-semibold text-gray-900 text-sm">SMS Notifications</p>
                   <p className="text-sm text-gray-500">Receive notifications via SMS</p>
                 </div>
                 <button
@@ -227,7 +249,7 @@ function SettingsDashboard() {
              
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div>
-                  <p className="font-semibold text-gray-900">Job Alerts</p>
+                  <p className="font-semibold text-gray-900 text-sm">Job Alerts</p>
                   <p className="text-sm text-gray-500">Get notified about new job requests</p>
                 </div>
                 <button
@@ -247,7 +269,7 @@ function SettingsDashboard() {
              
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div>
-                  <p className="font-semibold text-gray-900">Review Alerts</p>
+                  <p className="font-semibold text-gray-900 text-sm">Review Alerts</p>
                   <p className="text-sm text-gray-500">Get notified about new reviews</p>
                 </div>
                 <button
@@ -267,7 +289,7 @@ function SettingsDashboard() {
           
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div>
-                  <p className="font-semibold text-gray-900">Promotional Emails</p>
+                  <p className="font-semibold text-gray-900 text-sm">Promotional Emails</p>
                   <p className="text-sm text-gray-500">Receive promotional offers and updates</p>
                 </div>
                 <button
@@ -287,7 +309,7 @@ function SettingsDashboard() {
 
             <button
               onClick={handleSaveChanges}
-              className="flex items-center gap-2 px-6 py-3 bg-brandText text-white rounded-lg hover:bg-opacity-90 transition-colors font-medium mt-8"
+              className="flex items-center gap-2  px-4 py-2 text-sm bg-brandText text-white rounded-lg hover:bg-opacity-90 transition-colors font-medium mt-8"
             >
               <FiSave className="w-5 h-5" />
               Save Changes
@@ -299,9 +321,10 @@ function SettingsDashboard() {
         return (
           <div className="bg-white rounded-xl p-8 border border-gray-200">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Security</h2>
-            <p className="text-gray-600 mb-8">Manage your security settings</p>
+            <p className="text-gray-600 mb-8 text-sm">Manage your security settings</p>
+            <p className="text-brandText mb-4 text-sm font-semibold">Change Password</p>
 
-            <div className="space-y-6">
+            <div className="space-y-4 mb-6">
              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -309,8 +332,8 @@ function SettingsDashboard() {
                 </label>
                 <input
                   type="password"
-                  placeholder="Enter current password"
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
+                  placeholder=""
+                  className="w-full h-10 text-sm px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
                 />
               </div>
 
@@ -320,8 +343,8 @@ function SettingsDashboard() {
                 </label>
                 <input
                   type="password"
-                  placeholder="Enter new password"
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
+                  placeholder=""
+                  className="w-full h-10 text-sm px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
                 />
               </div>
 
@@ -331,18 +354,19 @@ function SettingsDashboard() {
                 </label>
                 <input
                   type="password"
-                  placeholder="Confirm new password"
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
+                  placeholder=""
+                  className="w-full h-10 text-sm px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent"
                 />
               </div>
+            </div>
 
-             
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 mt-8">
-                <div>
-                  <p className="font-semibold text-gray-900">Two-Factor Authentication</p>
-                  <p className="text-sm text-gray-500">Add an extra layer of security to your account</p>
+             <div>
+              <p className="text-sm font-semibold text-brandText mb-3">Two-Factor Authentication</p>
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">  
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
                 </div>
-                <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
+                <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium text-sm whitespace-nowrap ml-4">
                   Enable
                 </button>
               </div>
@@ -350,71 +374,63 @@ function SettingsDashboard() {
 
             <button
               onClick={handleSaveChanges}
-              className="flex items-center gap-2 px-6 py-3 bg-brandText text-white rounded-lg hover:bg-opacity-90 transition-colors font-medium mt-8"
-            >
-              <FiSave className="w-5 h-5" />
-              Update Password
-            </button>
-          </div>
-        );
-
-      case 'language':
-        return (
-          <div className="bg-white rounded-xl p-8 border border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Language</h2>
-            <p className="text-gray-600 mb-8">Choose your preferred language</p>
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border-2 border-brandText cursor-pointer">
-                <input
-                  type="radio"
-                  name="language"
-                  id="english"
-                  defaultChecked
-                  className="w-4 h-4 text-brandText focus:ring-brandText"
-                />
-                <label htmlFor="english" className="flex-1 cursor-pointer">
-                  <p className="font-semibold text-gray-900">English</p>
-                  <p className="text-sm text-gray-500">Default language</p>
-                </label>
-              </div>
-
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-gray-300">
-                <input
-                  type="radio"
-                  name="language"
-                  id="kinyarwanda"
-                  className="w-4 h-4 text-brandText focus:ring-brandText"
-                />
-                <label htmlFor="kinyarwanda" className="flex-1 cursor-pointer">
-                  <p className="font-semibold text-gray-900">Kinyarwanda</p>
-                  <p className="text-sm text-gray-500">Kinyarwanda language</p>
-                </label>
-              </div>
-
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-gray-300">
-                <input
-                  type="radio"
-                  name="language"
-                  id="french"
-                  className="w-4 h-4 text-brandText focus:ring-brandText"
-                />
-                <label htmlFor="french" className="flex-1 cursor-pointer">
-                  <p className="font-semibold text-gray-900">French</p>
-                  <p className="text-sm text-gray-500">Français</p>
-                </label>
-              </div>
-            </div>
-
-            <button
-              onClick={handleSaveChanges}
-              className="flex items-center gap-2 px-6 py-3 bg-brandText text-white rounded-lg hover:bg-opacity-90 transition-colors font-medium mt-8"
+              className="flex items-center gap-2 px-4 py-2 text-sm bg-brandText text-white rounded-lg hover:bg-opacity-90 transition-colors font-medium mt-8"
             >
               <FiSave className="w-5 h-5" />
               Save Changes
             </button>
           </div>
         );
+
+   case 'language':
+  return (
+    <div className="bg-white rounded-xl p-6 border border-gray-200">
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">Language</h2>
+      <p className="text-gray-600 mb-8 text-sm">Choose your preferred language</p>
+
+      <div className="space-y-4">
+        <label className="text-sm font-medium text-gray-700 block">Display Language</label>
+        
+        <div className="relative  w-full max-w-xs">
+          <div
+            className="flex items-center gap-2 text-sm px-3 py-2 rounded-xl hover:bg-brandOrange hover:text-white cursor-pointer transition-colors border border-gray-300"
+            onClick={() => setLanguageOpen(!languageOpen)}
+          >
+            <span>{currentLanguage.code}</span>
+          </div>
+
+          {languageOpen && (
+            <>
+              <div
+                className="fixed  text-sm inset-0 z-40"
+                onClick={() => setLanguageOpen(false)}
+              />
+              <div className=" w-full  absolute left-0 mt-2  bg-white rounded-lg shadow-lg py-1 z-50 border border-gray-200">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    className={`w-full flex items-center gap-3 px-3 py-1.5 transition-colors rounded-md ${
+                      currentLanguage.code === lang.code
+                        ? "text-brandOrange font-medium hover:bg-brandOrange hover:text-white"
+                        : "text-gray-700 hover:bg-brandOrange hover:text-white"
+                    }`}
+                    onClick={() => {
+                      handleLanguageChange(lang);
+                      setLanguageOpen(false);
+                    }}
+                  >
+                    <span className="text-sm">{lang.name}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <p className="text-xs text-gray-500 mt-2">This will change the language across the entire application.</p>
+      </div>
+    </div>
+  );
 
       default:
         return null;
@@ -424,54 +440,53 @@ function SettingsDashboard() {
   return (
     <div className="space-y-6">
      
-      <div className="flex gap-2 flex-wrap">
-        <button
-          onClick={() => setActiveTab('personal')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-            activeTab === 'personal'
-              ? 'bg-white text-brandText border-2 border-brandText'
-              : 'bg-white text-gray-600 border border-gray-300 hover:border-gray-400'
-          }`}
-        >
-          <FiUser className="w-4 h-4" />
-          Personal Information
-        </button>
-        <button
-          onClick={() => setActiveTab('notifications')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-            activeTab === 'notifications'
-              ? 'bg-white text-brandText border-2 border-brandText'
-              : 'bg-white text-gray-600 border border-gray-300 hover:border-gray-400'
-          }`}
-        >
-          <FiBell className="w-4 h-4" />
-          Notifications
-        </button>
-        <button
-          onClick={() => setActiveTab('security')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-            activeTab === 'security'
-              ? 'bg-white text-brandText border-2 border-brandText'
-              : 'bg-white text-gray-600 border border-gray-300 hover:border-gray-400'
-          }`}
-        >
-          <FiShield className="w-4 h-4" />
-          Security
-        </button>
-        <button
-          onClick={() => setActiveTab('language')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-            activeTab === 'language'
-              ? 'bg-white text-brandText border-2 border-brandText'
-              : 'bg-white text-gray-600 border border-gray-300 hover:border-gray-400'
-          }`}
-        >
-          <FiGlobe className="w-4 h-4" />
-          Language
-        </button>
-      </div>
-
-      {renderTabContent()}
+   <div className="flex gap-1 flex-wrap bg-gray-300 p-1 w-120 rounded-lg">
+  <button
+    onClick={() => setActiveTab('personal')}
+    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium text-xs transition-colors ${
+      activeTab === 'personal'
+        ? 'bg-gray-200 text-brandText  shadow-sm'
+        : 'bg-transparent text-gray-600 hover:bg-white/50'
+    }`}
+  >
+    <FiUser className="w-3.5 h-3.5" />
+    Personal Information
+  </button>
+  <button
+    onClick={() => setActiveTab('notifications')}
+    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium text-xs transition-colors ${
+      activeTab === 'notifications'
+        ? 'bg-gray-200 text-brandText shadow-sm'
+        : 'bg-transparent text-gray-600 hover:bg-white/50'
+    }`}
+  >
+    <FiBell className="w-3.5 h-3.5" />
+    Notifications
+  </button>
+  <button
+    onClick={() => setActiveTab('security')}
+    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium text-xs transition-colors ${
+      activeTab === 'security'
+        ? 'bg-gray-200 text-brandText  shadow-sm'
+        : 'bg-transparent text-gray-600 hover:bg-white/50'
+    }`}
+  >
+    <FiShield className="w-3.5 h-3.5" />
+    Security
+  </button>
+  <button
+    onClick={() => setActiveTab('language')}
+    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium text-xs transition-colors ${
+      activeTab === 'language'
+        ? 'bg-gray-200 text-brandText shadow-sm'
+        : 'bg-transparent text-gray-600 hover:bg-white/50'
+    }`}
+  >
+    <FiGlobe className="w-3.5 h-3.5" />
+    Language
+  </button>
+</div>
+{renderTabContent()}
     </div>
   );
 }

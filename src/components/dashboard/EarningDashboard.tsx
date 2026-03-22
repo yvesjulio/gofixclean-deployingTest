@@ -28,8 +28,8 @@ function EarningsDashboard() {
   };
 
   return (
-    <div className="max-w-2xl ">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+    <div className="max-w-xl ">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
         <div className="flex items-center gap-2 mb-6">
           <FiDollarSign className="w-6 h-6 text-gray-700" />
           <h2 className="text-xl font-bold text-gray-900">Earnings Summary</h2>

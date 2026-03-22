@@ -16,12 +16,12 @@ interface Review {
   };
 }
 
+
 function ReviewsDashboard() {
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'replied'>('all');
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState('');
 
-  // Mock data
   const reviews: Review[] = [
     {
       id: 1,
@@ -118,39 +118,37 @@ function ReviewsDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-     
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="text-5xl font-bold text-gray-900 mb-2">
-            {averageRating.toFixed(1)}
-          </div>
-          <div className="flex gap-1 mb-3">
-            {renderStars(Math.round(averageRating))}
-          </div>
-          <div className="text-sm text-gray-600">Average Rating</div>
-        </div>
+    <div className="space-y-6 ">
+   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ">
+  
+  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+    <div className="text-4xl font-bold text-brandText mb-1">
+      {averageRating.toFixed(1)}
+    </div>
+    <div className="flex gap-1  mb-2 ">
+      {renderStars(Math.round(averageRating))}
+    </div>
+    <div className="text-sm text-brandText">Average Rating</div>
+  </div>
 
-       
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="text-5xl font-bold text-gray-900 mb-2">{totalReviews}</div>
-          <div className="text-sm text-gray-600 mt-11">Total Reviews</div>
-        </div>
+  
+  <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+    <div className="text-4xl font-bold text-brandText mb-1">{totalReviews}</div>
+    <div className="text-sm text-brandText">Total Reviews</div>
+  </div>
 
-      
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="text-5xl font-bold text-gray-900 mb-2">{repliedCount}</div>
-          <div className="text-sm text-gray-600 mt-11">Replied</div>
-        </div>
+  
+  <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+    <div className="text-4xl font-bold text-brandText mb-1">{repliedCount}</div>
+    <div className="text-sm text-brandText">Replied</div>
+  </div>
 
-       
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="text-5xl font-bold text-gray-900 mb-2">{pendingCount}</div>
-          <div className="text-sm text-gray-600 mt-11">Pending Reply</div>
-        </div>
-      </div>
-
+  
+  <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+    <div className="text-4xl font-bold text-brandText mb-1">{pendingCount}</div>
+    <div className="text-sm text-brandText">Pending Reply</div>
+  </div>
+</div>
      
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <h3 className="text-xl font-bold text-gray-900 mb-6">Rating Distribution</h3>
@@ -258,7 +256,7 @@ function ReviewsDashboard() {
                 {review.status === 'pending' && replyingTo !== review.id && (
                   <button
                     onClick={() => handleReply(review.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-black border border-gray-300 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-sm font-medium"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 border border-gray-300 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-sm font-medium"
                   >
                     <FiMessageSquare className="w-4 h-4" />
                     Reply to Review

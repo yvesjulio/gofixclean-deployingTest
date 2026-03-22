@@ -1,6 +1,6 @@
 import { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdKeyboardBackspace } from "react-icons/md";
+import { FaArrowRightLong } from "react-icons/fa6";
 
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -72,9 +72,9 @@ const ResetPassword: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate("/")}
-          className="absolute top-4 left-4 md:top-4 md:left-8 text-white hover:text-brandOrange transition-colors"
+          className="absolute top-4 right-4 md:top-4 md:right-8 text-white hover:text-brandOrange transition-colors"
         >
-          <MdKeyboardBackspace size={24} />
+          <FaArrowRightLong size={24} />
         </button>
       </div>
     </section>

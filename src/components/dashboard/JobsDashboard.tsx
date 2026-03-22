@@ -113,10 +113,10 @@ const JobsDashboard: React.FC<JobsDashboardProps> = () => {
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-5 border-b border-gray-200">
+          <div className="p-5  border-gray-200">
             <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-gray-900 text-lg">Job Requests</h3>
-              <span className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
+              <h3 className="font-semibold text-gray-900 text-lg ">Job Requests</h3>
+              <span className="px-2 py-1 text-xs font-medium text-brandText bg-gray-200 rounded-full">
                 3 pending
               </span>
             </div>
@@ -144,7 +144,7 @@ const JobsDashboard: React.FC<JobsDashboardProps> = () => {
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
                       <h4 className="font-semibold text-gray-900 text-base">{job.name}</h4>
-                      <span className="font-semibold text-gray-900 text-sm">{job.amount}</span>
+                      <span className=" text-brandText text-sm">{job.amount}</span>
                     </div>
                     <p className="text-gray-500 text-sm mt-1">{job.job}</p>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
@@ -152,15 +152,17 @@ const JobsDashboard: React.FC<JobsDashboardProps> = () => {
                         <FiMapPin className="w-3 h-3" /> {job.location}
                       </span>
                       <span className="flex items-center gap-1">
+                     
                         <FiCalendar className="w-3 h-3" /> {job.date}
                       </span>
                     </div>
                   </div>
                 </div>
                 <div className="mt-3 flex gap-2">
+                 
                   <button
                     onClick={() => handleAccept(job.id)}
-                    className="flex-1 px-4 py-2 bg-brandText text-white rounded-lg hover:bg-brandOrange transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-2 bg-brandText text-white rounded-lg hover:bg-brandText/90 transition-colors text-sm font-medium flex items-center justify-center gap-2"
                   >
                     <FiCheck className="w-4 h-4" />
                     Accept
@@ -180,10 +182,10 @@ const JobsDashboard: React.FC<JobsDashboardProps> = () => {
 
 
         <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-5 border-b border-gray-200">
+          <div className="p-5  border-gray-200">
             <div className="flex justify-between items-center">
               <h3 className="font-semibold text-gray-900 text-lg">Active Jobs</h3>
-              <span className="px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-md border border-gray-200">
+              <span className="px-2 py-1 text-xs  text-gray-700 font-bold rounded-xl border border-gray-200">
                 {activeJobs.length} Jobs
               </span>
             </div>
@@ -242,13 +244,13 @@ const JobsDashboard: React.FC<JobsDashboardProps> = () => {
                 <div className="mt-4 flex gap-2">
                   <button
                     onClick={() => handleCall(job.id)}
-                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-orange-500 hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
                   >
                     <FiPhone className="w-4 h-4" /> Call
                   </button>
                   <button
                     onClick={() => handleNavigate(job.location)}
-                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-orange-500 hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
                   >
                     <FiNavigation className="w-4 h-4" /> Navigate
                   </button>
@@ -262,7 +264,7 @@ const JobsDashboard: React.FC<JobsDashboardProps> = () => {
                   <div className="relative flex-1">
                     <button
                       onClick={() => setOpenDropdown(openDropdown === job.id ? null : job.id)}
-                      className="w-full bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 pr-8 text-left focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent flex items-center justify-between"
+                      className="w-full bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 pr-8 text-left focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent flex items-center justify-between"
                     >
                       <span>{job.status}</span>
                       <FiChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openDropdown === job.id ? 'rotate-180' : ''}`} />

@@ -194,7 +194,7 @@ function AnalyticsDashboard() {
       case 'services':
         return (
           <div className="bg-white rounded-xl p-6 border border-gray-300">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Service Breakdown</h3>
+            <h3 className="text-lg font-semibold text-black mb-6">Service Breakdown</h3>
             <div className="flex items-center justify-between">
               <div className="w-1/2">
                 <ResponsiveContainer width="100%" height={250}>
@@ -227,7 +227,7 @@ function AnalyticsDashboard() {
                       />
                       <span className="text-sm text-gray-700">{service.name}</span>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900">{service.value}%</span>
+                    <span className="text-sm px-3 font-bold  bg-gray-200 rounded-2xl  text-brandText">{service.value}%</span>
                   </div>
                 ))}
               </div>
@@ -249,7 +249,7 @@ function AnalyticsDashboard() {
                       style={{ width: `${rating.percentage}%` }}
                     />
                   </div>
-                  <span className="text-sm font-semibold text-gray-900 w-8 text-right">
+                  <span className="text-sm  text-gray-900 w-8 text-right">
                     {rating.count}
                   </span>
                 </div>
@@ -257,10 +257,10 @@ function AnalyticsDashboard() {
             </div>
 
           
-            <div className="bg-orange-50 rounded-lg p-4 flex items-center gap-3">
+            <div className="bg-orange-50 border border-amber-100 rounded-lg p-4 flex items-center gap-3">
               <FiStar className="w-8 h-8 text-orange-500 fill-orange-500" />
               <div>
-                <p className="text-3xl font-bold text-gray-900">{averageRating}</p>
+                <p className="text-3xl font-bold text-gray-800">{averageRating}</p>
                 <p className="text-sm text-gray-600">Average from {totalReviews} reviews</p>
               </div>
             </div>
@@ -359,16 +359,16 @@ function AnalyticsDashboard() {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center gap-2 mb-4">
             <FiUsers className="w-5 h-5 text-gray-700" />
-            <h3 className="text-lg font-semibold text-gray-900">Client Insights</h3>
+            <h3 className="text-lg font-semibold text-brandText">Client Insights</h3>
           </div>
           <div className="space-y-3">
             {clientInsights.map((insight, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 rounded-lg border border-gray-200 bg-white hover:shadow-sm transition-shadow"
+                className="flex items-center justify-between p-2 rounded-lg border border-gray-200 bg-white hover:shadow-sm transition-shadow"
               >
                 <span className="text-gray-600 text-sm font-medium">{insight.label}</span>
-                <span className="text-lg font-semibold text-gray-900">{insight.value}</span>
+                <span className="text-lg  text-gray-900">{insight.value}</span>
               </div>
             ))}
           </div>
@@ -376,17 +376,18 @@ function AnalyticsDashboard() {
 
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center gap-2 mb-4">
+         
             <FiBarChart2 className="w-5 h-5 text-gray-700" />
-            <h3 className="text-lg font-semibold text-gray-900">Job Insights</h3>
+            <h3 className="text-lg font-semibold text-brandText">Job Insights</h3>
           </div>
           <div className="space-y-3">
             {jobInsights.map((insight, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 rounded-lg border border-gray-200 bg-white hover:shadow-sm transition-shadow"
+                className="flex items-center justify-between p-2 rounded-lg border border-gray-200 bg-white hover:shadow-sm transition-shadow"
               >
                 <span className="text-gray-600 text-sm font-medium">{insight.label}</span>
-                <span className="text-lg font-semibold text-gray-900">{insight.value}</span>
+                <span className="text-lg  text-gray-900">{insight.value}</span>
               </div>
             ))}
           </div>

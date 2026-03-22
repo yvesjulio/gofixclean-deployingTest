@@ -2,7 +2,7 @@ import { useState, FormEvent } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { MdKeyboardBackspace } from "react-icons/md";
+import { FaArrowRightLong } from "react-icons/fa6";
 
 const SignIn: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -113,7 +113,7 @@ const SignIn: React.FC = () => {
         </div>
       </div>
 
-    
+      
       <div className="w-full md:flex-1 relative h-70 sm:h-87.5 md:h-auto order-1 md:order-2">
         <img
           src="/images/image.png"
@@ -124,9 +124,9 @@ const SignIn: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate("/")}
-          className="absolute top-4 left-4 md:top-4 md:left-8 text-white hover:text-brandOrange transition-colors"
+          className="absolute top-4 right-4 md:top-4 md:right-8 text-white hover:text-brandOrange transition-colors"
         >
-          <MdKeyboardBackspace size={24} />
+          < FaArrowRightLong size={24} />
         </button>
       </div>
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { CgViewSplit } from "react-icons/cg";
 
-
 interface OverviewProps {
   userName?: string;
   userAvatar?: string;
@@ -9,6 +8,7 @@ interface OverviewProps {
   userType?: string;
   onToggleSidebar?: () => void;
   isSidebarOpen?: boolean;
+  activeSection?: string; 
   children?: React.ReactNode;
 }
 
@@ -16,12 +16,36 @@ const Overview: React.FC<OverviewProps> = ({
   userName,
   userAvatar,
   onToggleSidebar,
-  isSidebarOpen = true,
+  activeSection = 'Overview', 
   children
 }) => {
+ 
+  const getPageTitle = () => {
+    switch (activeSection.toLowerCase()) {
+      case 'overview':
+        return 'Overview';
+      case 'jobs':
+        return 'Jobs';
+      case 'reviews':
+        return 'Reviews';
+      case 'earnings':
+        return 'Earnings';
+      case 'analytics':
+        return 'Analytics';
+      case 'notifications':
+        return 'Notifications';
+      case 'availability':
+        return 'Availability';
+      case 'settings':
+        return 'Settings';
+      default:
+        return 'Overview';
+    }
+  };
+
   return (
     <div className="min-h-screen">
-      <div className="border-b border-gray-300  bg-white backdrop-blur-sm sticky top-0 z-10">
+      <div className="border-b border-gray-300 bg-white backdrop-blur-sm sticky top-0 z-10">
         <div className="px-3 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -36,7 +60,7 @@ const Overview: React.FC<OverviewProps> = ({
                 <CgViewSplit className="w-6 h-6" />
               </div>
               <h1 className="text-xl font-semibold text-brandText tracking-tight">
-                Overview
+                {getPageTitle()}
               </h1>
             </div>
 
@@ -54,13 +78,11 @@ const Overview: React.FC<OverviewProps> = ({
                   </div>
                 )}
               </div>
-              
             </div>
           </div>
         </div>
       </div>
       
-  
       <div className="p-6">
         {children}
       </div>
