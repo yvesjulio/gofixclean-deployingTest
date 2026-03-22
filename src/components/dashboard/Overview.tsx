@@ -1,66 +1,68 @@
 import React from 'react';
-import { FiChevronRight } from 'react-icons/fi';
+import { CgViewSplit } from "react-icons/cg";
 
-const Overview: React.FC = () => {
+
+interface OverviewProps {
+  userName?: string;
+  userAvatar?: string;
+  userRating?: number;
+  userType?: string;
+  onToggleSidebar?: () => void;
+  isSidebarOpen?: boolean;
+  children?: React.ReactNode;
+}
+
+const Overview: React.FC<OverviewProps> = ({ 
+  userName,
+  userAvatar,
+  onToggleSidebar,
+  isSidebarOpen = true,
+  children
+}) => {
   return (
-    <div className="bg-white min-h-screen">
-     
-      <div className="border-b border-gray-200 px-8 py-4">
-        <div className="flex items-center justify-between">
-         
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brandText rounded-lg flex items-center justify-center text-white font-bold text-sm">
-              GF
-            </div>
-            <h1 className="text-xl font-bold text-brandText">
-              GoFix<span className="text-brandOrange">&</span>Clean
-            </h1>
-          </div>
-
-         
-          <div className="flex items-center gap-3">
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">Jean Baptiste</p>
-              <div className="flex items-center gap-1 text-xs text-gray-500">
-                <span className="text-yellow-500">⭐ 4.8</span>
-                <span>•</span>
-                <span>Plumbing</span>
+    <div className="min-h-screen">
+      <div className="border-b border-gray-300  bg-white backdrop-blur-sm sticky top-0 z-10">
+        <div className="px-3 py-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={onToggleSidebar}
+                className="hidden lg:flex w-10 h-10 rounded-xl items-center justify-center text-brandText hover:bg-gray-100 transition-colors cursor-pointer"
+                aria-label="Toggle sidebar"
+              >
+                <CgViewSplit className="w-6 h-6" />
+              </button>
+              <div className="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center text-brandText">
+                <CgViewSplit className="w-6 h-6" />
               </div>
+              <h1 className="text-xl font-semibold text-brandText tracking-tight">
+                Overview
+              </h1>
             </div>
-            <div className="w-10 h-10 bg-gradient-to-br from-brandText to-brandOrange rounded-full flex items-center justify-center text-white font-bold">
-              JB
+
+            <div className="relative">
+              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                {userAvatar ? (
+                  <img 
+                    src={userAvatar} 
+                    alt={userName || "User"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-linear-to-br from-brandText to-brandOrange flex items-center justify-center text-white font-semibold text-sm">
+                    {userName ? userName.charAt(0).toUpperCase() : "U"}
+                  </div>
+                )}
+              </div>
+              
             </div>
           </div>
-        </div>
-
-       
-        <div className="mt-3 flex items-center gap-2 text-sm">
-          <span className="text-gray-400">Dashboard</span>
-          <FiChevronRight className="text-gray-300 text-xs" />
-          <span className="text-brandText font-medium">Overview</span>
         </div>
       </div>
-
       
-      <div className="p-8">
-       
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-1">Dashboard Overview</h2>
-          <p className="text-gray-500 text-sm">
-            Welcome back, Jean Baptiste!<br />
-            You have 3 new job requests and 2 pending reviews to respond to.
-          </p>
-        </div>
-
-      
-        <div className="flex gap-3 mb-8">
-          <button className="bg-brandText text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors">
-            View Jobs
-          </button>
-          <button className="bg-white text-gray-700 px-4 py-2 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-50 transition-colors">
-            View Reviews
-          </button>
-        </div>
+  
+      <div className="p-6">
+        {children}
       </div>
     </div>
   );
