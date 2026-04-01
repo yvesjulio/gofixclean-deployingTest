@@ -12,6 +12,10 @@ module.exports = {
         brandText: "#025E4C",
         brandYellow: "#F59E0B",
         brandGra: "#ECECEC",
+        brandTeal: "#012720",
+        brandTealLight: "#01342a",
+        brandTealMedium: "#014336",
+        brandGreenLight: "#357e70",
       },
       animation: {
         forwardBackward: "forwardBackward 1.5s ease-in-out infinite",

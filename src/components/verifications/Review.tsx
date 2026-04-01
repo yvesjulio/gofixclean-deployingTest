@@ -53,11 +53,12 @@ interface ReviewData {
     nin: string;
     serviceType: string;
     otherService: string;
+    serviceTags: string[];     
     aboutYou: string;
   };
   documents: {
     governmentId?: { name: string; uploaded: boolean };
-    selfieId?: { name: string; uploaded: boolean };
+    passportPhoto?: { name: string; uploaded: boolean };
     certifications?: { name: string; uploaded: boolean; count: number };
     workSamples?: { name: string; uploaded: boolean; count: number };
   };
@@ -69,7 +70,6 @@ function Review({ onBack }: ReviewProps) {
   const [reviewData, setReviewData] = useState<ReviewData | null>(null);
 
   useEffect(() => {
-    
     const personalInfoData = localStorage.getItem('personalInfoFormData');
     const documentsData = sessionStorage.getItem('uploadedDocuments');
 
@@ -77,58 +77,59 @@ function Review({ onBack }: ReviewProps) {
     const parsedDocuments = documentsData ? JSON.parse(documentsData) : {};
 
     
-    const certificationFiles = parsedDocuments['certifications'] ? 1 : 0;
-    const workSampleFiles = parsedDocuments['work-samples'] ? 1 : 0;
+    const getFileCount = (docKey: string): number => {
+      const data = parsedDocuments[docKey];
+      if (!data) return 0;
+      if (Array.isArray(data)) return data.length;
+      return 1;
+    };
 
     setReviewData({
-      personalInfo: parsedPersonalInfo || {
-        fullLegalName: "Not provided",
-        phoneNumber: "Not provided",
-        residentialAddress: "Not provided",
-        nin: "Not provided",
-        serviceType: "Not provided",
-        otherService: "",
-        aboutYou: "Not provided"
+      personalInfo: {
+        fullLegalName: parsedPersonalInfo?.fullLegalName || "Not provided",
+        phoneNumber: parsedPersonalInfo?.phoneNumber || "Not provided",
+        residentialAddress: parsedPersonalInfo?.residentialAddress || "Not provided",
+        nin: parsedPersonalInfo?.nin || "Not provided",
+        serviceType: parsedPersonalInfo?.serviceType || "Not provided",
+        otherService: parsedPersonalInfo?.otherService || "",
+        serviceTags: parsedPersonalInfo?.serviceTags || [],  // added
+        aboutYou: parsedPersonalInfo?.aboutYou || "Not provided"
       },
       documents: {
         governmentId: {
           name: parsedDocuments['government-id']?.name || 'Not uploaded',
           uploaded: !!parsedDocuments['government-id']
         },
-        selfieId: {
-          name: parsedDocuments['selfie-id']?.name || 'Not uploaded',
-          uploaded: !!parsedDocuments['selfie-id']
+        passportPhoto: {
+          name: parsedDocuments['passport-photo']?.name || 'Not uploaded',
+          uploaded: !!parsedDocuments['passport-photo']
         },
         certifications: {
           name: parsedDocuments['certifications']?.name || 'Not uploaded',
           uploaded: !!parsedDocuments['certifications'],
-          count: certificationFiles
+          count: getFileCount('certifications')
         },
         workSamples: {
           name: parsedDocuments['work-samples']?.name || 'Not uploaded',
           uploaded: !!parsedDocuments['work-samples'],
-          count: workSampleFiles
+          count: getFileCount('work-samples')
         }
       }
     });
   }, []);
 
   const handleSubmit = () => {
-    console.log('Submit button clicked');
     setIsSubmitted(true);
-   
     localStorage.removeItem('personalInfoFormData');
     sessionStorage.removeItem('uploadedDocuments');
   };
 
   const handleBackToProvider = () => {
-    console.log('Back to Provider Page clicked');
-    navigate('/become-provider'); 
+    navigate('/become-provider');
   };
 
   const handleGoToHome = () => {
-    console.log('Go to Home clicked');
-    navigate('/'); 
+    navigate('/');
   };
 
   const getServiceTypeDisplay = () => {
@@ -140,24 +141,18 @@ function Review({ onBack }: ReviewProps) {
     return serviceType || 'Not provided';
   };
 
-  
   const getDocumentIcon = (docType: string, isUploaded: boolean) => {
-   
-    const requiredDocs = ['governmentId', 'selfieId'];
-    
+    const requiredDocs = ['governmentId', 'passportPhoto'];
     if (requiredDocs.includes(docType)) {
-    
       return isUploaded ? 
         <GrStatusGood className="text-green-500 text-lg shrink-0" /> : 
         <BiErrorCircle className="text-red-500 text-lg shrink-0" />;
     } else {
-     
       return <BiErrorCircle className="text-green-500 text-lg shrink-0" />;
     }
   };
 
   if (isSubmitted) {
-    console.log('Showing ApplicationSubmitted');
     return <ApplicationSubmitted 
       onBackToProvider={handleBackToProvider} 
       onGoToHome={handleGoToHome} 
@@ -177,7 +172,6 @@ function Review({ onBack }: ReviewProps) {
       </div>
 
       <div className="space-y-6 sm:space-y-8">
-      
         <div className="bg-gray-100 rounded-lg p-4 sm:p-6">
           <h3 className="text-gray-800 mb-3 sm:mb-4 font-semibold">Personal Information</h3>
           <div className="space-y-3 text-sm">
@@ -203,6 +197,13 @@ function Review({ onBack }: ReviewProps) {
               <span className="w-14 sm:w-16 text-gray-500">Service:</span>
               <span className="text-gray-900 capitalize">{getServiceTypeDisplay()}</span>
             </div>
+            
+            {personalInfo.serviceTags && personalInfo.serviceTags.length > 0 && (
+              <div className="flex">
+                <span className="w-14 sm:w-16 text-gray-500">Tags:</span>
+                <span className="text-gray-900">{personalInfo.serviceTags.join(', ')}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -210,41 +211,49 @@ function Review({ onBack }: ReviewProps) {
         <div className="bg-gray-100 rounded-lg p-4 sm:p-6">
           <h3 className="text-gray-800 mb-3 sm:mb-4 font-semibold">Documents</h3>
           <div className="space-y-3 text-sm">
-         
-           <div className="flex items-start gap-2">
-  {getDocumentIcon('governmentId', documents.governmentId?.uploaded || false)}
-  <div className="flex-1 flex flex-wrap items-start sm:items-center gap-x-2 gap-y-1">
-    <span className="text-gray-500 whitespace-nowrap">Government ID:</span>
-    <span className="text-gray-900">
-      {documents.governmentId?.uploaded ? 'Uploaded' : 'Not uploaded'}
-    </span>
-  </div>
-</div>
+           
+            <div className="flex items-start gap-2">
+              {getDocumentIcon('governmentId', documents.governmentId?.uploaded || false)}
+              <div className="flex-1 flex flex-wrap items-start sm:items-center gap-x-2 gap-y-1">
+                <span className="text-gray-500 whitespace-nowrap">Government ID:</span>
+                <span className="text-gray-900">
+                  {documents.governmentId?.uploaded ? 'Uploaded' : 'Not uploaded'}
+                </span>
+              </div>
+            </div>
+
+           
+            <div className="flex items-start gap-2">
+              {getDocumentIcon('passportPhoto', documents.passportPhoto?.uploaded || false)}
+              <div className="flex-1 flex flex-wrap items-start sm:items-center gap-x-2 gap-y-1">
+                <span className="text-gray-500 whitespace-nowrap">Passport Photo:</span>
+                <span className="text-gray-900">
+                  {documents.passportPhoto?.uploaded ? 'Uploaded' : 'Not uploaded'}
+                </span>
+              </div>
+            </div>
 
           
-            <div className="flex items-start sm:items-center gap-2 flex-wrap sm:flex-nowrap">
-              {getDocumentIcon('selfieId', documents.selfieId?.uploaded || false)}
-              <span className="w-24 sm:w-23 text-gray-500">Selfie with ID:</span>
-              <span className="text-gray-900">
-                {documents.selfieId?.uploaded ? 'Uploaded' : 'Not uploaded'}
-              </span>
+            <div className="flex items-start gap-2">
+              {getDocumentIcon('certifications', documents.certifications?.uploaded || false)}
+              <div className="flex-1 flex flex-wrap items-start sm:items-center gap-x-2 gap-y-1">
+                <span className="text-gray-500 whitespace-nowrap">Certifications:</span>
+                <span className="text-gray-900">{documents.certifications?.count || 0} file(s)</span>
+              </div>
             </div>
 
-         
-            <div className="flex items-start sm:items-center gap-2 flex-wrap sm:flex-nowrap">
-              {getDocumentIcon('certifications', documents.certifications?.uploaded || false)}
-              <span className="w-24 sm:w-23 text-gray-500">Certifications:</span>
-              <span className="text-gray-900">{documents.certifications?.count || 0} file(s)</span>
-            </div>
-             <div className="flex items-start sm:items-center gap-2 flex-wrap sm:flex-nowrap">
+           
+            <div className="flex items-start gap-2">
               {getDocumentIcon('workSamples', documents.workSamples?.uploaded || false)}
-              <span className="w-24 sm:w-25 text-gray-500">Work Samples:</span>
-              <span className="text-gray-900">{documents.workSamples?.count || 0} file(s)</span>
+              <div className="flex-1 flex flex-wrap items-start sm:items-center gap-x-2 gap-y-1">
+                <span className="text-gray-500 whitespace-nowrap">Work Samples:</span>
+                <span className="text-gray-900">{documents.workSamples?.count || 0} file(s)</span>
+              </div>
             </div>
           </div>
         </div>
 
-     
+      
         <div className="bg-gray-100 rounded-lg p-4 sm:p-6">
           <h3 className="text-gray-800 mb-3 sm:mb-4 font-semibold">About You</h3>
           <p className="text-gray-700 text-sm leading-relaxed">
@@ -252,10 +261,10 @@ function Review({ onBack }: ReviewProps) {
           </p>
         </div>
 
-        
+     
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 sm:p-6">
           <div className="flex items-start gap-3">
-            <span className="text-amber-600 text-xl shrink-0"><BiErrorCircle/> </span>
+            <span className="text-amber-600 text-xl shrink-0"><BiErrorCircle /></span>
             <div>
               <h3 className="mb-2 font-semibold">Verification Process</h3>
               <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">
@@ -265,7 +274,7 @@ function Review({ onBack }: ReviewProps) {
           </div>
         </div>
 
-        
+       
         <div className="flex justify-between pt-4">
           <button
             onClick={onBack}

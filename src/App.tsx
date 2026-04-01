@@ -10,6 +10,12 @@ import ResetPassword from "./components/ResetPassword";
 import WhatsAppButton from "./components/WhatsAppButton";
 import ProviderVerification from "./pages/ProviderVerifications";
 import DashboardPages from "./pages/DashboardPages";
+import Booking from "./components/findServices/Booking";
+import ServiceDetails from "./components/landingpages/ServiceDetails";
+import PrivacyPolicyPage from "./components/policies/PrivacyPolicyPage";
+import TermsOfServicePage from "./components/policies/TermsOfServicePage";
+
+
 
 function AppWrapper() {
   const location = useLocation();
@@ -32,6 +38,10 @@ function AppWrapper() {
           <Route path="/resetpassword" element={<ResetPassword />} />
           <Route path="/provider-verifications" element={<ProviderVerification />} />
           <Route path="/dashboard" element={<DashboardPages />} />
+          <Route path="/booking" element={<Booking />} />
+          <Route path="/service-details/:category" element={<ServiceDetails />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms-of-service" element={<TermsOfServicePage />} /> 
         </Routes>
       </div>
       

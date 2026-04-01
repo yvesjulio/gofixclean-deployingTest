@@ -34,11 +34,10 @@ const Footer: React.FC = () => {
   };
 
   const handleNavClick = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const serviceLink = (category: string) => `/service-details/${encodeURIComponent(category)}`;
 
   return (
     <>
@@ -95,29 +94,93 @@ const Footer: React.FC = () => {
             </p>
 
             <div className="flex">
-              <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
+              <a
+                href="https://web.facebook.com/profile.php?id=61578898200991"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors inline-block"
+              >
                 <SlSocialFacebook />
-              </div>
-              <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
-                <PiTiktokLogo/>
-              </div>
-              <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
+              </a>
+
+              <a
+                href="https://www.tiktok.com/@gofixandclean?is_from_webapp=1&sender_device=pc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors inline-block"
+              >
+                <PiTiktokLogo />
+              </a>
+
+              <a
+                href="https://www.instagram.com/gofixandclean/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors inline-block"
+              >
                 <FaInstagram />
-              </div>
-              <div className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors">
+              </a>
+
+             
+              <a
+                href="https://www.linkedin.com/company/gofixandclean/?viewAsMember=true"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 text-2xl rounded-xl cursor-pointer hover:bg-[#696969] transition-colors inline-block"
+              >
                 <LuLinkedin />
-              </div>
+              </a>
             </div>
           </div>
 
           <div>
             <h3 className="font-semibold mb-4 text-xl">Services</h3>
             <ul className="space-y-2 text-gray-300 text-sm">
-              <li className="hover:text-white cursor-pointer transition-colors">Plumbers</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Electricians</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Cleaners</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Painters</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Handymen</li>
+              <li>
+                <Link
+                  to={serviceLink("Plumbing")}
+                  onClick={handleNavClick}
+                  className="hover:text-white transition-colors"
+                >
+                  Plumbers
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={serviceLink("Electrical")}
+                  onClick={handleNavClick}
+                  className="hover:text-white transition-colors"
+                >
+                  Electricians
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={serviceLink("Cleaning")}
+                  onClick={handleNavClick}
+                  className="hover:text-white transition-colors"
+                >
+                  Cleaners
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={serviceLink("Painting")}
+                  onClick={handleNavClick}
+                  className="hover:text-white transition-colors"
+                >
+                  Painters
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={serviceLink("Handyman")}
+                  onClick={handleNavClick}
+                  className="hover:text-white transition-colors"
+                >
+                  Handymen
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -134,18 +197,10 @@ const Footer: React.FC = () => {
 
               <li
                 className={`cursor-pointer transition-colors ${
-                  location.pathname === "/provider" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
+                  location.pathname === "/become-provider" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
                 }`}
               >
                 <Link to="/become-provider" onClick={handleNavClick}>Become a Provider</Link>
-              </li>
-
-              <li
-                className={`cursor-pointer transition-colors ${
-                  location.pathname === "/blog" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
-                }`}
-              >
-                <Link to="/blog" onClick={handleNavClick}>Blog</Link>
               </li>
 
               <li
@@ -186,8 +241,20 @@ const Footer: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p>© {new Date().getFullYear()} GoFix&Clean. All rights reserved.</p>
             <div className="flex gap-6">
-              <span className="cursor-pointer hover:underline">Privacy Policy</span>
-              <span className="cursor-pointer hover:underline">Terms of Service</span>
+              <Link
+                to="/privacy-policy"
+                onClick={handleNavClick}
+                className="cursor-pointer hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                to="/terms-of-service"
+                onClick={handleNavClick}
+                className="cursor-pointer hover:underline"
+              >
+                Terms of Service
+              </Link>
             </div>
           </div>
         </div>

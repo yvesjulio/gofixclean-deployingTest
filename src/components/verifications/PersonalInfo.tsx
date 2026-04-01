@@ -12,6 +12,7 @@ interface FormData {
   nin: string;
   serviceType: string;
   otherService: string;
+  serviceTags: string[];     
   aboutYou: string;
 }
 
@@ -22,8 +23,19 @@ interface FormErrors {
   nin?: string;
   serviceType?: string;
   otherService?: string;
+  serviceTags?: string;
   aboutYou?: string;
 }
+
+
+const serviceTagsOptions: Record<string, string[]> = {
+  plumber: ["Leak Repair", "Installation", "Emergency Service", "Pipe Replacement"],
+  electrician: ["Wiring", "Lighting Installation", "Repair", "Safety Inspection"],
+  cleaner: ["Deep Cleaning", "Office Cleaning", "Carpet Cleaning", "Window Cleaning"],
+  painter: ["Interior Painting", "Exterior Painting", "Wallpaper Removal", "Texture Painting"],
+  gardener: ["Lawn Mowing", "Planting", "Tree Trimming", "Irrigation"],
+  handyman: ["Furniture Assembly", "Repairs", "Maintenance", "Drywall Repair"],
+};
 
 function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
   const [showOtherService, setShowOtherService] = useState(false);
@@ -37,18 +49,17 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
       nin: "",
       serviceType: "",
       otherService: "",
+      serviceTags: [],
       aboutYou: ""
     };
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  
   useEffect(() => {
     localStorage.setItem('personalInfoFormData', JSON.stringify(formData));
   }, [formData]);
 
- 
   useEffect(() => {
     if (formData.serviceType) {
       setSelectedService(formData.serviceType);
@@ -60,9 +71,8 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
     const value = e.target.value;
     setSelectedService(value);
     setShowOtherService(value === "other");
-    setFormData({ ...formData, serviceType: value, otherService: value === "other" ? formData.otherService : "" });
+    setFormData({ ...formData, serviceType: value, otherService: value === "other" ? formData.otherService : "", serviceTags: [] });
     
-  
     if (errors.serviceType) {
       setErrors({ ...errors, serviceType: undefined });
     }
@@ -70,11 +80,38 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    
-   
+
+    if (name === "nin") {
+      const numbersOnly = value.replace(/\D/g, "");
+      if (numbersOnly.length <= 16) {
+        setFormData({ ...formData, nin: numbersOnly });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+
     if (errors[name as keyof FormErrors]) {
       setErrors({ ...errors, [name]: undefined });
+    }
+  };
+
+  const handleTagToggle = (tag: string) => {
+    const currentTags = formData.serviceTags;
+    const updatedTags = currentTags.includes(tag)
+      ? currentTags.filter(t => t !== tag)
+      : [...currentTags, tag];
+    setFormData({ ...formData, serviceTags: updatedTags });
+    if (errors.serviceTags) {
+      setErrors({ ...errors, serviceTags: undefined });
+    }
+  };
+
+  
+  const handleCustomTagsChange = (value: string) => {
+    const tags = value.split(',').map(t => t.trim()).filter(t => t);
+    setFormData({ ...formData, serviceTags: tags });
+    if (errors.serviceTags) {
+      setErrors({ ...errors, serviceTags: undefined });
     }
   };
 
@@ -89,13 +126,11 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
       newErrors.fullLegalName = "Full legal name is required";
     }
 
-
     if (!formData.phoneNumber.trim()) {
       newErrors.phoneNumber = "Phone number is required";
     } else if (!/^\+?[0-9\s]{10,}$/.test(formData.phoneNumber)) {
       newErrors.phoneNumber = "Please enter a valid phone number";
     }
-
 
     if (!formData.residentialAddress.trim()) {
       newErrors.residentialAddress = "Residential address is required";
@@ -103,8 +138,9 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
 
     if (!formData.nin.trim()) {
       newErrors.nin = "NIN is required";
+    } else if (!/^\d{16}$/.test(formData.nin)) {
+      newErrors.nin = "NIN must be exactly 16 digits";
     }
-
 
     if (!formData.serviceType) {
       newErrors.serviceType = "Please select a service type";
@@ -112,7 +148,17 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
       newErrors.otherService = "Please specify your service";
     }
 
-    
+   
+    if (formData.serviceType && formData.serviceType !== "other") {
+      if (!formData.serviceTags.length) {
+        newErrors.serviceTags = "Please select at least one service tag";
+      }
+    } else if (formData.serviceType === "other") {
+      if (!formData.serviceTags.length) {
+        newErrors.serviceTags = "Please enter at least one service tag (comma-separated)";
+      }
+    }
+
     if (!formData.aboutYou.trim()) {
       newErrors.aboutYou = "Please tell us about your skills and experience";
     } else if (formData.aboutYou.length < 20) {
@@ -124,15 +170,13 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
   };
 
   const handleContinue = () => {
-    
-    const allFields = ['fullLegalName', 'phoneNumber', 'residentialAddress', 'nin', 'serviceType', 'aboutYou'];
+    const allFields = ['fullLegalName', 'phoneNumber', 'residentialAddress', 'nin', 'serviceType', 'serviceTags', 'aboutYou'];
     const touchedFields = allFields.reduce((acc, field) => ({ ...acc, [field]: true }), {});
     if (showOtherService) {
       touchedFields.otherService = true;
     }
     setTouched(touchedFields);
 
-    
     if (validateForm()) {
       onNext(); 
     } else {
@@ -149,10 +193,13 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
     }
   };
 
+
+  const currentTags = selectedService && selectedService !== 'other' ? serviceTagsOptions[selectedService] || [] : [];
+
   return (
     <div className="w-full max-w-3xl mx-auto bg-white rounded-xl shadow-md p-4 sm:p-6 md:p-8">
       <div className="mb-4 sm:mb-6 md:mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold ">Personal Information</h2>
+        <h2 className="text-xl sm:text-2xl font-bold">Personal Information</h2>
         <p className="text-gray-500 text-xs sm:text-sm mt-1">Provide your personal details to get verified</p>
       </div>
       
@@ -183,7 +230,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
               Phone Number <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
+              type="tel"
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={handleInputChange}
@@ -199,7 +246,6 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
           </div>
         </div>
 
-      
         <div className="space-y-1 sm:space-y-2">
           <label className="text-xs sm:text-sm font-medium text-gray-700 block">
             Residential Address <span className="text-red-500">*</span>
@@ -220,7 +266,6 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
           )}
         </div>
 
-   
         <div className="space-y-1 sm:space-y-2">
           <label className="text-xs sm:text-sm font-medium text-gray-700 block">
             NIN (National ID Number) <span className="text-red-500">*</span>
@@ -231,7 +276,9 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
             value={formData.nin}
             onChange={handleInputChange}
             onBlur={() => handleBlur('nin')}
-            placeholder="Enter your NIN"
+            placeholder="Enter 16-digit NIN"
+            maxLength={16}
+            inputMode="numeric"
             className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#E6EFED] border rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent transition text-xs sm:text-sm text-[#696969] ${
               touched.nin && errors.nin ? 'border-red-500' : 'border-gray-300'
             }`}
@@ -239,9 +286,13 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
           {touched.nin && errors.nin && (
             <p className="text-red-500 text-xs mt-1">{errors.nin}</p>
           )}
+          {formData.nin.length > 0 && (
+            <p className={`text-xs mt-1 ${formData.nin.length === 16 ? 'text-green-600' : 'text-gray-500'}`}>
+              {formData.nin.length}/16 digits
+            </p>
+          )}
         </div>
 
-      
         <div className="space-y-1 sm:space-y-2">
           <label className="text-xs sm:text-sm font-medium text-gray-700 block">
             Service Type <span className="text-red-500">*</span>
@@ -289,6 +340,53 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
         </div>
 
       
+        {selectedService && selectedService !== "other" && currentTags.length > 0 && (
+          <div className="space-y-2">
+            <label className="text-xs sm:text-sm font-medium text-gray-700 block">
+              Service Tags <span className="text-red-500">*</span>
+            </label>
+            <p className="text-gray-500 text-xs">Select the services you offer</p>
+            <div className="flex flex-wrap gap-3">
+              {currentTags.map(tag => (
+                <label key={tag} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.serviceTags.includes(tag)}
+                    onChange={() => handleTagToggle(tag)}
+                    className="rounded border-gray-300 text-brandText focus:ring-brandText"
+                  />
+                  <span className="text-sm text-gray-700">{tag}</span>
+                </label>
+              ))}
+            </div>
+            {touched.serviceTags && errors.serviceTags && (
+              <p className="text-red-500 text-xs mt-1">{errors.serviceTags}</p>
+            )}
+          </div>
+        )}
+
+        {selectedService === "other" && (
+          <div className="space-y-2">
+            <label className="text-xs sm:text-sm font-medium text-gray-700 block">
+              Service Tags <span className="text-red-500">*</span>
+            </label>
+            <p className="text-gray-500 text-xs">Enter your service tags separated by commas (e.g., Leak Repair, Installation)</p>
+            <input
+              type="text"
+              value={formData.serviceTags.join(", ")}
+              onChange={(e) => handleCustomTagsChange(e.target.value)}
+              onBlur={() => handleBlur('serviceTags')}
+              placeholder="e.g., Leak Repair, Installation"
+              className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#E6EFED] border rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent transition text-xs sm:text-sm text-[#696969] ${
+                touched.serviceTags && errors.serviceTags ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {touched.serviceTags && errors.serviceTags && (
+              <p className="text-red-500 text-xs mt-1">{errors.serviceTags}</p>
+            )}
+          </div>
+        )}
+
         <div className="space-y-1 sm:space-y-2">
           <label className="text-xs sm:text-sm font-medium text-gray-700 block">
             About You <span className="text-red-500">*</span>
