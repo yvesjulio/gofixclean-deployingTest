@@ -26,8 +26,8 @@ function NotificationsDashboard() {
       time: '5 minutes ago',
       isRead: false,
       isMarkedAsRead: false,
-      icon: <FiBriefcase className="w-5 h-5" />,
-      iconBg: ' text-teal-700'
+      icon: <FiBriefcase className="w-4 h-4 sm:w-5 sm:h-5" />,
+      iconBg: 'text-teal-700'
     },
     {
       id: 2,
@@ -37,7 +37,7 @@ function NotificationsDashboard() {
       time: '1 hour ago',
       isRead: false,
       isMarkedAsRead: false,
-      icon: <FiMessageSquare className="w-5 h-5" />,
+      icon: <FiMessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />,
       iconBg: 'text-blue-700'
     },
     {
@@ -48,8 +48,8 @@ function NotificationsDashboard() {
       time: '3 hours ago',
       isRead: false,
       isMarkedAsRead: false,
-      icon: <FiDollarSign className="w-5 h-5" />,
-      iconBg: ' text-orange-700'
+      icon: <FiDollarSign className="w-4 h-4 sm:w-5 sm:h-5" />,
+      iconBg: 'text-orange-700'
     },
     {
       id: 4,
@@ -59,8 +59,8 @@ function NotificationsDashboard() {
       time: 'Yesterday',
       isRead: true,
       isMarkedAsRead: false,
-      icon: <FiStar className="w-5 h-5" />,
-      iconBg: ' text-yellow-700'
+      icon: <FiStar className="w-4 h-4 sm:w-5 sm:h-5" />,
+      iconBg: 'text-yellow-700'
     },
     {
       id: 5,
@@ -70,15 +70,14 @@ function NotificationsDashboard() {
       time: '2 days ago',
       isRead: true,
       isMarkedAsRead: false,
-      icon: <FiBriefcase className="w-5 h-5" />,
-      iconBg: ' text-teal-700'
+      icon: <FiBriefcase className="w-4 h-4 sm:w-5 sm:h-5" />,
+      iconBg: 'text-teal-700'
     }
   ]);
 
   const [showDropdown, setShowDropdown] = useState<number | null>(null);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
-  
   const markedCount = notifications.filter(n => n.isMarkedAsRead).length;
 
   const getTitle = () => {
@@ -127,7 +126,6 @@ function NotificationsDashboard() {
         isMarkedAsRead: true 
       }))
     );
-   
     setActiveFilter('marked');
   };
 
@@ -148,48 +146,48 @@ function NotificationsDashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
     
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
-          <FiBell className="w-5 h-5 text-brandText" />
-          <h2 className="text-sm text-brandText">
+          <FiBell className="w-4 h-4 sm:w-5 sm:h-5 text-brandText" />
+          <h2 className="text-xs sm:text-sm text-gray-600">
             {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
           </h2>
         </div>
         <button
           onClick={handleMarkAllAsRead}
-          className="flex items-center gap-2 px-4 py-2 text-sm text-brandText  border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          className="flex items-center justify-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-brandText border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
         >
-          <FiCheckCircle className="w-4 h-4" />
+          <FiCheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
           Mark all as read
         </button>
       </div>
 
-    
-      <div className="flex gap-2 bg-gray-300 p-1 rounded-lg w-fit">
+     
+      <div className="flex flex-wrap gap-1 sm:gap-2 bg-gray-300 p-1 rounded-lg w-fit">
         <button
           onClick={() => setActiveFilter('all')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
             activeFilter === 'all'
               ? 'bg-gray-200 text-gray-900 shadow-sm'
-              : 'text-brandText hover:text-gray-900'
+              : 'text-gray-600 hover:text-gray-900'
           }`}
         >
           All
         </button>
         <button
           onClick={() => setActiveFilter('unread')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors relative ${
+          className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors relative ${
             activeFilter === 'unread'
               ? 'bg-gray-200 text-gray-900 shadow-sm'
-              : 'text-brandText hover:text-gray-900'
+              : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          <span className="flex items-center gap-2">
+          <span className="flex items-center gap-1 sm:gap-2">
             Unread
             {unreadCount > 0 && (
-              <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 bg-red-500 text-white text-xs rounded-full font-semibold">
+              <span className="inline-flex items-center justify-center min-w-4 h-4 sm:min-w-5 sm:h-5 px-1 sm:px-1.5 bg-red-500 text-white text-[10px] sm:text-xs rounded-full font-semibold">
                 {unreadCount}
               </span>
             )}
@@ -197,30 +195,30 @@ function NotificationsDashboard() {
         </button>
         <button
           onClick={() => setActiveFilter('jobs')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
             activeFilter === 'jobs'
               ? 'bg-gray-200 text-gray-900 shadow-sm'
-              : 'text-brandText hover:text-gray-900'
+              : 'text-gray-600 hover:text-gray-900'
           }`}
         >
           Jobs
         </button>
         <button
           onClick={() => setActiveFilter('messages')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
             activeFilter === 'messages'
               ? 'bg-gray-200 text-gray-900 shadow-sm'
-              : 'text-brandText hover:text-gray-900'
+              : 'text-gray-600 hover:text-gray-900'
           }`}
         >
           Messages
         </button>
         <button
           onClick={() => setActiveFilter('payments')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`px-2 sm:px-4 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
             activeFilter === 'payments'
               ? 'bg-gray-200 text-gray-900 shadow-sm'
-              : 'text-brandText hover:text-gray-900'
+              : 'text-gray-600 hover:text-gray-900'
           }`}
         >
           Payments
@@ -229,93 +227,85 @@ function NotificationsDashboard() {
 
      
       <div className="bg-white rounded-xl border border-gray-200">
-        <div className="p-6  border-gray-200">
-          <h3 className="text-lg font-bold text-gray-900">{getTitle()}</h3>
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <h3 className="text-base sm:text-lg font-bold text-brandTealMedium">{getTitle()}</h3>
         </div>
 
-        <div className="p-4 space-y-3">
+        <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
           {filteredNotifications.length === 0 ? (
-            <div className="p-12 text-center">
-              <p className="text-gray-500">No notifications to display</p>
+            <div className="p-8 sm:p-12 text-center">
+              <p className="text-gray-500 text-sm sm:text-base">No notifications to display</p>
             </div>
           ) : (
             filteredNotifications.map((notification, index) => (
               <div
                 key={notification.id}
-                className={`p-4 flex items-start gap-4 hover:bg-gray-50 transition-colors rounded-xl border border-gray-300 ${
+                className={`p-3 sm:p-4 flex gap-3 sm:gap-4 hover:bg-gray-50 transition-colors rounded-xl border border-gray-300 ${
                   !notification.isRead ? 'bg-blue-50' : 'bg-gray-100'
                 }`}
               >
-           
-                <div className={`p-3 rounded-lg ${notification.iconBg} shrink-0`}>
+              
+                <div className={`p-2 sm:p-3 rounded-lg ${notification.iconBg} shrink-0`}>
                   {notification.icon}
                 </div>
 
               
                 <div className="flex-1 min-w-0">
-                  <h4 className=" text-gray-900 mb-1">
+                  <h4 className="text-sm sm:text-base text-brandTealMedium mb-0.5 sm:mb-1">
                     {notification.title}
                   </h4>
-                  <p className="text-gray-600 text-sm mb-2">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2 line-clamp-2">
                     {notification.description}
                   </p>
-                  <p className="text-xs text-gray-500">{notification.time}</p>
+                  <p className="text-[10px] sm:text-xs text-gray-500">{notification.time}</p>
                 </div>
 
-                
-                <div className="flex items-start gap-3 shrink-0">
-                  
+             
+                <div className="flex items-start gap-2 shrink-0">
                  
                   <div className="relative">
                     <button
                       onClick={() =>
                         setShowDropdown(showDropdown === notification.id ? null : notification.id)
                       }
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1"
+                      className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex gap-0.5"
                     >
                       <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
                       <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
                       <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
                     </button>
 
-                   
                     {showDropdown === notification.id && (
                       <>
-                       
                         <div
                           className="fixed inset-0 z-10"
                           onClick={() => setShowDropdown(null)}
                         />
-                        
-                        
                         <div 
                           className={`absolute right-0 ${
                             index >= filteredNotifications.length - 2 ? 'bottom-full mb-1' : 'top-full mt-1'
-                          } min-w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 overflow-hidden`}
+                          } min-w-36 sm:min-w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20`}
                         >
-                         
                           {activeFilter === 'marked' ? (
-                           
                             <button
                               onClick={() => deleteNotification(notification.id)}
-                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors whitespace-nowrap"
+                              className="w-full px-3 sm:px-4 py-1.5 sm:py-2 text-left text-xs sm:text-sm text-red-600 hover:bg-red-50 transition-colors whitespace-nowrap"
                             >
                               Delete
                             </button>
                           ) : (
-                           
                             <>
                               {!notification.isMarkedAsRead && (
                                 <button
                                   onClick={() => markAsRead(notification.id)}
-                                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"
+                                  className="w-full px-3 sm:px-4 py-1.5 sm:py-2 text-left text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"
                                 >
                                   Mark as read
                                 </button>
                               )}
                               <button
                                 onClick={() => deleteNotification(notification.id)}
-                                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors whitespace-nowrap"
+                                className="w-full px-3 sm:px-4 py-1.5 sm:py-2 text-left text-xs sm:text-sm text-red-600 hover:bg-red-50 transition-colors whitespace-nowrap"
                               >
                                 Delete
                               </button>
@@ -326,12 +316,11 @@ function NotificationsDashboard() {
                     )}
                   </div>
 
-                
+                 
                   {!notification.isRead && (
-                    <div className="w-2 h-2 bg-brandText rounded-full mt-2"></div>
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-brandText rounded-full mt-1 sm:mt-2"></div>
                   )}
                 </div>
-                
               </div>
             ))
           )}

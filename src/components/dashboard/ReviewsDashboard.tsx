@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import { FiStar, FiMessageSquare } from 'react-icons/fi';
 
 interface Review {
@@ -15,7 +15,6 @@ interface Review {
     date: string;
   };
 }
-
 
 function ReviewsDashboard() {
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'replied'>('all');
@@ -69,12 +68,10 @@ function ReviewsDashboard() {
     }
   ];
 
-
   const totalReviews = reviews.length;
   const repliedCount = reviews.filter(r => r.status === 'replied').length;
   const pendingCount = reviews.filter(r => r.status === 'pending').length;
   const averageRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
-
 
   const ratingDistribution = [5, 4, 3, 2, 1].map(rating => ({
     rating,
@@ -88,12 +85,11 @@ function ReviewsDashboard() {
     return true;
   });
 
-  
-  const renderStars = (rating: number) => {
+  const renderStars = (rating: number, size: string = 'w-4 h-4 sm:w-5 sm:h-5') => {
     return [...Array(5)].map((_, index) => (
       <FiStar
         key={index}
-        className={`w-5 h-5 ${
+        className={`${size} ${
           index < rating
             ? 'fill-yellow-500 text-yellow-500'
             : 'fill-gray-200 text-gray-200'
@@ -118,56 +114,54 @@ function ReviewsDashboard() {
   };
 
   return (
-    <div className="space-y-6 ">
-   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ">
-  
-  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
-    <div className="text-4xl font-bold text-brandText mb-1">
-      {averageRating.toFixed(1)}
-    </div>
-    <div className="flex gap-1  mb-2 ">
-      {renderStars(Math.round(averageRating))}
-    </div>
-    <div className="text-sm text-brandText">Average Rating</div>
-  </div>
+    <div className="space-y-4 sm:space-y-6">
 
-  
-  <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
-    <div className="text-4xl font-bold text-brandText mb-1">{totalReviews}</div>
-    <div className="text-sm text-brandText">Total Reviews</div>
-  </div>
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+          <div className="text-2xl sm:text-4xl font-bold text-brandText mb-1">
+            {averageRating.toFixed(1)}
+          </div>
+          <div className="flex gap-0.5 sm:gap-1 mb-1 sm:mb-2">
+            {renderStars(Math.round(averageRating), 'w-3 h-3 sm:w-4 sm:h-4')}
+          </div>
+          <div className="text-xs sm:text-sm text-gray-600">Average Rating</div>
+        </div>
 
-  
-  <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
-    <div className="text-4xl font-bold text-brandText mb-1">{repliedCount}</div>
-    <div className="text-sm text-brandText">Replied</div>
-  </div>
+        <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+          <div className="text-2xl sm:text-4xl font-bold text-brandText mb-1">{totalReviews}</div>
+          <div className="text-xs sm:text-sm text-gray-600">Total Reviews</div>
+        </div>
 
-  
-  <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
-    <div className="text-4xl font-bold text-brandText mb-1">{pendingCount}</div>
-    <div className="text-sm text-brandText">Pending Reply</div>
-  </div>
-</div>
-     
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-        <h3 className="text-xl font-bold text-gray-900 mb-6">Rating Distribution</h3>
-        <div className="space-y-3">
+        <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+          <div className="text-2xl sm:text-4xl font-bold text-brandText mb-1">{repliedCount}</div>
+          <div className="text-xs sm:text-sm text-gray-600">Replied</div>
+        </div>
+
+        <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-200 flex flex-col items-center justify-center">
+          <div className="text-2xl sm:text-4xl font-bold text-brandText mb-1">{pendingCount}</div>
+          <div className="text-xs sm:text-sm text-gray-600">Pending Reply</div>
+        </div>
+      </div>
+
+      
+      <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Rating Distribution</h3>
+        <div className="space-y-2 sm:space-y-3">
           {ratingDistribution.map(({ rating, count }) => {
             const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
             return (
-              <div key={rating} className="flex items-center gap-4">
-                <div className="flex items-center gap-1 w-12">
-                  <span className="text-sm font-medium text-gray-700">{rating}</span>
-                  <FiStar className="w-4 h-4 fill-yellow-500 text-yellow-500" />
+              <div key={rating} className="flex items-center gap-2 sm:gap-4">
+                <div className="flex items-center gap-0.5 sm:gap-1 w-10 sm:w-12">
+                  <span className="text-xs sm:text-sm font-medium text-gray-700">{rating}</span>
+                  <FiStar className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-500 text-yellow-500" />
                 </div>
-                <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 sm:h-3 bg-gray-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-yellow-500 rounded-full transition-all duration-300"
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
-                <span className="text-sm font-medium text-gray-600 w-8 text-right">
+                <span className="text-xs sm:text-sm font-medium text-gray-600 w-6 sm:w-8 text-right">
                   {count}
                 </span>
               </div>
@@ -176,113 +170,115 @@ function ReviewsDashboard() {
         </div>
       </div>
 
-      
-      <div className="flex gap-2">
+    
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setActiveTab('all')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors ${
             activeTab === 'all'
               ? 'bg-brandText text-white'
-              : 'bg-gray-200  text-gray-700  hover:bg-brandOrange hover:text-white border border-gray-300'
+              : 'bg-gray-200 text-gray-700 hover:bg-brandOrange hover:text-white border border-gray-300'
           }`}
         >
           All ({totalReviews})
         </button>
         <button
           onClick={() => setActiveTab('pending')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors ${
             activeTab === 'pending'
               ? 'bg-brandText text-white'
-              : 'bg-gray-200  text-gray-700 hover:bg-brandOrange hover:text-white border border-gray-300'
+              : 'bg-gray-200 text-gray-700 hover:bg-brandOrange hover:text-white border border-gray-300'
           }`}
         >
           Pending Reply ({pendingCount})
         </button>
         <button
           onClick={() => setActiveTab('replied')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium text-xs sm:text-sm transition-colors ${
             activeTab === 'replied'
               ? 'bg-brandText text-white'
-              : 'bg-gray-200  text-gray-700  hover:bg-brandOrange hover:text-white border border-gray-300'
+              : 'bg-gray-200 text-gray-700 hover:bg-brandOrange hover:text-white border border-gray-300'
           }`}
         >
           Replied ({repliedCount})
         </button>
       </div>
 
-     
-      <div className="space-y-4">
+      
+      <div className="space-y-3 sm:space-y-4">
         {filteredReviews.map((review) => (
           <div
             key={review.id}
-            className="bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+            className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200"
           >
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <img
                 src={review.avatar}
                 alt={review.name}
-                className="w-14 h-14 rounded-full object-cover shrink-0"
+                className="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover shrink-0"
               />
-              <div className="flex-1">
-                <div className="flex items-start justify-between mb-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
                   <div>
-                    <h4 className="font-semibold text-gray-900 text-lg">{review.name}</h4>
-                    <div className="flex items-center gap-3 mt-1">
+                    <h4 className="font-semibold text-gray-900 text-base sm:text-lg truncate">{review.name}</h4>
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
                       <div className="flex gap-0.5">
-                        {renderStars(review.rating)}
+                        {renderStars(review.rating, 'w-3 h-3 sm:w-4 sm:h-4')}
                       </div>
-                      <span className="px-3 py-1 bg-gray-200 text-brandText text-sm rounded-xl">
+                      <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-gray-200 text-brandText text-xs sm:text-sm rounded-xl">
                         {review.service}
                       </span>
                     </div>
                   </div>
-                  <span className="text-sm text-gray-500">{review.date}</span>
+                  <span className="text-xs sm:text-sm text-gray-500">{review.date}</span>
                 </div>
 
-                <p className="text-gray-500 leading-relaxed mb-4">{review.comment}</p>
+                <p className="text-gray-500 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4">
+                  {review.comment}
+                </p>
 
                
                 {review.status === 'replied' && review.reply && (
-                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <div className="flex items-start justify-between mb-2">
-                      <span className="text-sm  text-brandText">Your Response</span>
-                      <span className="text-xs text-brandText">{review.reply.date}</span>
+                  <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200 mb-3 sm:mb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 gap-1">
+                      <span className="text-xs sm:text-sm font-medium text-brandText">Your Response</span>
+                      <span className="text-xs text-gray-500">{review.reply.date}</span>
                     </div>
-                    <p className="text-gray-500 text-sm leading-relaxed">{review.reply.text}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm leading-relaxed">{review.reply.text}</p>
                   </div>
                 )}
 
-              
+               
                 {review.status === 'pending' && replyingTo !== review.id && (
                   <button
                     onClick={() => handleReply(review.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 border border-gray-300 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-sm font-medium"
+                    className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-200 text-gray-700 border border-gray-300 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-xs sm:text-sm font-medium"
                   >
-                    <FiMessageSquare className="w-4 h-4" />
+                    <FiMessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
                     Reply to Review
                   </button>
                 )}
 
                
                 {replyingTo === review.id && (
-                  <div className="space-y-3">
+                  <div className="space-y-3 mt-3">
                     <textarea
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
                       placeholder="Write your response..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none"
-                      rows={4}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent resize-none text-xs sm:text-sm"
+                      rows={3}
                     />
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={handleCancelReply}
-                        className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                        className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-xs sm:text-sm font-medium"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleSendReply}
-                        className="px-4 py-2 bg-teal-700 text-white rounded-lg hover:bg-teal-800 transition-colors text-sm font-medium"
+                        className="px-3 sm:px-4 py-1.5 sm:py-2 bg-brandText text-white rounded-lg hover:bg-brandText/90 transition-colors text-xs sm:text-sm font-medium"
                       >
                         Send Response
                       </button>
@@ -297,8 +293,8 @@ function ReviewsDashboard() {
 
      
       {filteredReviews.length === 0 && (
-        <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
-          <p className="text-gray-500 text-lg">No reviews found in this category.</p>
+        <div className="bg-white rounded-xl p-8 sm:p-12 shadow-sm border border-gray-200 text-center">
+          <p className="text-gray-500 text-sm sm:text-lg">No reviews found in this category.</p>
         </div>
       )}
     </div>

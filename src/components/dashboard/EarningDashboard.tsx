@@ -32,12 +32,12 @@ function EarningsDashboard() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
         <div className="flex items-center gap-2 mb-6">
           <FiDollarSign className="w-6 h-6 text-gray-700" />
-          <h2 className="text-xl font-bold text-gray-900">Earnings Summary</h2>
+          <h2 className="text-xl font-bold text-brandTealMedium">Earnings Summary</h2>
         </div>
 
 <div className="bg-linear-to-br from-blue-50 via-yellow-50 to-green-50 rounded-xl p-6 mb-6 text-center border border-gray-200">
   <p className="text-sm text-gray-600 mb-2">This Month</p>
-  <h3 className="text-4xl font-bold text-gray-900 mb-2">
+  <h3 className="text-3xl font-bold text-brandTealMedium mb-2">
     {formatCurrency(earningsData.thisMonth)} RWF
   </h3>
   <div className="flex items-center justify-center gap-1 bg-orange-100 text-orange-700 px-2 py-1 rounded-full w-fit mx-auto">
@@ -54,7 +54,7 @@ function EarningsDashboard() {
               <FiCalendar className="w-4 h-4" />
               <span className="text-sm">Today</span>
             </div>
-            <p className="text-xl font-bold text-gray-900">
+            <p className="text-xl font-bold text-brandTealMedium">
               {formatCurrency(earningsData.today)} RWF
             </p>
           </div>
@@ -65,7 +65,7 @@ function EarningsDashboard() {
               <FiTrendingUp className="w-4 h-4" />
               <span className="text-sm">This Week</span>
             </div>
-            <p className="text-xl font-bold text-gray-900">
+            <p className="text-xl font-bold text-brandTealMedium">
               {formatCurrency(earningsData.thisWeek)} RWF
             </p>
           </div>
@@ -74,8 +74,8 @@ function EarningsDashboard() {
        
         <div className="bg-white rounded-xl p-2 pl-4  border border-gray-200 mb-4">
           <div className="flex items-center justify-between">
-            <span className="text-gray-500 text-sm">Total Earnings</span>
-            <span className="text- font-bold text-gray-800">
+            <span className="text-brandGreenLight text-sm">Total Earnings</span>
+            <span className="text- font-bold text-brandTealMedium">
               {formatCurrency(earningsData.totalEarnings)} RWF
             </span>
           </div>
@@ -84,8 +84,8 @@ function EarningsDashboard() {
        
         <div className="bg-white rounded-xl pl-4 p-2 border border-gray-200">
           <div className="flex items-center justify-between">
-            <span className="text-gray-500 text-sm">Jobs Completed (This Month)</span>
-            <span className=" font-bold text-gray-800">
+            <span className="text-brandGreenLight text-sm">Jobs Completed (This Month)</span>
+            <span className=" font-bold text-brandTealMedium">
               {earningsData.jobsCompleted}
             </span>
           </div>

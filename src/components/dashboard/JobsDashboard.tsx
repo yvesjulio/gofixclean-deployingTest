@@ -110,22 +110,23 @@ const JobsDashboard: React.FC<JobsDashboardProps> = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col lg:flex-row gap-6">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+       
         <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-5  border-gray-200">
+          <div className="p-4 sm:p-5 border-b border-gray-200">
             <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-gray-900 text-lg ">Job Requests</h3>
+              <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Job Requests</h3>
               <span className="px-2 py-1 text-xs font-medium text-brandText bg-gray-200 rounded-full">
                 3 pending
               </span>
             </div>
           </div>
-          <div className="p-4 space-y-3">
+          <div className="p-3 sm:p-4 space-y-3">
             {jobRequests.map((job) => (
               <div
                 key={job.id}
-                className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow"
+                className="border border-gray-200 rounded-xl p-3 sm:p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex gap-3">
                   <div className="shrink-0">
@@ -133,45 +134,45 @@ const JobsDashboard: React.FC<JobsDashboardProps> = () => {
                       <img
                         src={job.avatar}
                         alt={job.name}
-                        className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-gray-200"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
-                        <FiUser className="w-6 h-6 text-gray-500" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                        <FiUser className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
                       </div>
                     )}
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-semibold text-gray-900 text-base">{job.name}</h4>
-                      <span className=" text-brandText text-sm">{job.amount}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
+                      <h4 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{job.name}</h4>
+                      <span className="text-brandText text-xs sm:text-sm font-semibold">{job.amount}</span>
                     </div>
-                    <p className="text-gray-500 text-sm mt-1">{job.job}</p>
-                    <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                    <p className="text-gray-500 text-xs sm:text-sm mt-1 truncate">{job.job}</p>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-4 mt-2 text-xs text-gray-500">
                       <span className="flex items-center gap-1">
-                        <FiMapPin className="w-3 h-3" /> {job.location}
+                        <FiMapPin className="w-3 h-3 shrink-0" /> 
+                        <span className="truncate">{job.location}</span>
                       </span>
                       <span className="flex items-center gap-1">
-                     
-                        <FiCalendar className="w-3 h-3" /> {job.date}
+                        <FiCalendar className="w-3 h-3 shrink-0" /> 
+                        <span className="truncate">{job.date}</span>
                       </span>
                     </div>
                   </div>
                 </div>
                 <div className="mt-3 flex gap-2">
-                 
                   <button
                     onClick={() => handleAccept(job.id)}
-                    className="flex-1 px-4 py-2 bg-brandText text-white rounded-lg hover:bg-brandText/90 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                    className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-brandText text-white rounded-lg hover:bg-brandText/90 transition-colors text-xs sm:text-sm font-medium flex items-center justify-center gap-2"
                   >
-                    <FiCheck className="w-4 h-4" />
+                    <FiCheck className="w-3 h-3 sm:w-4 sm:h-4" />
                     Accept
                   </button>
                   <button
                     onClick={() => handleDecline(job.id)}
-                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                    className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-xs sm:text-sm font-medium flex items-center justify-center gap-2"
                   >
-                    <FiX className="w-4 h-4" />
+                    <FiX className="w-3 h-3 sm:w-4 sm:h-4" />
                     Decline
                   </button>
                 </div>
@@ -180,104 +181,103 @@ const JobsDashboard: React.FC<JobsDashboardProps> = () => {
           </div>
         </div>
 
-
+       
         <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-5  border-gray-200">
+          <div className="p-4 sm:p-5 border-b border-gray-200">
             <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-gray-900 text-lg">Active Jobs</h3>
-              <span className="px-2 py-1 text-xs  text-gray-700 font-bold rounded-xl border border-gray-200">
+              <h3 className="font-semibold text-gray-900 text-base sm:text-lg">Active Jobs</h3>
+              <span className="px-2 py-1 text-xs text-gray-700 font-bold rounded-xl border border-gray-200">
                 {activeJobs.length} Jobs
               </span>
             </div>
           </div>
-          <div className="p-4 space-y-3">
+          <div className="p-3 sm:p-4 space-y-3">
             {activeJobs.map((job) => (
               <div
                 key={job.id}
-                className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow"
+                className="border border-gray-200 rounded-xl p-3 sm:p-4 hover:shadow-md transition-shadow"
               >
-              
-                <div className="flex gap-3 items-start">
+               
+                <div className="flex gap-3">
                   <div className="shrink-0">
                     {job.avatar ? (
                       <img
                         src={job.avatar}
                         alt={job.name}
-                        className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-gray-200"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
-                        <FiUser className="w-6 h-6 text-gray-500" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                        <FiUser className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500" />
                       </div>
                     )}
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-semibold text-gray-900 text-base">{job.name}</h4>
-                        <p className="text-gray-500 text-sm mt-1">{job.job}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{job.name}</h4>
+                        <p className="text-gray-500 text-xs sm:text-sm mt-0.5 sm:mt-1 truncate">{job.job}</p>
                       </div>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusBadgeColor(job.status)}`}>
+                      <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-medium rounded-full border ${getStatusBadgeColor(job.status)} whitespace-nowrap self-start sm:self-auto`}>
                         {job.status}
                       </span>
                     </div>
                   </div>
                 </div>
 
-               
-                <div className="mt-3 space-y-1 text-sm text-gray-600">
+              
+                <div className="mt-3 space-y-1 text-xs sm:text-sm text-gray-600">
                   <div className="flex items-center gap-2">
-                    <FiMapPin className="w-4 h-4 text-gray-400" />
-                    <span>{job.location}</span>
+                    <FiMapPin className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 shrink-0" />
+                    <span className="truncate">{job.location}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FiCalendar className="w-4 h-4 text-gray-400" />
-                    <span>{job.date}</span>
+                    <FiCalendar className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 shrink-0" />
+                    <span className="truncate">{job.date}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Amount:</span>
-                    <span className="font-semibold text-gray-900">{job.amount}</span>
+                  <div className="flex justify-between items-center mt-2 pt-1 border-t border-gray-100">
+                    <span className="text-gray-600 text-xs sm:text-sm">Amount:</span>
+                    <span className="font-semibold text-gray-900 text-sm sm:text-base">{job.amount}</span>
                   </div>
                 </div>
 
-             
-                <div className="mt-4 flex gap-2">
+               
+                <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => handleCall(job.id)}
-                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                    className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-xs sm:text-sm font-medium flex items-center justify-center gap-1 sm:gap-2"
                   >
-                    <FiPhone className="w-4 h-4" /> Call
+                    <FiPhone className="w-3 h-3 sm:w-4 sm:h-4" /> Call
                   </button>
                   <button
                     onClick={() => handleNavigate(job.location)}
-                    className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                    className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-brandOrange hover:text-white transition-colors text-xs sm:text-sm font-medium flex items-center justify-center gap-1 sm:gap-2"
                   >
-                    <FiNavigation className="w-4 h-4" /> Navigate
+                    <FiNavigation className="w-3 h-3 sm:w-4 sm:h-4" /> Navigate
                   </button>
                 </div>
 
-              
-                <div className="mt-3 flex items-center gap-2">
-                  <label className="text-sm text-gray-600 whitespace-nowrap">
+             
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
+                  <label className="text-xs sm:text-sm text-gray-600 whitespace-nowrap">
                     Update Status:
                   </label>
                   <div className="relative flex-1">
                     <button
                       onClick={() => setOpenDropdown(openDropdown === job.id ? null : job.id)}
-                      className="w-full bg-gray-100 border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 pr-8 text-left focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent flex items-center justify-between"
+                      className="w-full bg-gray-100 border border-gray-200 text-gray-700 text-xs sm:text-sm rounded-lg px-3 py-2 pr-8 text-left focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent flex items-center justify-between"
                     >
                       <span>{job.status}</span>
-                      <FiChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openDropdown === job.id ? 'rotate-180' : ''}`} />
+                      <FiChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-400 transition-transform ${openDropdown === job.id ? 'rotate-180' : ''}`} />
                     </button>
 
-                   
                     {openDropdown === job.id && (
                       <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-2 space-y-1">
                         {statusOptions.map((status) => (
                           <button
                             key={status}
                             onClick={() => updateJobStatus(job.id, status)}
-                            className={`w-full px-3 py-2 text-sm text-left transition-colors flex items-center justify-between rounded-lg ${
+                            className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-left transition-colors flex items-center justify-between rounded-lg ${
                               job.status === status
                                 ? getStatusColor(status)
                                 : 'bg-white text-gray-700 hover:bg-gray-50'
@@ -285,7 +285,7 @@ const JobsDashboard: React.FC<JobsDashboardProps> = () => {
                           >
                             <span>{status}</span>
                             {job.status === status && (
-                              <FiCheck className="w-4 h-4" />
+                              <FiCheck className="w-3 h-3 sm:w-4 sm:h-4" />
                             )}
                           </button>
                         ))}

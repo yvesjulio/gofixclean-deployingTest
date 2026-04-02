@@ -11,7 +11,6 @@ import {
   FiClock, 
   FiSettings, 
   FiLogOut, 
-  FiMenu,
   FiX,
 } from 'react-icons/fi';
 
@@ -27,6 +26,8 @@ interface SidebarProps {
   activeSection?: string; 
   isOpen?: boolean;
   onToggle?: () => void;
+  isMobileMenuOpen?: boolean;
+  setIsMobileMenuOpen?: (open: boolean) => void;
 }
 
 interface NavItem {
@@ -48,12 +49,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   onSectionChange,
   activeSection = 'Overview', 
   isOpen = true,
-  onToggle
+  onToggle,
+  isMobileMenuOpen = false,
+  setIsMobileMenuOpen = () => {}
 }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState('overview');
 
-  
   useEffect(() => {
     const sectionToId: { [key: string]: string } = {
       'Overview': 'overview',
@@ -92,35 +93,19 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-     
-      <button
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white text-brandText rounded-lg border border-gray-200"
-      >
-        {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-      </button>
-
-      
-      {isMobileMenuOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-
-     
       <aside
         className={`
-          fixed top-0 left-0 h-screen bg-white z-50
-          transition-all duration-300 ease-in-out
+          fixed top-0 left-0 h-screen bg-white z-40
+          transition-transform duration-300 ease-in-out
           ${isOpen ? 'lg:w-72' : 'lg:w-20'}
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
           border-r border-gray-200
+          shadow-xl lg:shadow-none
+          overflow-y-auto
         `}
       >
         <div className="flex flex-col h-full">
-         
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               {isOpen ? (
@@ -128,8 +113,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                   GoFix<span className="text-brandOrange">&</span>Clean
                 </h1>
               ) : (
-                <div className="w-8 h-8 bg-brandText rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">G</span>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                  <span className="text-brandText font-semibold text-2xl">GF<span className="text-brandOrange">&</span>C</span>
                 </div>
               )}
               <button
@@ -150,7 +135,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
 
-         
           <div className={`px-6 py-3 border-b border-gray-200 ${!isOpen && 'lg:px-3'}`}>
             <div className={`flex items-center ${!isOpen ? 'lg:justify-center' : 'gap-3'}`}>
               <div className="relative">
@@ -180,13 +164,10 @@ const Sidebar: React.FC<SidebarProps> = ({
               )}
             </div>
           </div>
-
-         
           <div className={`px-6 pt-4 pb-1 ${!isOpen && 'lg:px-3'}`}>
             {isOpen && <span className="text-xs text-gray-600 tracking-wider">Dashboard</span>}
           </div>
           
-         
           <div className={`flex-1 ${!isOpen ? 'lg:px-2' : 'lg:px-3'}`}>
             <nav className="py-2">
               <ul className="space-y-0.5">
@@ -228,8 +209,6 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           <div className="border-t border-gray-200 w-full"></div>
-
-         
           <div className={`py-2 ${!isOpen ? 'lg:px-2' : 'lg:px-3'}`}>
             <button
               onClick={() => {
