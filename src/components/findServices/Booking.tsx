@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiClock, FiStar, FiBriefcase,FiCalendar, FiUpload, FiThumbsUp, FiX } from 'react-icons/fi';
+import { FiMapPin, FiClock, FiStar, FiBriefcase, FiCalendar, FiUpload, FiThumbsUp, FiX, FiCheckCircle, FiAlertTriangle, FiShield, FiPhone, FiUser } from 'react-icons/fi';
 import { LuMessageCircle } from "react-icons/lu";
 import { MdOutlineVerified } from "react-icons/md";
 import { TiStarOutline } from "react-icons/ti";
-import Footer from "../landingpages/Footer"; 
+import Footer from "../landingpages/Footer";
 
 interface TimeSlot {
   time: string;
@@ -35,6 +35,24 @@ interface Provider {
   services: string[];
 }
 
+interface UploadedMedia {
+  id: string;
+  name: string;
+  type: "image" | "video";
+  preview: string;
+}
+
+const SERVICE_CHECKLISTS: Record<string, string[]> = {
+  Electrical: ["No power", "Wiring issue", "Installation", "Lighting repair", "Other"],
+  Plumbing: ["Leaking pipe", "Blocked drain", "Installation", "Water heater issue", "Other"],
+  Cleaning: ["Deep cleaning", "Regular cleaning", "Move-in/out cleaning", "Office cleaning", "Other"],
+  Painting: ["Interior painting", "Exterior painting", "Wallpaper", "Touch-up", "Other"],
+  Cooking: ["Private event", "Meal prep", "Cooking class", "Catering", "Other"],
+  Mechanics: ["Engine issue", "Brake problem", "Oil change", "Diagnostics", "Other"],
+  Handyman: ["Furniture assembly", "Minor repair", "Installation", "Maintenance", "Other"],
+  Moving: ["Packing", "Loading & transport", "Full move", "Single item", "Other"],
+};
+
 function Booking() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -46,11 +64,24 @@ function Booking() {
     }
   }, [provider, navigate]);
 
+
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [landmark, setLandmark] = useState("");
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [taskDescription, setTaskDescription] = useState<string>('');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [bookingErrors, setBookingErrors] = useState<{ date?: string; time?: string }>({});
+  const [estimatedDuration, setEstimatedDuration] = useState("");
+  const [urgency, setUrgency] = useState<"normal" | "urgent">("normal");
+  const [selectedChecklist, setSelectedChecklist] = useState<string[]>([]);
+  const [uploadedMedia, setUploadedMedia] = useState<UploadedMedia[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [otherInput, setOtherInput] = useState<string>("");
+  const [showOtherInput, setShowOtherInput] = useState<boolean>(false);
+
+  const mediaInputRef = useRef<HTMLInputElement>(null);
 
   const timeSlots: TimeSlot[] = [
     { time: '09:00', available: true },
@@ -63,7 +94,8 @@ function Booking() {
     { time: '17:00', available: true },
   ];
 
- 
+  const durationOptions = ["1 hour", "2–3 hours", "Half day (4 hrs)", "Full day (8 hrs)"];
+
   const [reviews, setReviews] = useState<Review[]>([
     {
       id: 1,
@@ -99,15 +131,6 @@ function Booking() {
   const [newRating, setNewRating] = useState<number>(5);
   const [newComment, setNewComment] = useState<string>('');
 
- 
-  const [showMessageModal, setShowMessageModal] = useState(false);
-  const [messageSubject, setMessageSubject] = useState('');
-  const [messageBody, setMessageBody] = useState('');
-  const [attachedFile, setAttachedFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const mediaInputRef = useRef<HTMLInputElement>(null);
-
-
   const totalReviews = reviews.length;
   const averageRating = totalReviews
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
@@ -119,16 +142,108 @@ function Booking() {
     return { stars, count, percentage };
   });
 
-  const handleBookNow = () => {
-    const errors: { date?: string; time?: string } = {};
-    if (!selectedDate) errors.date = 'Please select a date';
-    if (!selectedTime) errors.time = 'Please select a time';
-    if (Object.keys(errors).length > 0) {
-      setBookingErrors(errors);
+  const checklist = SERVICE_CHECKLISTS[provider?.category || "Handyman"] || SERVICE_CHECKLISTS["Handyman"];
+
+  const handleUrgencyChange = (value: "normal" | "urgent") => {
+    setUrgency(value);
+    if (value === "urgent") {
+      setSelectedDate(new Date().toISOString().split("T")[0]);
+    }
+  };
+
+  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    
+    const remainingSlots = Math.max(0, 3 - uploadedMedia.length);
+    
+    if (uploadedMedia.length < 3 && remainingSlots > 0) {
+      Array.from(files).slice(0, remainingSlots).forEach(file => {
+        const isVideo = file.type.startsWith("video/");
+        const isImage = file.type.startsWith("image/");
+        if (!isVideo && !isImage) {
+          alert("Only images and videos are allowed");
+          return;
+        }
+        setUploadedMedia(prev => [
+          ...prev,
+          {
+            id: Math.random().toString(36).substr(2, 9),
+            name: file.name,
+            type: isVideo ? "video" : "image",
+            preview: URL.createObjectURL(file),
+          },
+        ]);
+      });
+    } else {
+      alert(`Please upload at least 3 photos or videos. You have uploaded ${uploadedMedia.length} file(s).`);
+    }
+  };
+
+  const removeMedia = (id: string) => {
+    setUploadedMedia(prev => prev.filter(m => m.id !== id));
+  };
+
+  const toggleChecklist = (item: string) => {
+    if (item === "Other") {
+      if (!selectedChecklist.includes("Other")) {
+        setSelectedChecklist(prev => [...prev, item]);
+        setShowOtherInput(true);
+      } else {
+        setSelectedChecklist(prev => prev.filter(i => i !== item));
+        setShowOtherInput(false);
+        setOtherInput("");
+      }
+    } else {
+      setSelectedChecklist(prev =>
+        prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
+      );
+    }
+  };
+
+  const handleOtherInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOtherInput(e.target.value);
+  };
+
+  const handleBooking = () => {
+    if (!fullName.trim()) {
+      alert("Please enter your full name");
       return;
     }
-    setBookingErrors({});
-    console.log('Booking:', { selectedDate, selectedTime, taskDescription, uploadedFile, provider });
+    if (!phoneNumber.trim()) {
+      alert("Please enter your phone number");
+      return;
+    }
+    if (!address.trim()) {
+      alert("Please enter your address");
+      return;
+    }
+    if (!selectedDate || !selectedTime) {
+      alert("Please select date and time");
+      return;
+    }
+    if (!taskDescription.trim()) {
+      alert("Please describe your task");
+      return;
+    }
+    if (!estimatedDuration) {
+      alert("Please select estimated duration");
+      return;
+    }
+    if (uploadedMedia.length < 3) {
+      alert(`Please upload at least 3 photos or videos. You have uploaded ${uploadedMedia.length} file(s).`);
+      return;
+    }
+    if (selectedChecklist.includes("Other") && !otherInput.trim()) {
+      alert("Please specify what 'Other' service you need");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setBookingSuccess(true);
+    }, 1500);
   };
 
   const renderStars = (rating: number, size: string = 'w-4 h-4') => {
@@ -176,180 +291,365 @@ function Booking() {
     setShowReviewForm(false);
   };
 
-  
-  const handleAttachFile = () => fileInputRef.current?.click();
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) setAttachedFile(e.target.files[0]);
-  };
-  const handleSendMessage = () => {
-    if (!messageBody.trim()) {
-      alert('Please write a message.');
-      return;
-    }
-    console.log('Sending message:', {
-      to: provider?.name,
-      subject: messageSubject,
-      message: messageBody,
-      file: attachedFile?.name
-    });
-    setMessageSubject('');
-    setMessageBody('');
-    setAttachedFile(null);
-    setShowMessageModal(false);
-  };
-  const closeModal = () => {
-    setShowMessageModal(false);
-    setMessageSubject('');
-    setMessageBody('');
-    setAttachedFile(null);
-  };
-
-  
-  const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setUploadedFile(e.target.files[0]);
-    }
-   
-    if (mediaInputRef.current) {
-      mediaInputRef.current.value = '';
-    }
-  };
-
-  const removeMedia = () => {
-    setUploadedFile(null);
-    if (mediaInputRef.current) {
-      mediaInputRef.current.value = '';
-    }
-  };
-
   if (!provider) return null;
+
+  if (bookingSuccess) {
+    return (
+      <>
+        <div className="min-h-screen bg-gray-50 p-10 px-6 md:px-16 flex items-center justify-center">
+          <div className="max-w-md w-full bg-white rounded-2xl border border-gray-200 p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+              <FiCheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Booking Request Sent!</h3>
+            <p className="text-gray-600 text-sm mb-4">
+              Your booking request has been sent to <strong>{provider.name}</strong>. They will review and respond shortly.
+            </p>
+            <div className="bg-gray-50 rounded-lg p-4 text-left space-y-2 mb-4 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Date</span>
+                <span className="font-medium text-gray-900">{selectedDate}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Time</span>
+                <span className="font-medium text-gray-900">{selectedTime}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Duration</span>
+                <span className="font-medium text-gray-900">{estimatedDuration}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Urgency</span>
+                <span className={`font-medium ${urgency === "urgent" ? "text-orange-600" : "text-gray-900"}`}>
+                  {urgency === "urgent" ? "Urgent (Same Day)" : "Normal"}
+                </span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mb-4">
+              You'll receive a notification once {provider.name} confirms your booking.
+            </p>
+            <button
+              onClick={() => setBookingSuccess(false)}
+              className="w-full bg-brandText hover:bg-brandText/90 text-white font-semibold py-3 rounded-lg transition-colors"
+            >
+              Book Another Service
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
       <div className="min-h-screen bg-gray-50 p-10 px-6 md:px-16">
-        <div className="max-w-325 w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
           
+         
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl  p-6 border border-gray-200 sticky top-8">
-              <div className="mb-6">
-                <p className="text-3xl font-bold text-brandTealMedium">{provider.price}</p>
-                <p className="text-gray-500 text-sm">per hour</p>
-              </div>
-
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 sticky top-8">
             
-              <div className="mb-6">
-                <label className="block text-sm text-brandTealMedium mb-2">Select Date</label>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText bg-gray-100 text-brandTealMedium ${
-                    bookingErrors.date ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                />
-                {bookingErrors.date && <p className="text-red-500 text-xs mt-1">{bookingErrors.date}</p>}
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <p className="text-3xl font-bold text-brandTealMedium">{provider.price}</p>
+                  <p className="text-sm text-gray-500">FROM</p>
+                </div>
               </div>
 
              
               <div className="mb-6">
-                <label className="block text-sm text-brandTealMedium mb-2">Select Time</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {timeSlots.map((slot) => (
-                    <button
-                      key={slot.time}
-                      onClick={() => setSelectedTime(slot.time)}
-                      disabled={!slot.available}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedTime === slot.time
-                          ? 'bg-brandText text-white'
-                          : slot.available
-                          ? 'bg-gray-100 text-brandTealMedium hover:bg-gray-200'
-                          : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      {slot.time}
-                    </button>
-                  ))}
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">1. Your Info</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm  text-brandTealMedium mb-1">
+                      Full Name <span className="text-red-500m">*</span>
+                    </label>
+                    <div className="relative">
+                      <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brandTealMedium" />
+                      <input
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="Enter your full name"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm  text-brandTealMedium mb-1">
+                      Phone Number <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brandTealMedium" />
+                      <input
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="+250 7XX XXX XXX"
+                        type="tel"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
+                      />
+                    </div>
+                  </div>
                 </div>
-                {bookingErrors.time && <p className="text-red-500 text-xs mt-1">{bookingErrors.time}</p>}
               </div>
 
-          
+             
               <div className="mb-6">
-                <label className="block text-sm text-brandTealMedium mb-2">Describe Your Task</label>
-                <textarea
-                  value={taskDescription}
-                  onChange={(e) => setTaskDescription(e.target.value)}
-                  placeholder="Describe what you need help with..."
-                  rows={4}
-                  className="w-full h-18 px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText resize-none text-gray-700 text-sm"
-                />
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">2. Location</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-brandTealMedium mb-1">
+                      Exact Address <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brandTealMedium" />
+                      <input
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Street, house number"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-brandTealMedium mb-1">
+                      Landmark (Optional)
+                    </label>
+                    <input
+                      value={landmark}
+                      onChange={(e) => setLandmark(e.target.value)}
+                      placeholder="Near school, church, etc."
+                      className="w-full px-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
+                    />
+                  </div>
+                </div>
               </div>
 
             
               <div className="mb-6">
-                <label className="block text-sm text-brandTealMedium mb-2">Add Photo/Video (Optional)</label>
-                <p className="text-xs text-gray-500 mb-3">Upload an image or video to help describe the task</p>
-
-      {!uploadedFile ? (
-    <div>
-      <input
-        type="file"
-        ref={mediaInputRef}
-        accept="image/*,video/*"
-        onChange={handleMediaChange}
-        className="hidden"
-      />
-      <button
-        type="button"
-        onClick={() => mediaInputRef.current?.click()}
-        className="w-full px-4 py-3 hover:bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-300 transition-colors flex items-center justify-center gap-2 "
-      >
-        <FiUpload className="w-5 h-5 text-gray-500" />
-        <span className="text-sm font-medium text-gray-500">Upload media</span>
-      </button>
-    </div>
-                ) : (
-                  <div className="mt-2">
-                    <div className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
-                      <span className="text-sm text-gray-700 truncate">{uploadedFile.name}</span>
-                      <button
-                        type="button"
-                        onClick={removeMedia}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <FiX className="w-4 h-4" />
-                      </button>
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">3. Date & Time</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-brandTealMedium mb-1">
+                      Select Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      min={new Date().toISOString().split("T")[0]}
+                      className="w-full px-4 py-2.5 rounded-lg bg-gray-100 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-brandText"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-brandTealMedium mb-1">
+                      Select Time <span className="text-red-500">*</span>
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {timeSlots.map(slot => (
+                        <button
+                          key={slot.time}
+                          onClick={() => setSelectedTime(slot.time)}
+                          className={`px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
+                            selectedTime === slot.time
+                              ? "bg-brandText text-white"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          }`}
+                        >
+                          {slot.time}
+                        </button>
+                      ))}
                     </div>
                   </div>
+                </div>
+              </div>
+
+             
+              <div className="mb-6">
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">4. Service Details</p>
+
+                
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-brandTealMedium mb-2">
+                    What do you need help with?
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {checklist.map(item => (
+                      <button
+                        key={item}
+                        onClick={() => toggleChecklist(item)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
+                          selectedChecklist.includes(item)
+                            ? "bg-brandText text-white border-brandText"
+                            : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+                        }`}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {showOtherInput && (
+                  <div className="mb-3">
+                    <label className="block text-sm font-medium text-brandTealMedium mb-1">
+                      Please specify your other requirement <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={otherInput}
+                      onChange={handleOtherInputChange}
+                      placeholder="Enter your specific requirement..."
+                      className="w-full px-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
+                    />
+                  </div>
                 )}
+
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-brandTealMedium mb-1">
+                    Describe Your Task <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={taskDescription}
+                    onChange={(e) => setTaskDescription(e.target.value)}
+                    placeholder="Describe what you need help with..."
+                    rows={3}
+                    className="w-full px-4 py-2.5 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText resize-none text-sm"
+                  />
+                </div>
+
+              
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-brandTealMedium mb-2">
+                    Estimated Duration <span className="text-red-500">*</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {durationOptions.map(opt => (
+                      <button
+                        key={opt}
+                        onClick={() => setEstimatedDuration(opt)}
+                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 ${
+                          estimatedDuration === opt
+                            ? "bg-brandText text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        <FiClock className="h-3 w-3" />
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-brandTealMedium mb-2">Urgency</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleUrgencyChange("normal")}
+                      className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                        urgency === "normal"
+                          ? "bg-brandText text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      Normal
+                    </button>
+                    <button
+                      onClick={() => handleUrgencyChange("urgent")}
+                      className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
+                        urgency === "urgent"
+                          ? "bg-orange-600 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      <FiAlertTriangle className="h-3 w-3" />
+                      Urgent (Same Day)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Media Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-brandTealMedium mb-1">
+                    Add Photos/Videos <span className="text-red-500">*</span>
+                  </label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Please upload at least 3 images or videos to help describe the task
+                  </p>
+                  {uploadedMedia.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2 mb-2">
+                      {uploadedMedia.map(media => (
+                        <div key={media.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+                          {media.type === "image" ? (
+                            <img src={media.preview} alt="Upload" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="flex items-center justify-center h-full">
+                              <FiUpload className="h-8 w-8 text-gray-400" />
+                            </div>
+                          )}
+                          <button
+                            onClick={() => removeMedia(media.id)}
+                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full"
+                          >
+                            <FiX className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="text-sm text-gray-600 mb-2">
+                    {uploadedMedia.length}/3 files uploaded
+                  </div>
+                  <label className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                    <FiUpload className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm text-gray-500">Upload media</span>
+                    <input
+                      type="file"
+                      ref={mediaInputRef}
+                      className="hidden"
+                      accept="image/*,video/*"
+                      multiple
+                      onChange={handleMediaUpload}
+                    />
+                  </label>
+                </div>
               </div>
 
-              <div className="space-y-3 mb-4">
-                <button
-    onClick={handleBookNow}
-    className="w-full bg-brandText text-sm hover:bg-brandText/90 text-white font-semibold py-3 rounded-lg transition-colors"
-  >
-    Book Now
-  </button>
-               <button
-    onClick={() => setShowMessageModal(true)}
-    className="w-full hover:bg-brandOrange hover:text-white border text-sm border-gray-300 bg-gray-100 text-brandTealMedium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-  >
-    <LuMessageCircle className="w-4 h-4" />
-    <span>Message</span>
-  </button>
+         
+              <button
+                className="w-full bg-brandText hover:bg-brandText/90 text-white font-semibold py-3 rounded-lg transition-colors mb-4"
+                onClick={handleBooking}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Sending Request..." : "Request Service"}
+              </button>
+
+           
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <FiShield className="h-3.5 w-3.5 text-green-500" />
+                  <span>No payment upfront</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <FiCheckCircle className="h-3.5 w-3.5 text-green-500" />
+                  <span>Verified professionals</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <FiClock className="h-3.5 w-3.5 text-green-500" />
+                  <span>Fast response (within 1 hour)</span>
+                </div>
               </div>
 
-              <p className="text-xs text-gray-500 text-center">
-                You won't be charged yet. Payment is collected after the service is completed.
+             
+              <p className="text-xs text-gray-500 text-center mt-3 border-t border-gray-200 pt-3">
+                ⚠ Cancellation after worker dispatch may incur a fee.
               </p>
             </div>
           </div>
 
-        
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-2xl  p-6 border border-gray-200">
+            <div className="bg-white rounded-2xl p-6 border border-gray-200">
               <div className="flex items-start gap-4">
                 <img src={provider.image} alt={provider.name} className="w-20 h-20 rounded-xl object-cover" />
                 <div className="flex-1">
@@ -382,7 +682,7 @@ function Booking() {
               <p className="text-gray-500 leading-relaxed text-sm">{provider.description}</p>
             </div>
 
-            <div className="bg-white rounded-2xl  p-6 border border-gray-200">
+            <div className="bg-white rounded-2xl p-6 border border-gray-200">
               <h2 className="text-xl font-bold text-brandTealMedium mb-4">Skills & Services</h2>
               <div className="flex flex-wrap gap-2">
                 {provider.services.map((service, idx) => (
@@ -393,8 +693,7 @@ function Booking() {
               </div>
             </div>
 
-           
-            <div className="bg-white rounded-2xl  p-6 border border-gray-200">
+            <div className="bg-white rounded-2xl p-6 border border-gray-200">
               <h2 className="text-xl font-bold text-brandTealMedium mb-4">Experience</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-gray-100 rounded-xl p-4 text-center">
@@ -420,13 +719,13 @@ function Booking() {
               </div>
             </div>
 
-          
+            {/* Reviews Section */}
             <div className="bg-white rounded-2xl p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-brandTealMedium">Reviews & Ratings</h2>
                 <button
                   onClick={() => setShowReviewForm(!showReviewForm)}
-                  className="px-3 py-2 bg-brandText hover:bg-brandText/90 text-white text-xs  rounded-lg transition-colors"
+                  className="px-3 py-2 bg-brandText hover:bg-brandText/90 text-white text-xs rounded-lg transition-colors"
                 >
                   Write a Review
                 </button>
@@ -454,7 +753,6 @@ function Booking() {
                 </div>
               </div>
 
-             
               {showReviewForm && (
                 <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
                   <div className="flex justify-between items-center mb-4">
@@ -493,7 +791,6 @@ function Booking() {
                     />
                   </div>
                   <div className="flex justify-end gap-3">
-                   
                     <button
                       onClick={handleSubmitReview}
                       className="px-4 py-2 bg-brandText text-white text-sm rounded-lg hover:bg-brandText/90 transition-colors"
@@ -504,7 +801,6 @@ function Booking() {
                 </div>
               )}
 
-             
               <div className="space-y-6">
                 {reviews.map((review) => (
                   <div key={review.id} className="pb-6 border-b border-gray-200 last:border-0">
@@ -513,7 +809,7 @@ function Booking() {
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <h4 className=" text-brandTealMedium">{review.name}</h4>
+                            <h4 className="text-brandTealMedium">{review.name}</h4>
                             {renderStars(review.rating)}
                           </div>
                           <span className="text-sm text-gray-500">{review.date}</span>
@@ -526,8 +822,8 @@ function Booking() {
                           </div>
                         )}
                         <button className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 transition-colors">
-                          <FiThumbsUp className="w-4 h-4 "/>
-                          <span className='text-gray-500'>Helpful ({review.helpful})</span>
+                          <FiThumbsUp className="w-4 h-4" />
+                          <span className="text-gray-500">Helpful ({review.helpful})</span>
                         </button>
                       </div>
                     </div>
@@ -538,91 +834,6 @@ function Booking() {
           </div>
         </div>
       </div>
-
-     
-      {showMessageModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-gray-200 rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start ">
-                <h2 className="text-xl font-bold text-brandTealMedium">Message {provider.name}</h2>
-                <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
-                  <FiX className="w-5 h-5" />
-                </button>
-              </div>
-              <p className="text-brandGreenLight text-xs mb-6">
-                Send a message to discuss your project or ask questions
-              </p>
-
-              <div className="flex items-center gap-3 mb-6">
-                <img
-                  src={provider.image}
-                  alt={provider.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <p className="font-semibold text-brandTealMedium">{provider.name}</p>
-                  <p className="text-xs text-brandGreenLight">Usually responds within 1 hour</p>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                  Subject (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={messageSubject}
-                  onChange={(e) => setMessageSubject(e.target.value)}
-                  placeholder="What is this about?"
-                  className="w-full px-4 py-2 border text-xs border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-brandTealMedium"
-                />
-              </div>
-
-              <div className="mb-4">
-  <label className="block text-sm font-medium text-brandTealMedium mb-1">
-    Message
-  </label>
-  <textarea
-    rows={4}
-    value={messageBody}
-    onChange={(e) => setMessageBody(e.target.value)}
-    placeholder="Describe what you need help with..."
-    className="w-full px-4 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText resize-none text-brandTealMedium"
-  />
-</div>
-
-              <div className="mb-6">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <button
-                  onClick={handleAttachFile}
-                  className="flex items-center gap-2 text-sm text-brandTealMedium hover:text-gray-900 transition-colors"
-                >
-                  <FiUpload className="w-4 h-4" />
-                  Attach file
-                </button>
-                {attachedFile && (
-                  <p className="text-xs text-gray-500 mt-1">Attached: {attachedFile.name}</p>
-                )}
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  onClick={handleSendMessage}
-                  className="px-4 py-2 bg-brandText hover:bg-brandText/90 text-white rounded-lg transition-colors"
-                >
-                  Send Message
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <Footer />
     </>
