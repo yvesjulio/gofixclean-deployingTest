@@ -59,7 +59,7 @@ const Hero: React.FC = () => {
           <span className="animate-pulse">|</span>
         </span>
         <br />
-        Near You 
+        Near You
       </h1>
 
       <p className="text-[#C5C5C5] mx-auto mb-8 max-w-3xl">
@@ -71,7 +71,7 @@ const Hero: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-12 mb-12">
         <Link to="/services" onClick={handleNavClick}>
           <button className="bg-brandOrange text-brandWhite px-6 py-3 rounded-md transition-all duration-400 ease-out hover:bg-[#e05e2e] hover:scale-[1.03]">
-            Find a provider
+            Book a provider
           </button>
         </Link>
 

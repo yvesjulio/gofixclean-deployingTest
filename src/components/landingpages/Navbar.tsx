@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
   });
 
   const languages: Language[] = [
-    { code: "US", flag: "🇺🇸", name: "English", nativeName: "English" },
+    { code: "EN", flag: "🇺🇸", name: "English", nativeName: "English" },
     { code: "FR", flag: "🇫🇷", name: "Français", nativeName: "Français" },
     { code: "RW", flag: "🇷🇼", name: "Kinyarwanda", nativeName: "Kinyarwanda" }
   ];
