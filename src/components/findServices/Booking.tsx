@@ -1,25 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiClock, FiStar, FiBriefcase, FiCalendar, FiUpload, FiThumbsUp, FiX, FiCheckCircle, FiAlertTriangle, FiShield, FiPhone, FiUser } from 'react-icons/fi';
-import { LuMessageCircle } from "react-icons/lu";
+import { FiMapPin, FiClock, FiUpload, FiX, FiCheckCircle, FiAlertTriangle, FiShield, FiPhone, FiUser } from 'react-icons/fi';
 import { MdOutlineVerified } from "react-icons/md";
-import { TiStarOutline } from "react-icons/ti";
 import Footer from "../landingpages/Footer";
 
 interface TimeSlot {
   time: string;
   available: boolean;
-}
-
-interface Review {
-  id: number;
-  name: string;
-  avatar: string;
-  rating: number;
-  date: string;
-  comment: string;
-  providerResponse?: string;
-  helpful: number;
 }
 
 interface Provider {
@@ -40,6 +27,7 @@ interface UploadedMedia {
   name: string;
   type: "image" | "video";
   preview: string;
+  file: File; // ✅ ADD THIS
 }
 
 const SERVICE_CHECKLISTS: Record<string, string[]> = {
@@ -80,8 +68,110 @@ function Booking() {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [otherInput, setOtherInput] = useState<string>("");
   const [showOtherInput, setShowOtherInput] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState("");
 
   const mediaInputRef = useRef<HTMLInputElement>(null);
+
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      if (!file.type.startsWith("image/")) {
+        resolve(file); // don't compress videos
+        return;
+      }
+
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+      };
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxWidth = 1200;
+
+        const scale = Math.min(1, maxWidth / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name, { type: "image/jpeg" }));
+            } else {
+              resolve(file);
+            }
+          },
+          "image/jpeg",
+          0.7 // quality (0.7 = good balance)
+        );
+      };
+
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const uploadSingle = (
+    file: File,
+    index: number,
+    progressMap: number[],
+    retries = 2
+  ): Promise<string> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const compressedFile = await compressImage(file);
+
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+
+        formData.append("file", compressedFile);
+        formData.append("upload_preset", "GoFixandClean");
+
+        xhr.open(
+          "POST",
+          "https://api.cloudinary.com/v1_1/dufxdw0zr/upload"
+        );
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            progressMap[index] = e.loaded / e.total;
+
+            const total =
+              progressMap.reduce((a, b) => a + b, 0) / progressMap.length;
+
+            setUploadProgress(Math.round(total * 100));
+          }
+        };
+
+        xhr.onload = () => {
+          const res = JSON.parse(xhr.responseText);
+          if (res.secure_url) {
+            resolve(res.secure_url);
+          } else {
+            throw new Error("Upload failed");
+          }
+        };
+
+        xhr.onerror = async () => {
+          if (retries > 0) {
+            console.log(`Retrying upload (${retries})...`);
+            resolve(uploadSingle(file, index, progressMap, retries - 1));
+          } else {
+            reject("Upload failed after retries");
+          }
+        };
+
+        xhr.send(formData);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
 
   const timeSlots: TimeSlot[] = [
     { time: '09:00', available: true },
@@ -95,52 +185,6 @@ function Booking() {
   ];
 
   const durationOptions = ["1 hour", "2–3 hours", "Half day (4 hrs)", "Full day (8 hrs)"];
-
-  const [reviews, setReviews] = useState<Review[]>([
-    {
-      id: 1,
-      name: 'Adaeze Okonkwo',
-      avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-      rating: 5,
-      date: '1/15/2024',
-      comment: 'Excellent service! The work was done professionally and on time. I highly recommend this provider for any plumbing needs. Very friendly and explained everything clearly.',
-      providerResponse: 'Thank you so much for your kind words! It was a pleasure working with you.',
-      helpful: 12
-    },
-    {
-      id: 2,
-      name: 'Emeka Nwosu',
-      avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-      rating: 4,
-      date: '1/10/2024',
-      comment: 'Good job overall. Arrived a bit late but the quality of work was great. Would use again.',
-      helpful: 5
-    },
-    {
-      id: 3,
-      name: 'Chiamaka Eze',
-      avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
-      rating: 4,
-      date: '1/5/2024',
-      comment: 'Very professional and friendly. Will definitely hire again.',
-      helpful: 8
-    }
-  ]);
-
-  const [showReviewForm, setShowReviewForm] = useState(false);
-  const [newRating, setNewRating] = useState<number>(5);
-  const [newComment, setNewComment] = useState<string>('');
-
-  const totalReviews = reviews.length;
-  const averageRating = totalReviews
-    ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
-    : 0;
-
-  const ratingDistribution = [5, 4, 3, 2, 1].map(stars => {
-    const count = reviews.filter(r => r.rating === stars).length;
-    const percentage = totalReviews ? (count / totalReviews) * 100 : 0;
-    return { stars, count, percentage };
-  });
 
   const checklist = SERVICE_CHECKLISTS[provider?.category || "Handyman"] || SERVICE_CHECKLISTS["Handyman"];
 
@@ -157,7 +201,7 @@ function Booking() {
     
     const remainingSlots = Math.max(0, 3 - uploadedMedia.length);
     
-    if (uploadedMedia.length < 3 && remainingSlots > 0) {
+    if (remainingSlots > 0) {
       Array.from(files).slice(0, remainingSlots).forEach(file => {
         const isVideo = file.type.startsWith("video/");
         const isImage = file.type.startsWith("image/");
@@ -165,6 +209,13 @@ function Booking() {
           alert("Only images and videos are allowed");
           return;
         }
+
+        // ✅ ADD SIZE LIMIT
+        if (file.size > 10 * 1024 * 1024) {
+          alert("Each file must be under 10MB");
+          return;
+        }
+
         setUploadedMedia(prev => [
           ...prev,
           {
@@ -172,11 +223,12 @@ function Booking() {
             name: file.name,
             type: isVideo ? "video" : "image",
             preview: URL.createObjectURL(file),
+            file: file, // ✅ STORE THE FILE OBJECT
           },
         ]);
       });
     } else {
-      alert(`Please upload at least 3 photos or videos. You have uploaded ${uploadedMedia.length} file(s).`);
+      alert(`${"You can upload up to 3 photos or videos. You have already uploaded"} ${uploadedMedia.length} ${"file(s)."}`);
     }
   };
 
@@ -205,90 +257,107 @@ function Booking() {
     setOtherInput(e.target.value);
   };
 
-  const handleBooking = () => {
-    if (!fullName.trim()) {
-      alert("Please enter your full name");
+  const handleBooking = async () => {
+    // Rate limiting: prevent spam submissions
+    const lastSubmit = localStorage.getItem("lastSubmit");
+    if (lastSubmit && Date.now() - parseInt(lastSubmit) < 30000) {
+      alert("Please wait 30 seconds before submitting another request.");
       return;
     }
-    if (!phoneNumber.trim()) {
-      alert("Please enter your phone number");
-      return;
-    }
-    if (!address.trim()) {
-      alert("Please enter your address");
-      return;
-    }
-    if (!selectedDate || !selectedTime) {
-      alert("Please select date and time");
-      return;
-    }
-    if (!taskDescription.trim()) {
-      alert("Please describe your task");
-      return;
-    }
-    if (!estimatedDuration) {
-      alert("Please select estimated duration");
-      return;
-    }
-    if (uploadedMedia.length < 3) {
-      alert(`Please upload at least 3 photos or videos. You have uploaded ${uploadedMedia.length} file(s).`);
-      return;
-    }
+
+    if (!fullName.trim()) return alert("Please enter your full name");
+    if (!phoneNumber.trim()) return alert("Please enter your phone number");
+    if (!address.trim()) return alert("Please enter your address");
+    if (!selectedDate || !selectedTime) return alert("Please select date and time");
+    if (!taskDescription.trim()) return alert("Please describe your task");
+    if (!estimatedDuration) return alert("Please select estimated duration");
+
     if (selectedChecklist.includes("Other") && !otherInput.trim()) {
-      alert("Please specify what 'Other' service you need");
-      return;
+      return alert("Please specify 'Other'");
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
+
+    try {
+      // 1. Upload files to Cloudinary with progress
+      setUploading(true);
+      setUploadStatus("Uploading files...");
+
+      const progressMap = new Array(uploadedMedia.length).fill(0);
+
+      const uploadPromises = uploadedMedia.map((media, index) =>
+        uploadSingle(media.file, index, progressMap)
+      );
+
+      const mediaUrls = await Promise.all(uploadPromises);
+
+      setUploadStatus("Upload complete \u2705");
+      setUploading(false);
+
+      // 2. Build a real HTML form (NO fetch)
+      const form = document.createElement("form");
+      form.action = "https://submit-form.com/IH47AF19Y";
+      form.method = "POST";
+
+      const payload = {
+        fullName,
+        phoneNumber,
+        address,
+        landmark,
+        selectedDate,
+        selectedTime,
+        taskDescription,
+        estimatedDuration,
+        urgency,
+        checklist: JSON.stringify(selectedChecklist),
+        otherInput,
+        media: JSON.stringify(mediaUrls),
+        providerName: provider?.name,
+        providerCategory: provider?.category,
+        providerLocation: provider?.location,
+      };
+
+      Object.entries(payload).forEach(([key, value]) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = String(value);
+        form.appendChild(input);
+      });
+
+      const iframe = document.createElement("iframe");
+      iframe.name = "hidden_iframe";
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
+
+      form.target = "hidden_iframe";
+      document.body.appendChild(form);
+      form.submit();
+
+      // Update rate limiting timestamp
+      localStorage.setItem("lastSubmit", Date.now().toString());
+
+      setTimeout(() => {
+        setBookingSuccess(true);
+      }, 800);
+
+      setTimeout(() => {
+        document.body.removeChild(form);
+        document.body.removeChild(iframe);
+      }, 1000);
+    } catch (error) {
+      console.error(error);
+      if (uploading) {
+        alert("Some uploads failed. Please try again.");
+        setUploading(false);
+        setIsSubmitting(false);
+        return;
+      }
+      alert("Something went wrong. Please try again.");
+    } finally {
       setIsSubmitting(false);
-      setBookingSuccess(true);
-    }, 1500);
-  };
-
-  const renderStars = (rating: number, size: string = 'w-4 h-4') => {
-    return (
-      <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <FiStar
-            key={star}
-            className={`${size} ${
-              star <= rating
-                ? 'text-yellow-500 fill-yellow-500'
-                : 'text-gray-300'
-            }`}
-          />
-        ))}
-      </div>
-    );
-  };
-
-  const handleSubmitReview = () => {
-    if (!newComment.trim()) {
-      alert('Please write a review comment.');
-      return;
+      setUploading(false);
     }
-
-    const newReview: Review = {
-      id: Date.now(),
-      name: 'You',
-      avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
-      rating: newRating,
-      date: new Date().toLocaleDateString('en-US'),
-      comment: newComment.trim(),
-      helpful: 0,
-    };
-
-    setReviews([newReview, ...reviews]);
-    setNewRating(5);
-    setNewComment('');
-    setShowReviewForm(false);
-  };
-
-  const handleCancelReview = () => {
-    setNewRating(5);
-    setNewComment('');
-    setShowReviewForm(false);
   };
 
   if (!provider) return null;
@@ -301,38 +370,38 @@ function Booking() {
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <FiCheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Booking Request Sent!</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{"Booking Request Sent!"}</h3>
             <p className="text-gray-600 text-sm mb-4">
-              Your booking request has been sent to <strong>{provider.name}</strong>. They will review and respond shortly.
+              {"Your booking request has been sent to"} <strong>{provider.name}</strong>. {"They will review and respond shortly."}
             </p>
             <div className="bg-gray-50 rounded-lg p-4 text-left space-y-2 mb-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">Date</span>
+                <span className="text-gray-600">{"Date"}</span>
                 <span className="font-medium text-gray-900">{selectedDate}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Time</span>
+                <span className="text-gray-600">{"Time"}</span>
                 <span className="font-medium text-gray-900">{selectedTime}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Duration</span>
+                <span className="text-gray-600">{"Duration"}</span>
                 <span className="font-medium text-gray-900">{estimatedDuration}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Urgency</span>
+                <span className="text-gray-600">{"Urgency"}</span>
                 <span className={`font-medium ${urgency === "urgent" ? "text-orange-600" : "text-gray-900"}`}>
                   {urgency === "urgent" ? "Urgent (Same Day)" : "Normal"}
                 </span>
               </div>
             </div>
             <p className="text-xs text-gray-500 mb-4">
-              You'll receive a notification once {provider.name} confirms your booking.
+              {"You'll receive a notification once"} {provider.name} {"confirms your booking."}
             </p>
             <button
               onClick={() => setBookingSuccess(false)}
               className="w-full bg-brandText hover:bg-brandText/90 text-white font-semibold py-3 rounded-lg transition-colors"
             >
-              Book Another Service
+              {"Book Another Service"}
             </button>
           </div>
         </div>
@@ -353,38 +422,38 @@ function Booking() {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <p className="text-3xl font-bold text-brandTealMedium">{provider.price}</p>
-                  <p className="text-sm text-gray-500">FROM</p>
+                  <p className="text-sm text-gray-500">{"FROM"}</p>
                 </div>
               </div>
 
              
               <div className="mb-6">
-                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">1. Your Info</p>
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">{"1. Your Info"}</p>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm  text-brandTealMedium mb-1">
-                      Full Name <span className="text-red-500m">*</span>
+                      {"Full Name"} <span className="text-red-500m">*</span>
                     </label>
                     <div className="relative">
                       <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brandTealMedium" />
                       <input
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Enter your full name"
+                        placeholder={"Enter your full name"}
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
                       />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm  text-brandTealMedium mb-1">
-                      Phone Number <span className="text-red-500">*</span>
+                      {"Phone Number"} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brandTealMedium" />
                       <input
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
-                        placeholder="+250 7XX XXX XXX"
+                        placeholder={"+250 7XX XXX XXX"}
                         type="tel"
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
                       />
@@ -395,30 +464,30 @@ function Booking() {
 
              
               <div className="mb-6">
-                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">2. Location</p>
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">{"2. Location"}</p>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                      Exact Address <span className="text-red-500">*</span>
+                      {"Exact Address"} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brandTealMedium" />
                       <input
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        placeholder="Street, house number"
+                        placeholder={"Street, house number"}
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
                       />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                      Landmark (Optional)
+                      {"Landmark (Optional)"}
                     </label>
                     <input
                       value={landmark}
                       onChange={(e) => setLandmark(e.target.value)}
-                      placeholder="Near school, church, etc."
+                      placeholder={"Near school, church, etc."}
                       className="w-full px-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
                     />
                   </div>
@@ -427,11 +496,11 @@ function Booking() {
 
             
               <div className="mb-6">
-                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">3. Date & Time</p>
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">{"3. Date & Time"}</p>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                      Select Date <span className="text-red-500">*</span>
+                      {"Select Date"} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
@@ -443,7 +512,7 @@ function Booking() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                      Select Time <span className="text-red-500">*</span>
+                      {"Select Time"} <span className="text-red-500">*</span>
                     </label>
                     <div className="grid grid-cols-4 gap-2">
                       {timeSlots.map(slot => (
@@ -466,12 +535,12 @@ function Booking() {
 
              
               <div className="mb-6">
-                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">4. Service Details</p>
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">{"4. Service Details"}</p>
 
                 
                 <div className="mb-3">
                   <label className="block text-sm font-medium text-brandTealMedium mb-2">
-                    What do you need help with?
+                    {"What do you need help with?"}
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {checklist.map(item => (
@@ -493,13 +562,13 @@ function Booking() {
                 {showOtherInput && (
                   <div className="mb-3">
                     <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                      Please specify your other requirement <span className="text-red-500">*</span>
+                      {"Please specify your other requirement"} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={otherInput}
                       onChange={handleOtherInputChange}
-                      placeholder="Enter your specific requirement..."
+                      placeholder={"Enter your specific requirement..."}
                       className="w-full px-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
                     />
                   </div>
@@ -507,12 +576,12 @@ function Booking() {
 
                 <div className="mb-3">
                   <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                    Describe Your Task <span className="text-red-500">*</span>
+                    {"Describe Your Task"} <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     value={taskDescription}
                     onChange={(e) => setTaskDescription(e.target.value)}
-                    placeholder="Describe what you need help with..."
+                    placeholder={"Describe what you need help with..."}
                     rows={3}
                     className="w-full px-4 py-2.5 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText resize-none text-sm"
                   />
@@ -521,7 +590,7 @@ function Booking() {
               
                 <div className="mb-3">
                   <label className="block text-sm font-medium text-brandTealMedium mb-2">
-                    Estimated Duration <span className="text-red-500">*</span>
+                    {"Estimated Duration"} <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {durationOptions.map(opt => (
@@ -543,7 +612,7 @@ function Booking() {
 
                 
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-brandTealMedium mb-2">Urgency</label>
+                  <label className="block text-sm font-medium text-brandTealMedium mb-2">{"Urgency"}</label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => handleUrgencyChange("normal")}
@@ -553,7 +622,7 @@ function Booking() {
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                     >
-                      Normal
+                      {"Normal"}
                     </button>
                     <button
                       onClick={() => handleUrgencyChange("urgent")}
@@ -564,18 +633,23 @@ function Booking() {
                       }`}
                     >
                       <FiAlertTriangle className="h-3 w-3" />
-                      Urgent (Same Day)
+                      {"Urgent (Same Day)"}
                     </button>
                   </div>
                 </div>
 
                 {/* Media Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                    Add Photos/Videos <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex items-center gap-2 mb-1">
+                    <label className="block text-sm font-medium text-brandTealMedium">
+                      {"Add Photos/Videos"}
+                    </label>
+                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">
+                      {"Recommend"}
+                    </span>
+                  </div>
                   <p className="text-xs text-gray-500 mb-2">
-                    Please upload at least 3 images or videos to help describe the task
+                    {"Upload up to 3 images or videos to help describe your task (optional but recommended)"}
                   </p>
                   {uploadedMedia.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mb-2">
@@ -599,11 +673,24 @@ function Booking() {
                     </div>
                   )}
                   <div className="text-sm text-gray-600 mb-2">
-                    {uploadedMedia.length}/3 files uploaded
+                    {uploadedMedia.length}/3 {"files uploaded"}
                   </div>
+                  {uploading && (
+                    <div className="mt-3 mb-3">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-brandText h-2 rounded-full transition-all"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {uploadStatus} ({uploadProgress}%)
+                      </p>
+                    </div>
+                  )}
                   <label className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                     <FiUpload className="h-4 w-4 text-gray-400" />
-                    <span className="text-sm text-gray-500">Upload media</span>
+                    <span className="text-sm text-gray-500">{"Upload media"}</span>
                     <input
                       type="file"
                       ref={mediaInputRef}
@@ -620,30 +707,30 @@ function Booking() {
               <button
                 className="w-full bg-brandText hover:bg-brandText/90 text-white font-semibold py-3 rounded-lg transition-colors mb-4"
                 onClick={handleBooking}
-                disabled={isSubmitting}
+                disabled={isSubmitting || uploading}
               >
-                {isSubmitting ? "Sending Request..." : "Request Service"}
+                {isSubmitting ? "Sending Request..." : uploading ? "Uploading files..." : "Request Service"}
               </button>
 
            
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <FiShield className="h-3.5 w-3.5 text-green-500" />
-                  <span>No payment upfront</span>
+                  <span>{"No payment upfront"}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <FiCheckCircle className="h-3.5 w-3.5 text-green-500" />
-                  <span>Verified professionals</span>
+                  <span>{"Verified professionals"}</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <FiClock className="h-3.5 w-3.5 text-green-500" />
-                  <span>Fast response (within 1 hour)</span>
+                  <span>{"Fast response (within 1 hour)"}</span>
                 </div>
               </div>
 
              
               <p className="text-xs text-gray-500 text-center mt-3 border-t border-gray-200 pt-3">
-                ⚠ Cancellation after worker dispatch may incur a fee.
+                {"\u26a0 Cancellation after worker dispatch may incur a fee."}
               </p>
             </div>
           </div>
@@ -651,7 +738,13 @@ function Booking() {
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl p-6 border border-gray-200">
               <div className="flex items-start gap-4">
-                <img src={provider.image} alt={provider.name} className="w-20 h-20 rounded-xl object-cover" />
+                {provider.image ? (
+                  <img src={provider.image} alt={provider.name} className="w-20 h-20 rounded-xl object-cover" />
+                ) : (
+                  <div className="w-20 h-20 rounded-xl bg-gray-200 flex items-center justify-center text-lg font-semibold text-gray-600">
+                    {provider.name.charAt(0)}
+                  </div>
+                )}
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h1 className="text-2xl font-bold text-brandTealMedium">{provider.name}</h1>
@@ -660,17 +753,12 @@ function Booking() {
                   <p className="text-gray-500 text-sm mb-3">{provider.category}</p>
                   <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                     <div className="flex items-center gap-1">
-                      <FiStar className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                      <span className="font-semibold text-gray-900">{averageRating.toFixed(1)}</span>
-                      <span>({totalReviews} reviews)</span>
-                    </div>
-                    <div className="flex items-center gap-1">
                       <FiMapPin className="w-4 h-4" />
                       <span>{provider.location}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <FiClock className="w-4 h-4" />
-                      <span>Responds within 1 hour</span>
+                      <span>{"Responds within 1 hour"}</span>
                     </div>
                   </div>
                 </div>
@@ -678,156 +766,17 @@ function Booking() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 border border-gray-200">
-              <h2 className="text-xl font-bold text-brandTealMedium mb-4">About</h2>
+              <h2 className="text-xl font-bold text-brandTealMedium mb-4">{"About"}</h2>
               <p className="text-gray-500 leading-relaxed text-sm">{provider.description}</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 border border-gray-200">
-              <h2 className="text-xl font-bold text-brandTealMedium mb-4">Skills & Services</h2>
+              <h2 className="text-xl font-bold text-brandTealMedium mb-4">{"Skills & Services"}</h2>
               <div className="flex flex-wrap gap-2">
                 {provider.services.map((service, idx) => (
                   <span key={idx} className="px-4 py-2 bg-gray-100 text-brandText rounded-lg text-sm font-medium">
                     {service}
                   </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-6 border border-gray-200">
-              <h2 className="text-xl font-bold text-brandTealMedium mb-4">Experience</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-gray-100 rounded-xl p-4 text-center">
-                  <FiBriefcase className="w-8 h-8 text-brandText mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-brandTealMedium">342</p>
-                  <p className="text-xs text-brandGreenLight">Jobs completed</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <TiStarOutline className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-brandTealMedium">4.9</p>
-                  <p className="text-xs text-brandGreenLight">Avg.Rating</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <LuMessageCircle className="w-8 h-8 text-brandTealMedium mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-brandTealMedium">127</p>
-                  <p className="text-sm text-brandGreenLight">Reviews</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <FiCalendar className="w-8 h-8 text-brandTealMedium mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-brandTealMedium">2020</p>
-                  <p className="text-xs text-brandGreenLight">Member Since</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Reviews Section */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-brandTealMedium">Reviews & Ratings</h2>
-                <button
-                  onClick={() => setShowReviewForm(!showReviewForm)}
-                  className="px-3 py-2 bg-brandText hover:bg-brandText/90 text-white text-xs rounded-lg transition-colors"
-                >
-                  Write a Review
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-gray-200">
-                <div>
-                  <div className="text-5xl font-bold text-gray-900 mb-2">{averageRating.toFixed(1)}</div>
-                  {renderStars(Math.round(averageRating))}
-                  <p className="text-sm text-gray-600 mt-2">{totalReviews} reviews</p>
-                </div>
-                <div className="space-y-2">
-                  {ratingDistribution.map((item) => (
-                    <div key={item.stars} className="flex items-center gap-3">
-                      <span className="text-sm text-gray-400 w-8">{item.stars}★</span>
-                      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-yellow-500 rounded-full"
-                          style={{ width: `${item.percentage}%` }}
-                        />
-                      </div>
-                      <span className="text-sm text-gray-500 w-8 text-right">{item.count}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {showReviewForm && (
-                <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-sm text-brandTealMedium">Your Review for {provider.name}</h3>
-                    <button onClick={handleCancelReview} className="text-gray-500 hover:text-gray-700">
-                      <FiX className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-xs font-medium text-brandGreenLight mb-2">Select Rating</label>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map(star => (
-                        <button
-                          key={star}
-                          onClick={() => setNewRating(star)}
-                          className="focus:outline-none"
-                        >
-                          <FiStar
-                            className={`w-6 h-6 ${
-                              star <= newRating
-                                ? 'text-yellow-500 fill-yellow-500'
-                                : 'text-gray-300'
-                            }`}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="mb-4">
-                    <textarea
-                      rows={4}
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Write your review here..."
-                      className="w-full px-4 py-3 bg-gray-200 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText resize-none text-brandTealMedium text-xs"
-                    />
-                  </div>
-                  <div className="flex justify-end gap-3">
-                    <button
-                      onClick={handleSubmitReview}
-                      className="px-4 py-2 bg-brandText text-white text-sm rounded-lg hover:bg-brandText/90 transition-colors"
-                    >
-                      Submit Review
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-6">
-                {reviews.map((review) => (
-                  <div key={review.id} className="pb-6 border-b border-gray-200 last:border-0">
-                    <div className="flex items-start gap-4">
-                      <img src={review.avatar} alt={review.name} className="w-12 h-12 rounded-full object-cover" />
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h4 className="text-brandTealMedium">{review.name}</h4>
-                            {renderStars(review.rating)}
-                          </div>
-                          <span className="text-sm text-gray-500">{review.date}</span>
-                        </div>
-                        <p className="text-gray-500 text-xs leading-relaxed mb-3">{review.comment}</p>
-                        {review.providerResponse && (
-                          <div className="bg-gray-100 rounded-lg p-4 mb-3">
-                            <p className="text-xs font-semibold text-brandText mb-1">Provider Response</p>
-                            <p className="text-xs text-gray-500">{review.providerResponse}</p>
-                          </div>
-                        )}
-                        <button className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-900 transition-colors">
-                          <FiThumbsUp className="w-4 h-4" />
-                          <span className="text-gray-500">Helpful ({review.helpful})</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
                 ))}
               </div>
             </div>

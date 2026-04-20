@@ -4,16 +4,22 @@ import { HiStar } from "react-icons/hi2";
 import { GoClock } from "react-icons/go";
 import { Link } from "react-router-dom";
 
-const words: string[] = ["Plumber", "Electrician", "Cleaner", "Handyman", "Gardener"];
-
 const Hero: React.FC = () => {
   const [text, setText] = useState<string>("");
   const [wordIndex, setWordIndex] = useState<number>(0);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
+  const words: string[] = [
+    "Plumber",
+    "Electrician",
+    "Cleaner",
+    "Handyman",
+    "General fix"
+  ];
+
   useEffect(() => {
     const currentWord: string = words[wordIndex];
-    let timeout: NodeJS.Timeout;
+    let timeout: ReturnType<typeof setTimeout>;
 
     if (!isDeleting) {
       timeout = setTimeout(() => {
@@ -49,35 +55,33 @@ const Hero: React.FC = () => {
     <section className="bg-brandText text-brandWhite px-6 md:px-9 pt-16 pb-16 text-center">
       <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/40 rounded-xl mb-6 bg-white/20 text-sm font-light text-gray-200">
         <VscWorkspaceTrusted className="text-2xl text-brandWhite" />
-        <span className="text-sm">Verified & Trusted Providers</span>
+        <span className="text-sm">{"Verified & Trusted Providers"}</span>
       </div>
 
       <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4 text-[#ECECEC]">
-        Find Trusted{" "}
+        {"Find Trusted"}{" "}
         <span className="text-brandOrange">
           {text}
           <span className="animate-pulse">|</span>
         </span>
         <br />
-        Near You
+        {"Near You"}
       </h1>
 
       <p className="text-[#C5C5C5] mx-auto mb-8 max-w-3xl">
-        Connect with certified plumbers, electricians, cleaners, and more.
-        <br />
-        Quality home services made simple, safe, and affordable.
+        {"Connect with certified plumbers, electricians, cleaners, and more. Quality home services made simple, safe, and affordable."}
       </p>
 
       <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-12 mb-12">
         <Link to="/services" onClick={handleNavClick}>
           <button className="bg-brandOrange text-brandWhite px-6 py-3 rounded-md transition-all duration-400 ease-out hover:bg-[#e05e2e] hover:scale-[1.03]">
-            Book a provider
+            {"Book a provider"}
           </button>
         </Link>
 
         <Link to="/become-provider" onClick={handleNavClick}>
           <button className="bg-brandWhite px-6 py-3 rounded-md font-medium text-brandText transition-all duration-400 ease-out hover:scale-[1.03]">
-            Become a provider
+            {"Become a provider"}
           </button>
         </Link>
       </div>
@@ -86,23 +90,23 @@ const Hero: React.FC = () => {
         <div>
           <div className="flex items-center justify-center gap-2 text-lg font-bold">
             <HiStar className="text-2xl text-brandYellow" />
-            <span className="text-3xl">4.9</span>
+            <span className="text-3xl">{"4.9"}</span>
           </div>
-          <p className="text-sm text-[#C5C5C5] mt-1">Average ratings</p>
+          <p className="text-sm text-[#C5C5C5] mt-1">{"Average ratings"}</p>
         </div>
 
         <div>
           <div className="flex items-center justify-center gap-2 text-lg font-bold">
             <span className="text-3xl">30+</span>
           </div>
-          <p className="text-sm text-[#C5C5C5] mt-1">Areas we cover</p>
+          <p className="text-sm text-[#C5C5C5] mt-1">{"Areas we cover"}</p>
         </div>
 
         <div>
           <div className="flex items-center justify-center gap-2 text-lg font-bold">
             <span className="text-3xl">5K+</span>
           </div>
-          <p className="text-sm text-[#C5C5C5] mt-1">Service providers</p>
+          <p className="text-sm text-[#C5C5C5] mt-1">{"Service providers"}</p>
         </div>
 
         <div>
@@ -110,7 +114,7 @@ const Hero: React.FC = () => {
             <GoClock className="text-xl" />
             <span className="text-3xl">30 min</span>
           </div>
-          <p className="text-sm text-[#C5C5C5] mt-1">Avg. response time</p>
+          <p className="text-sm text-[#C5C5C5] mt-1">{"Avg. response time"}</p>
         </div>
       </div>
     </section>

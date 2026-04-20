@@ -4,23 +4,26 @@ import { LuClock3 } from "react-icons/lu";
 import { GoCreditCard } from "react-icons/go";
 import { LuHeadphones } from "react-icons/lu";
 import { FaRegHeart } from "react-icons/fa6";
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 
 interface Category {
   title: string;
   description: string;
   icon: ReactElement;
   bgColor: string;
+  titleKey?: string;
+  descKey?: string;
 }
 
 const Choose: React.FC = () => {
+
   const categories: Category[] = [
-    { title: "Verified Professionals", description: "Every provider undergoes thorough background checks and skill verification before joining our platform.", icon: <MdOutlineVerified className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
-    { title: "Secure Payments", description: "Your payments are protected. Pay only after the job is done to your satisfaction with our secure system.", icon: <MdOutlineVerifiedUser className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
-    { title: "Quick Response", description: "Get matched with available providers within minutes. Most requests receive responses in under 30 minutes.", icon: <LuClock3 className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
-    { title: "Transparent Payment", description: "No hidden fees or surprises. See upfront pricing and get detailed quotes before confirming your booking.", icon: <GoCreditCard className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
-    { title: "24/7 Support", description: "Our dedicated support team is always here to help you with any questions or concerns.", icon: <LuHeadphones className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
-    { title: "Satisfaction Guaranteed", description: "Not happy with the service? We'll work to make it right or provide a refund within our guarantee terms.", icon: <FaRegHeart className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
+    { titleKey: "choose.verifiedProfessionals", descKey: "choose.verifiedProfessionalsDesc", title: "Verified Professionals", description: "Every provider undergoes thorough background checks and skill verification before joining our platform.", icon: <MdOutlineVerified className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
+    { titleKey: "choose.securePayments", descKey: "choose.securePaymentsDesc", title: "Secure Payments", description: "Your payments are protected. Pay only after the job is done to your satisfaction with our secure system.", icon: <MdOutlineVerifiedUser className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
+    { titleKey: "choose.quickResponse", descKey: "choose.quickResponseDesc", title: "Quick Response", description: "Get matched with available providers within minutes. Most requests receive responses in under 30 minutes.", icon: <LuClock3 className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
+    { titleKey: "choose.transparentPayment", descKey: "choose.transparentPaymentDesc", title: "Transparent Payment", description: "No hidden fees or surprises. See upfront pricing and get detailed quotes before confirming your booking.", icon: <GoCreditCard className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
+    { titleKey: "choose.support", descKey: "choose.supportDesc", title: "24/7 Support", description: "Our dedicated support team is always here to help you with any questions or concerns.", icon: <LuHeadphones className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
+    { titleKey: "choose.satisfactionGuaranteed", descKey: "choose.satisfactionGuaranteedDesc", title: "Satisfaction Guaranteed", description: "Not happy with the service? We'll work to make it right or provide a refund within our guarantee terms.", icon: <FaRegHeart className="text-2xl text-[#096647]" />, bgColor: "bg-[#E7F8F2]" },
   ];
 
   return (
@@ -33,9 +36,9 @@ const Choose: React.FC = () => {
       </div>
 
     
-      <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center">Why Choose Us?</h2>
+      <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-center">{"Why Choose Us?"}</h2>
       <p className="text-[#696969] text-sm sm:text-base max-w-xl mx-auto leading-relaxed mb-10 text-center">
-        We're committed to providing the best service experience. Here's what sets us apart from the rest.
+        {"We're committed to providing the best service experience. Here's what sets us apart from the rest."}
       </p>
 
     

@@ -83,14 +83,14 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <span className="bg-white px-2 py-1 font-bold text-[#025E4C] rounded-xl">GF</span>
+              <span className="bg-white px-2 py-1 font-bold text-[#025E4C] rounded-xl">{"GF"}</span>
               <h2 className="text-2xl font-bold">
-                GoFix<span className="text-[#FF6B35]">&</span>Clean
+                {"GoFix&Clean"}
               </h2>
             </div>
 
             <p className="text-sm text-[#C5C5C5] leading-relaxed mb-4">
-              Connecting households with trusted service providers. Quality services at your fingertips.
+              {"Connecting households with trusted service providers. Quality services at your fingertips."}
             </p>
 
             <div className="flex">
@@ -134,7 +134,7 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4 text-xl">Services</h3>
+            <h3 className="font-semibold mb-4 text-xl">{"Services"}</h3>
             <ul className="space-y-2 text-gray-300 text-sm">
               <li>
                 <Link
@@ -185,14 +185,14 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4 text-xl">Company</h3>
+            <h3 className="font-semibold mb-4 text-xl">{"About Us"}</h3>
             <ul className="space-y-2 text-sm">
               <li
                 className={`cursor-pointer transition-colors ${
                   location.pathname === "/about" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
                 }`}
               >
-                <Link to="/about" onClick={handleNavClick}>About Us</Link>
+                <Link to="/about" onClick={handleNavClick}>{"About Us"}</Link>
               </li>
 
               <li
@@ -200,7 +200,7 @@ const Footer: React.FC = () => {
                   location.pathname === "/become-provider" ? "font-bold text-brandOrange" : "text-gray-300 hover:text-white"
                 }`}
               >
-                <Link to="/become-provider" onClick={handleNavClick}>Become a Provider</Link>
+                <Link to="/become-provider" onClick={handleNavClick}>{"Become a Provider"}</Link>
               </li>
 
               <li
@@ -222,7 +222,7 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4 text-xl">Contact Us</h3>
+            <h3 className="font-semibold mb-4 text-xl">{"Contact Us"}</h3>
             <ul className="space-y-2 text-gray-300 text-sm">
               <li className="flex items-center gap-2 hover:text-white cursor-pointer transition-colors">
                 <CiLocationOn /> Kigali, Rwanda
@@ -239,21 +239,21 @@ const Footer: React.FC = () => {
 
         <div className="border-t border-gray-600 mt-10 pt-6 text-sm text-gray-400">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p>© {new Date().getFullYear()} GoFix&Clean. All rights reserved.</p>
+            <p>{"\u00a9 2024 GoFix&Clean. All rights reserved."}</p>
             <div className="flex gap-6">
               <Link
                 to="/privacy-policy"
                 onClick={handleNavClick}
                 className="cursor-pointer hover:underline"
               >
-                Privacy Policy
+                {"Privacy Policy"}
               </Link>
               <Link
                 to="/terms-of-service"
                 onClick={handleNavClick}
                 className="cursor-pointer hover:underline"
               >
-                Terms of Service
+                {"Terms of Service"}
               </Link>
             </div>
           </div>

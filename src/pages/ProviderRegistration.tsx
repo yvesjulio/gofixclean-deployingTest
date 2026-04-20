@@ -2,15 +2,33 @@ import { useState } from "react";
 import PersonalDetails from "../components/verifications/PersonalDetails";
 import Verification from "../components/verifications/Verification";
 import PersonalInfo from "../components/verifications/PersonalInfo";
-import Documents from "../components/verifications/Documents";
 import Review from "../components/verifications/Review";
 import Footer from "../components/landingpages/Footer";
 
-type Step = 'personal' | 'documents' | 'review';
+type Step = 'personal' | 'review';
 
-function ProviderVerifications() {
+interface FormData {
+  fullLegalName: string;
+  phoneNumber: string;
+  residentialAddress: string;
+  serviceType: string;
+  otherService: string;
+  serviceTags: string[];
+  aboutYou: string;
+}
+
+function ProviderRegistration() {
   const [currentStep, setCurrentStep] = useState<Step>('personal');
   const [completedSteps, setCompletedSteps] = useState<Set<Step>>(new Set());
+  const [formData, setFormData] = useState<FormData>({
+    fullLegalName: '',
+    phoneNumber: '',
+    residentialAddress: '',
+    serviceType: '',
+    otherService: '',
+    serviceTags: [],
+    aboutYou: ''
+  });
 
   const handleStepClick = (step: Step) => {
     if (completedSteps.has(step) || step === currentStep) {
@@ -39,18 +57,14 @@ function ProviderVerifications() {
       
       <div className="bg-[#EAEFEE] pt-20 pb-8">
         {currentStep === 'personal' && (
-          <PersonalInfo onNext={() => handleNext('documents')} />
-        )}
-        
-        {currentStep === 'documents' && (
-          <Documents 
-            onNext={() => handleNext('review')} 
-            onBack={() => handleBack('personal')} 
-          />
+          <PersonalInfo onNext={(data) => {
+            setFormData(data);
+            handleNext('review');
+          }} />
         )}
         
         {currentStep === 'review' && (
-          <Review onBack={() => handleBack('documents')} />
+          <Review formData={formData} onBack={() => handleBack('personal')} />
         )}
       </div>
 
@@ -90,6 +104,4 @@ function ProviderVerifications() {
   );
 }
 
-export default ProviderVerifications;
-
-
+export default ProviderRegistration;

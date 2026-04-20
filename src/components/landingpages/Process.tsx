@@ -1,38 +1,45 @@
 import { FiSearch } from "react-icons/fi";
 import { FaUserCheck, FaRegCalendarCheck } from "react-icons/fa";
 import { GoStar } from "react-icons/go";
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 
 interface ProcessCategory {
   title: string;
   description: string;
   icon: ReactElement;
+  titleKey?: string;
+  descKey?: string;
 }
 
 const Process: React.FC = () => {
+
   const categories: ProcessCategory[] = [
     {
+      titleKey: "process.searchBrowse",
+      descKey: "process.searchBrowseDesc",
       title: "Search & Browse",
-      description:
-        "Enter your service need and location. Browse through verified providers with real reviews and ratings.",
+      description: "Enter your service need and location. Browse through verified providers with real reviews and ratings.",
       icon: <FiSearch className="text-2xl text-brandText" />,
     },
     {
+      titleKey: "process.chooseProvider",
+      descKey: "process.chooseProviderDesc",
       title: "Choose a Provider",
-      description:
-        "Compare profiles, check availability, and select the best professional for your specific needs.",
+      description: "Compare profiles, check availability, and select the best professional for your specific needs.",
       icon: <FaUserCheck className="text-2xl text-brandText" />,
     },
     {
+      titleKey: "process.bookSchedule",
+      descKey: "process.bookScheduleDesc",
       title: "Book & Schedule",
-      description:
-        "Pick a convenient date and time. Get instant confirmation and chat directly with your provider.",
+      description: "Pick a convenient date and time. Get instant confirmation and chat directly with your provider.",
       icon: <FaRegCalendarCheck className="text-2xl text-brandText" />,
     },
     {
+      titleKey: "process.getDoneReview",
+      descKey: "process.getDoneReviewDesc",
       title: "Get it Done & Review",
-      description:
-        "Your provider arrives and completes the job. Pay securely and share your experience.",
+      description: "Your provider arrives and completes the job. Pay securely and share your experience.",
       icon: <GoStar className="text-2xl text-brandText" />,
     },
   ];
@@ -41,17 +48,16 @@ const Process: React.FC = () => {
     <div className="text-center px-4 md:px-0 pt-16 pb-16">
       <div className="flex justify-center">
         <div className="flex items-center gap-2 px-6 py-2 border border-white/40 rounded-xl bg-[#B1CDC8] font-medium text-brandText mb-6">
-          <span>Simple Process</span>
+          <span>{"Simple Process"}</span>
         </div>
       </div>
 
       <h2 className="text-2xl md:text-3xl font-bold mb-4">
-        How GoFix<span className="text-brandOrange">&</span>Clean Works
+        {"How GoFix&Clean Works"}
       </h2>
 
       <p className="text-[#696868] max-w-xl mx-auto leading-relaxed mb-10">
-        Getting quality service is just a few clicks away. Our platform <br className="hidden md:block" />
-        makes it easy to find, book, and pay for services.
+        {"Getting quality service is just a few clicks away. Our platform makes it easy to find, book, and pay for services."}
       </p>
 
       <div className="flex flex-wrap justify-center gap-6">

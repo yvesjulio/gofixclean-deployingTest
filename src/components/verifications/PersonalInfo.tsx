@@ -1,32 +1,29 @@
 import { useState, useEffect } from "react";
 
-interface PersonalInfoProps {
-  onNext: () => void;
-  onBack?: () => void; 
-}
-
 interface FormData {
   fullLegalName: string;
   phoneNumber: string;
   residentialAddress: string;
-  nin: string;
   serviceType: string;
   otherService: string;
-  serviceTags: string[];     
+  serviceTags: string[];
   aboutYou: string;
+}
+
+interface PersonalInfoProps {
+  onNext: (formData: FormData) => void;
+  onBack?: () => void;
 }
 
 interface FormErrors {
   fullLegalName?: string;
   phoneNumber?: string;
   residentialAddress?: string;
-  nin?: string;
   serviceType?: string;
   otherService?: string;
   serviceTags?: string;
   aboutYou?: string;
 }
-
 
 const serviceTagsOptions: Record<string, string[]> = {
   plumber: ["Leak Repair", "Installation", "Emergency Service", "Pipe Replacement"],
@@ -41,23 +38,24 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
   const [showOtherService, setShowOtherService] = useState(false);
   const [selectedService, setSelectedService] = useState("");
   const [formData, setFormData] = useState<FormData>(() => {
-    const savedData = localStorage.getItem('personalInfoFormData');
-    return savedData ? JSON.parse(savedData) : {
-      fullLegalName: "",
-      phoneNumber: "",
-      residentialAddress: "",
-      nin: "",
-      serviceType: "",
-      otherService: "",
-      serviceTags: [],
-      aboutYou: ""
-    };
+    const savedData = localStorage.getItem("personalInfoFormData");
+    return savedData
+      ? JSON.parse(savedData)
+      : {
+          fullLegalName: "",
+          phoneNumber: "",
+          residentialAddress: "",
+          serviceType: "",
+          otherService: "",
+          serviceTags: [],
+          aboutYou: "",
+        };
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    localStorage.setItem('personalInfoFormData', JSON.stringify(formData));
+    localStorage.setItem("personalInfoFormData", JSON.stringify(formData));
   }, [formData]);
 
   useEffect(() => {
@@ -71,8 +69,12 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
     const value = e.target.value;
     setSelectedService(value);
     setShowOtherService(value === "other");
-    setFormData({ ...formData, serviceType: value, otherService: value === "other" ? formData.otherService : "", serviceTags: [] });
-    
+    setFormData({
+      ...formData,
+      serviceType: value,
+      otherService: value === "other" ? formData.otherService : "",
+      serviceTags: [],
+    });
     if (errors.serviceType) {
       setErrors({ ...errors, serviceType: undefined });
     }
@@ -80,16 +82,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
-    if (name === "nin") {
-      const numbersOnly = value.replace(/\D/g, "");
-      if (numbersOnly.length <= 16) {
-        setFormData({ ...formData, nin: numbersOnly });
-      }
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-
+    setFormData({ ...formData, [name]: value });
     if (errors[name as keyof FormErrors]) {
       setErrors({ ...errors, [name]: undefined });
     }
@@ -98,7 +91,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
   const handleTagToggle = (tag: string) => {
     const currentTags = formData.serviceTags;
     const updatedTags = currentTags.includes(tag)
-      ? currentTags.filter(t => t !== tag)
+      ? currentTags.filter((t) => t !== tag)
       : [...currentTags, tag];
     setFormData({ ...formData, serviceTags: updatedTags });
     if (errors.serviceTags) {
@@ -106,9 +99,8 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
     }
   };
 
-  
   const handleCustomTagsChange = (value: string) => {
-    const tags = value.split(',').map(t => t.trim()).filter(t => t);
+    const tags = value.split(",").map((t) => t.trim()).filter((t) => t);
     setFormData({ ...formData, serviceTags: tags });
     if (errors.serviceTags) {
       setErrors({ ...errors, serviceTags: undefined });
@@ -136,33 +128,26 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
       newErrors.residentialAddress = "Residential address is required";
     }
 
-    if (!formData.nin.trim()) {
-      newErrors.nin = "NIN is required";
-    } else if (!/^\d{16}$/.test(formData.nin)) {
-      newErrors.nin = "NIN must be exactly 16 digits";
-    }
-
     if (!formData.serviceType) {
       newErrors.serviceType = "Please select a service type";
     } else if (formData.serviceType === "other" && !formData.otherService.trim()) {
       newErrors.otherService = "Please specify your service";
     }
 
-   
     if (formData.serviceType && formData.serviceType !== "other") {
       if (!formData.serviceTags.length) {
         newErrors.serviceTags = "Please select at least one service tag";
       }
     } else if (formData.serviceType === "other") {
       if (!formData.serviceTags.length) {
-        newErrors.serviceTags = "Please enter at least one service tag (comma-separated)";
+        newErrors.serviceTags = "Please provide service tags for your custom service";
       }
     }
 
     if (!formData.aboutYou.trim()) {
-      newErrors.aboutYou = "Please tell us about your skills and experience";
+      newErrors.aboutYou = "Tell us about yourself";
     } else if (formData.aboutYou.length < 20) {
-      newErrors.aboutYou = "Please provide more details (at least 20 characters)";
+      newErrors.aboutYou = "About you must be at least 20 characters";
     }
 
     setErrors(newErrors);
@@ -170,15 +155,25 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
   };
 
   const handleContinue = () => {
-    const allFields = ['fullLegalName', 'phoneNumber', 'residentialAddress', 'nin', 'serviceType', 'serviceTags', 'aboutYou'];
-    const touchedFields = allFields.reduce((acc, field) => ({ ...acc, [field]: true }), {});
+    const allFields = [
+      'fullLegalName',
+      'phoneNumber',
+      'residentialAddress',
+      'serviceType',
+      'serviceTags',
+      'aboutYou',
+    ];
+    const touchedFields = allFields.reduce(
+      (acc, field) => ({ ...acc, [field]: true }),
+      {}
+    ) as Record<string, boolean>;
     if (showOtherService) {
       touchedFields.otherService = true;
     }
     setTouched(touchedFields);
 
     if (validateForm()) {
-      onNext(); 
+      onNext(formData);
     } else {
       const firstErrorField = document.querySelector('.border-red-500');
       if (firstErrorField) {
@@ -193,21 +188,22 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
     }
   };
 
-
   const currentTags = selectedService && selectedService !== 'other' ? serviceTagsOptions[selectedService] || [] : [];
 
   return (
     <div className="w-full max-w-3xl mx-auto bg-white rounded-xl shadow-md p-4 sm:p-6 md:p-8">
       <div className="mb-4 sm:mb-6 md:mb-8">
         <h2 className="text-xl sm:text-2xl font-bold">Personal Information</h2>
-        <p className="text-gray-500 text-xs sm:text-sm mt-1">Provide your personal details to get verified</p>
+        <p className="text-gray-500 text-xs sm:text-sm mt-1">
+          Tell us about your skills and background so we can match you with the right jobs.
+        </p>
       </div>
-      
+
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex-1 space-y-1 sm:space-y-2">
             <label className="text-xs sm:text-sm font-medium text-gray-700 block">
-              Full Legal Name <span className="text-red-500">*</span>
+              Full legal name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -215,7 +211,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
               value={formData.fullLegalName}
               onChange={handleInputChange}
               onBlur={() => handleBlur('fullLegalName')}
-              placeholder="Enter your full name"
+              placeholder="Enter your full legal name"
               className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#E6EFED] border rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent transition text-xs sm:text-sm text-[#696969] ${
                 touched.fullLegalName && errors.fullLegalName ? 'border-red-500' : 'border-gray-300'
               }`}
@@ -227,7 +223,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
 
           <div className="flex-1 space-y-1 sm:space-y-2">
             <label className="text-xs sm:text-sm font-medium text-gray-700 block">
-              Phone Number <span className="text-red-500">*</span>
+              Phone number <span className="text-red-500">*</span>
             </label>
             <input
               type="tel"
@@ -235,7 +231,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
               value={formData.phoneNumber}
               onChange={handleInputChange}
               onBlur={() => handleBlur('phoneNumber')}
-              placeholder="+250 xxx xxx xxx"
+              placeholder="+250 7XX XXX XXX"
               className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#E6EFED] border rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent transition text-xs sm:text-sm text-[#696969] ${
                 touched.phoneNumber && errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
               }`}
@@ -248,7 +244,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
 
         <div className="space-y-1 sm:space-y-2">
           <label className="text-xs sm:text-sm font-medium text-gray-700 block">
-            Residential Address <span className="text-red-500">*</span>
+            Residential address <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -256,7 +252,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
             value={formData.residentialAddress}
             onChange={handleInputChange}
             onBlur={() => handleBlur('residentialAddress')}
-            placeholder="Enter your full address"
+            placeholder="Street, house number"
             className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#E6EFED] border rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent transition text-xs sm:text-sm text-[#696969] ${
               touched.residentialAddress && errors.residentialAddress ? 'border-red-500' : 'border-gray-300'
             }`}
@@ -268,34 +264,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
 
         <div className="space-y-1 sm:space-y-2">
           <label className="text-xs sm:text-sm font-medium text-gray-700 block">
-            NIN (National ID Number) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="nin"
-            value={formData.nin}
-            onChange={handleInputChange}
-            onBlur={() => handleBlur('nin')}
-            placeholder="Enter 16-digit NIN"
-            maxLength={16}
-            inputMode="numeric"
-            className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#E6EFED] border rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent transition text-xs sm:text-sm text-[#696969] ${
-              touched.nin && errors.nin ? 'border-red-500' : 'border-gray-300'
-            }`}
-          />
-          {touched.nin && errors.nin && (
-            <p className="text-red-500 text-xs mt-1">{errors.nin}</p>
-          )}
-          {formData.nin.length > 0 && (
-            <p className={`text-xs mt-1 ${formData.nin.length === 16 ? 'text-green-600' : 'text-gray-500'}`}>
-              {formData.nin.length}/16 digits
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-1 sm:space-y-2">
-          <label className="text-xs sm:text-sm font-medium text-gray-700 block">
-            Service Type <span className="text-red-500">*</span>
+            Service type <span className="text-red-500">*</span>
           </label>
           <select
             name="serviceType"
@@ -306,7 +275,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
               touched.serviceType && errors.serviceType ? 'border-red-500' : 'border-gray-300'
             }`}
           >
-            <option value="">Select service type...</option>
+            <option value="">Select a service type</option>
             <option value="plumber">Plumber</option>
             <option value="electrician">Electrician</option>
             <option value="cleaner">Cleaner</option>
@@ -327,7 +296,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
                 value={formData.otherService}
                 onChange={handleInputChange}
                 onBlur={() => handleBlur('otherService')}
-                placeholder="Please specify your service"
+                placeholder="Describe your service"
                 className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#E6EFED] border rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText focus:border-transparent transition text-xs sm:text-sm text-[#696969] ${
                   touched.otherService && errors.otherService ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -339,7 +308,6 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
           )}
         </div>
 
-      
         {selectedService && selectedService !== "other" && currentTags.length > 0 && (
           <div className="space-y-2">
             <label className="text-xs sm:text-sm font-medium text-gray-700 block">
@@ -347,7 +315,7 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
             </label>
             <p className="text-gray-500 text-xs">Select the services you offer</p>
             <div className="flex flex-wrap gap-3">
-              {currentTags.map(tag => (
+              {currentTags.map((tag) => (
                 <label key={tag} className="flex items-center space-x-2">
                   <input
                     type="checkbox"
@@ -409,18 +377,18 @@ function PersonalInfo({ onNext, onBack }: PersonalInfoProps) {
 
         <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4">
           {onBack && (
-          <button 
-            onClick={handleBack}
-            className="bg-transparent text-gray-700 py-2 px-6 rounded-lg font-medium border border-gray-300 hover:border-brandOrange hover:text-brandOrange transition-all duration-300 text-sm order-2 sm:order-1 w-full sm:w-auto"
-          >
-            Back
-          </button>
+            <button
+              onClick={handleBack}
+              className="bg-transparent text-gray-700 py-2 px-6 rounded-lg font-medium border border-gray-300 hover:border-brandOrange hover:text-brandOrange transition-all duration-300 text-sm order-2 sm:order-1 w-full sm:w-auto"
+            >
+              Back
+            </button>
           )}
-          <button 
+          <button
             onClick={handleContinue}
             className="bg-brandText text-white py-2 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-all duration-300 hover:scale-[1.02] text-sm order-1 sm:order-2 w-full sm:w-auto sm:ml-auto"
           >
-            Continue to documents
+            Continue to review
           </button>
         </div>
       </div>

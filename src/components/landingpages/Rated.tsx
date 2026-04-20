@@ -69,16 +69,15 @@ const Rated: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div className="md:w-2/3">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-[#FFD1C0] text-xs sm:text-sm font-medium text-[#8C3B1D] mb-2">
-            Top rated
+            {"Top rated"}
           </div>
 
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">
-            Featured Service Providers
+            {"Featured Service Providers"}
           </h2>
 
           <p className="text-[#696969] text-xs sm:text-sm md:text-base">
-            Meet some of our highest-rated professionals trusted by
-            <br className="sm:hidden" /> thousands of customers.
+            {"Meet some of our highest-rated professionals trusted by thousands of customers."}
           </p>
         </div>
 
@@ -93,7 +92,7 @@ const Rated: React.FC = () => {
             }
           }}
         >
-          <span>View all providers</span>
+          <span>{"View all providers"}</span>
           <TiArrowRight className="ml-1 text-lg transition-transform duration-300 group-hover:translate-x-2" />
         </div>
       </div>
@@ -109,7 +108,7 @@ const Rated: React.FC = () => {
           >
             <span className="absolute top-3 right-3 bg-brandText text-white text-xs px-3 py-1 rounded-full flex items-center gap-1 z-10">
               <GrStatusGood className="text-[12px]" />
-              Top rated
+              {"Top rated"}
             </span>
 
             <div className="overflow-hidden">

@@ -11,47 +11,40 @@ interface Provider {
 }
 
 const Testimonials: React.FC = () => {
+
   const providers: Provider[] = [
     {
       name: "John Dril",
       job: "Plumbing expert",
-      image:
-        "https://plus.unsplash.com/premium_photo-1705563088246-3673a401ed6a?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image: "",
       rating: 5,
-      quote:
-        "As a busy working mom, I don't have time to search for home service providers<br/>GoFix&Clean makes it easy to find trusted cleaners and handymen<br/>Love the video call feature!",
+      quote: "As a busy working mom, I don't have time to search for home service providers GoFix&Clean makes it easy to find trusted cleaners and handymen Love the video call feature!",
     },
     {
       name: "Jane Doe",
       job: "Electrical Specialist",
-      image:
-        "https://plus.unsplash.com/premium_photo-1681493771936-7d76691184d9?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image: "",
       rating: 4,
-      quote:
-         "I don't have time to search for home service providers<br/>GoFix&Clean makes it easy to find trusted cleaners and handymen<br/>Love the video call feature!",
+      quote: "I don't have time to search for home service providers GoFix&Clean makes it easy to find trusted cleaners and handymen Love the video call feature!",
     },
     {
       name: "Mark Smith",
       job: "Gardening Expert",
-      image:
-        "https://images.unsplash.com/photo-1552493450-2b5ce80ed13f?q=80&w=814&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image: "",
       rating: 3,
-      quote:
-        "They made gardening so easy! Friendly staff and trustworthy providers.<br/>Will use again.",
+      quote: "They made gardening so easy! Friendly staff and trustworthy providers. Will use again.",
     },
     {
       name: "Jane Doe",
       job: "Electrical Specialist",
-      image:
-        "https://plus.unsplash.com/premium_photo-1681493771936-7d76691184d9?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image: "",
       rating: 4,
-      quote:
-        "Excellent service! Quick response and very professional.<br/>Highly recommend GoFix&Clean.",
+      quote: "Excellent service! Quick response and very professional. Highly recommend GoFix&Clean.",
     },
   ];
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<number | null>(null);
 
  
   const clearAutoSlide = () => {
@@ -100,10 +93,12 @@ const Testimonials: React.FC = () => {
     <section className="px-4 sm:px-6 md:px-16 py-16">
       <div className="text-center max-w-3xl mx-auto mb-12">
         <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-2xl bg-[#B1CDC8] font-medium text-[#01342A] mb-4">
+          {/* Use a generic label or add to translations if needed */}
           Testimonials
         </div>
 
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
+          {/* Use a generic but appropriate heading */}
           What Our Customers Say
         </h2>
 
@@ -143,7 +138,7 @@ const Testimonials: React.FC = () => {
         <div className="relative">
           <div className="flex gap-1 text-2xl absolute -top-8 left-7">
             {Array.from({ length: providers[currentIndex].rating }).map((_, i) => (
-              <FaStar key={i} className="text-black" />
+              <FaStar key={i} className="text-brandYellow" />
             ))}
           </div>
         </div>
@@ -160,11 +155,19 @@ const Testimonials: React.FC = () => {
 
        
         <div className="flex items-center gap-4 mt-4 ml-6">
-          <img
-            src={providers[currentIndex].image}
-            alt={providers[currentIndex].name}
-            className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover"
-          />
+          {providers[currentIndex].image ? (
+            <img
+              src={providers[currentIndex].image}
+              alt={providers[currentIndex].name}
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-200 flex items-center justify-center">
+              <span className="text-2xl font-semibold text-gray-500">
+                {providers[currentIndex].name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
 
           <div>
             <h3 className="font-bold text-base sm:text-lg">

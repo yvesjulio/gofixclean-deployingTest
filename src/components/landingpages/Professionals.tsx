@@ -1,7 +1,8 @@
 import { FaUserGroup } from "react-icons/fa6";
 import { FiGift, FiArrowRight } from "react-icons/fi";
-import { ReactNode, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import type { ReactNode } from "react";
+import { NavLink } from "react-router-dom";
 
 interface Category {
   title: string;
@@ -14,8 +15,6 @@ interface Category {
 }
 
 const Professionals: React.FC = () => {
-  const location = useLocation();
-  
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -25,9 +24,9 @@ const Professionals: React.FC = () => {
 
   const categories: Category[] = [
     {
-      title: "Looking for a service?",
+      title: "Find a provider",
       description:
-        "Find trusted professionals for any task. From plumbing to cleaning, we've got you covered with verified providers.",
+        "We connect you with reliable cleaners and technicians serving Kigali and nearby areas.",
       button: "Find a provider",
       icon: <FaUserGroup className="text-2xl text-[#E6EFED]" />,
       bgColor: "bg-[#357E70]",
@@ -58,11 +57,10 @@ const Professionals: React.FC = () => {
     <section className="px-4 sm:px-6 md:px-16 py-16">
       <div className="text-center max-w-3xl mx-auto mb-10">
         <h2 className="text-2xl sm:text-3xl font-bold mb-3">
-          Trusted professionals, across Kigali.
+          {"Trusted professionals, across Kigali."}
         </h2>
         <p className="text-sm sm:text-base text-[#696969] leading-relaxed">
-          We connect you with reliable cleaners and technicians serving Kigali
-          and nearby areas.
+          {"We connect you with reliable cleaners and technicians serving Kigali and nearby areas."}
         </p>
       </div>
 
@@ -100,7 +98,7 @@ const Professionals: React.FC = () => {
             }`
           }
         >
-          Find service near you
+          {"Find a provider"}
         </NavLink>
       </div>
 
