@@ -161,7 +161,6 @@ function Booking() {
 
         xhr.onerror = async () => {
           if (retries > 0) {
-            console.log(`Retrying upload (${retries})...`);
             resolve(uploadSingle(file, index, progressMap, retries - 1));
           } else {
             reject("Upload failed after retries");
@@ -323,7 +322,6 @@ function Booking() {
         } catch (error) {
           attemptCount++;
           if (attemptCount < maxRetries) {
-            console.log(`Form submission failed, retrying... (Attempt ${attemptCount}/${maxRetries})`);
             setUploadStatus(`Retrying submission... (${attemptCount}/${maxRetries})`);
             await new Promise(resolve => setTimeout(resolve, 1000));
             return submitFormWithRetry();
@@ -336,7 +334,6 @@ function Booking() {
       await submitFormWithRetry();
 
     } catch (error) {
-      console.error("Booking error:", error);
       setUploading(false);
       setIsSubmitting(false);
       

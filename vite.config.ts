@@ -12,4 +12,37 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          // Split vendor libraries into separate chunks
+          if (id.includes("node_modules")) {
+            if (id.includes("@supabase")) {
+              return "vendor-supabase";
+            }
+            if (id.includes("@radix-ui")) {
+              return "vendor-radix";
+            }
+            if (id.includes("recharts")) {
+              return "vendor-charts";
+            }
+            if (id.includes("react-router")) {
+              return "vendor-router";
+            }
+            return "vendor";
+          }
+          // Split admin pages into separate chunk
+          if (id.includes("pages/admin")) {
+            return "admin";
+          }
+          // Split policy pages into separate chunk
+          if (id.includes("policies")) {
+            return "policies";
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 });

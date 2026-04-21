@@ -140,8 +140,6 @@ function Review({ onBack, formData }: ReviewProps) {
         aboutYou: submitData.aboutYou,
       };
 
-      console.log("📤 Submitting provider data:", payload);
-
       const response = await fetch("https://submit-form.com/boL1oVWXQ", {
         method: "POST",
         headers: {
@@ -152,21 +150,17 @@ function Review({ onBack, formData }: ReviewProps) {
       });
 
       const responseText = await response.text();
-      console.log("📨 Response status:", response.status);
-      console.log("📨 Response body:", responseText);
 
       if (!response.ok) {
         throw new Error(`Server error: ${response.status} - ${responseText}`);
       }
 
-      console.log("Application Submitted!");
       setIsSubmitted(true);
       localStorage.removeItem('personalInfoFormData');
 
       // Update rate limiting timestamp
       localStorage.setItem("lastSubmit", Date.now().toString());
     } catch (error: any) {
-      console.error("Submission error", error);
       alert(error?.message || "Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);

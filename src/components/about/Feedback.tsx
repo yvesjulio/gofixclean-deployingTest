@@ -9,9 +9,9 @@ const Feedback: React.FC = () => {
 
   const feedbackData: FeedbackItem[] = [
     { number: "30+", label: "Areas We Cover" },
-    { number: "5K+", label: "Service Providers" },
-    { number: "100K+", label: "Jobs Completed" },
-    { number: "50K+", label: "Happy Clients" },
+    { number: "10+", label: "Service Providers" },
+    { number: "10+", label: "Jobs Completed" },
+    { number: "20+", label: "Happy Clients" },
   ];
 
   return (

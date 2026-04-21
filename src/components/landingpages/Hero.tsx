@@ -104,7 +104,7 @@ const Hero: React.FC = () => {
 
         <div>
           <div className="flex items-center justify-center gap-2 text-lg font-bold">
-            <span className="text-3xl">5K+</span>
+            <span className="text-3xl">10+</span>
           </div>
           <p className="text-sm text-[#C5C5C5] mt-1">{"Service providers"}</p>
         </div>
