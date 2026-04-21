@@ -1,3 +1,4 @@
+import foundedImg from "/images/founded.png";
 
 const OurStory: React.FC = () => {
 
@@ -29,7 +30,7 @@ const OurStory: React.FC = () => {
         </div>
         <div className="overflow-hidden rounded-3xl">
           <img
-            src="/images/founded.png"
+            src={foundedImg}
             alt="GoFix&Clean Logo"
             className="w-full h-72 md:h-96 object-cover transition-transform duration-300 hover:scale-105"
           />

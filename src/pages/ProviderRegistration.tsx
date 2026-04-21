@@ -4,6 +4,7 @@ import Verification from "../components/verifications/Verification";
 import PersonalInfo from "../components/verifications/PersonalInfo";
 import Review from "../components/verifications/Review";
 import Footer from "../components/landingpages/Footer";
+import whatsappImg from "/images/whatsapp.png";
 
 type Step = 'personal' | 'review';
 
@@ -86,7 +87,7 @@ function ProviderRegistration() {
           animation: "forwardBackward 1.5s ease-in-out infinite",
         }}
       >
-        <img src="/images/whatsapp.png" alt="WhatsApp" className="h-10 w-10" />
+        <img src={whatsappImg} alt="WhatsApp" className="h-10 w-10" />
       </a>
 
       <style>

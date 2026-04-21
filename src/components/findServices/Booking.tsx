@@ -71,8 +71,10 @@ function Booking() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
+  const [mediaJson, setMediaJson] = useState("");
 
   const mediaInputRef = useRef<HTMLInputElement>(null);
+  const bookingFormRef = useRef<HTMLFormElement | null>(null);
 
   const compressImage = (file: File): Promise<File> => {
     return new Promise((resolve) => {
@@ -257,7 +259,9 @@ function Booking() {
     setOtherInput(e.target.value);
   };
 
-  const handleBooking = async () => {
+  const handleBooking = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     // Rate limiting: prevent spam submissions
     const lastSubmit = localStorage.getItem("lastSubmit");
     if (lastSubmit && Date.now() - parseInt(lastSubmit) < 30000) {
@@ -277,6 +281,8 @@ function Booking() {
     }
 
     setIsSubmitting(true);
+    let attemptCount = 0;
+    const maxRetries = 2;
 
     try {
       // 1. Upload files to Cloudinary with progress
@@ -291,69 +297,56 @@ function Booking() {
 
       const mediaUrls = await Promise.all(uploadPromises);
 
-      setUploadStatus("Upload complete \u2705");
+      setUploadStatus("Upload complete ✅");
       setUploading(false);
 
-      // 2. Build a real HTML form (NO fetch)
-      const form = document.createElement("form");
-      form.action = "https://submit-form.com/IH47AF19Y";
-      form.method = "POST";
-
-      const payload = {
-        fullName,
-        phoneNumber,
-        address,
-        landmark,
-        selectedDate,
-        selectedTime,
-        taskDescription,
-        estimatedDuration,
-        urgency,
-        checklist: JSON.stringify(selectedChecklist),
-        otherInput,
-        media: JSON.stringify(mediaUrls),
-        providerName: provider?.name,
-        providerCategory: provider?.category,
-        providerLocation: provider?.location,
-      };
-
-      Object.entries(payload).forEach(([key, value]) => {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = key;
-        input.value = String(value);
-        form.appendChild(input);
-      });
-
-      const iframe = document.createElement("iframe");
-      iframe.name = "hidden_iframe";
-      iframe.style.display = "none";
-      document.body.appendChild(iframe);
-
-      form.target = "hidden_iframe";
-      document.body.appendChild(form);
-      form.submit();
-
-      // Update rate limiting timestamp
+      // 2. Use native form submit through the hidden iframe with retry logic
+      setMediaJson(JSON.stringify(mediaUrls));
       localStorage.setItem("lastSubmit", Date.now().toString());
 
-      setTimeout(() => {
-        setBookingSuccess(true);
-      }, 800);
+      // Retry logic for form submission
+      const submitFormWithRetry = async () => {
+        try {
+          if (bookingFormRef.current) {
+            bookingFormRef.current.submit();
+            
+            // Wait a bit to see if submission succeeds
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // If we get here, submission likely succeeded
+            setTimeout(() => {
+              setBookingSuccess(true);
+            }, 800);
+          } else {
+            throw new Error("Booking form not found");
+          }
+        } catch (error) {
+          attemptCount++;
+          if (attemptCount < maxRetries) {
+            console.log(`Form submission failed, retrying... (Attempt ${attemptCount}/${maxRetries})`);
+            setUploadStatus(`Retrying submission... (${attemptCount}/${maxRetries})`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return submitFormWithRetry();
+          } else {
+            throw error;
+          }
+        }
+      };
 
-      setTimeout(() => {
-        document.body.removeChild(form);
-        document.body.removeChild(iframe);
-      }, 1000);
+      await submitFormWithRetry();
+
     } catch (error) {
-      console.error(error);
+      console.error("Booking error:", error);
+      setUploading(false);
+      setIsSubmitting(false);
+      
+      // Show specific error messages
       if (uploading) {
-        alert("Some uploads failed. Please try again.");
-        setUploading(false);
-        setIsSubmitting(false);
+        alert("❌ Some uploads failed. Please check your internet connection and try again.");
         return;
       }
-      alert("Something went wrong. Please try again.");
+      
+      alert("❌ Failed to submit booking after " + maxRetries + " attempts. Please try again or contact support.");
     } finally {
       setIsSubmitting(false);
       setUploading(false);
@@ -417,8 +410,26 @@ function Booking() {
           
          
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 sticky top-8">
-            
+            <form
+              ref={bookingFormRef}
+              action="https://submit.formspark.io/IH47AF19Y"
+              method="POST"
+              target="hidden_iframe"
+              onSubmit={handleBooking}
+              className="bg-white rounded-2xl p-6 border border-gray-200 sticky top-8"
+            >
+              <input type="hidden" name="providerName" value={provider.name} />
+              <input type="hidden" name="providerCategory" value={provider.category} />
+              <input type="hidden" name="providerLocation" value={provider.location} />
+              <input type="hidden" name="urgency" value={urgency} />
+              <input type="hidden" name="checklist" value={JSON.stringify(selectedChecklist)} />
+              <input type="hidden" name="otherInput" value={otherInput} />
+              <input type="hidden" name="media" value={mediaJson} />
+              <input type="hidden" name="selectedDate" value={selectedDate} />
+              <input type="hidden" name="selectedTime" value={selectedTime} />
+              <input type="hidden" name="estimatedDuration" value={estimatedDuration} />
+              <iframe name="hidden_iframe" style={{ display: 'none' }} />
+
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <p className="text-3xl font-bold text-brandTealMedium">{provider.price}</p>
@@ -517,6 +528,7 @@ function Booking() {
                     <div className="grid grid-cols-4 gap-2">
                       {timeSlots.map(slot => (
                         <button
+                          type="button"
                           key={slot.time}
                           onClick={() => setSelectedTime(slot.time)}
                           className={`px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
@@ -545,6 +557,7 @@ function Booking() {
                   <div className="flex flex-wrap gap-2">
                     {checklist.map(item => (
                       <button
+                        type="button"
                         key={item}
                         onClick={() => toggleChecklist(item)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${
@@ -595,6 +608,7 @@ function Booking() {
                   <div className="grid grid-cols-2 gap-2">
                     {durationOptions.map(opt => (
                       <button
+                        type="button"
                         key={opt}
                         onClick={() => setEstimatedDuration(opt)}
                         className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1.5 ${
@@ -705,8 +719,8 @@ function Booking() {
 
          
               <button
+                type="submit"
                 className="w-full bg-brandText hover:bg-brandText/90 text-white font-semibold py-3 rounded-lg transition-colors mb-4"
-                onClick={handleBooking}
                 disabled={isSubmitting || uploading}
               >
                 {isSubmitting ? "Sending Request..." : uploading ? "Uploading files..." : "Request Service"}
@@ -732,7 +746,7 @@ function Booking() {
               <p className="text-xs text-gray-500 text-center mt-3 border-t border-gray-200 pt-3">
                 {"\u26a0 Cancellation after worker dispatch may incur a fee."}
               </p>
-            </div>
+            </form>
           </div>
 
           <div className="lg:col-span-2 space-y-6">

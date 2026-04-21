@@ -1,4 +1,5 @@
 import React from "react";
+import whatsappImg from "/images/whatsapp.png";
 
 const WhatsAppButton: React.FC = () => {
   return (
@@ -20,7 +21,7 @@ const WhatsAppButton: React.FC = () => {
           animation: "forwardBackward 1.5s ease-in-out infinite",
         }}
       >
-        <img src="/images/whatsapp.png" alt="WhatsApp" className="h-10 w-10" />
+        <img src={whatsappImg} alt="WhatsApp" className="h-10 w-10" />
       </a>
 
       <style>

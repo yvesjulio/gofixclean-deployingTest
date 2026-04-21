@@ -7,6 +7,7 @@ import { CgMail } from "react-icons/cg";
 import { FiArrowUp } from "react-icons/fi";
 import { FaInstagram } from "react-icons/fa";
 import { PiTiktokLogo } from "react-icons/pi";
+import whatsappImg from "/images/whatsapp.png";
 
 const Footer: React.FC = () => {
   const [showTopBtn, setShowTopBtn] = useState(false);
@@ -67,7 +68,7 @@ const Footer: React.FC = () => {
           animation: "forwardBackward 1.5s ease-in-out infinite",
         }}
       >
-        <img src="/images/whatsapp.png" alt="WhatsApp" className="h-10 w-10" />
+        <img src={whatsappImg} alt="WhatsApp" className="h-10 w-10" />
       </a>
 
       <style>
@@ -228,10 +229,10 @@ const Footer: React.FC = () => {
                 <CiLocationOn /> Kigali, Rwanda
               </li>
               <li className="flex items-center gap-2 hover:text-white cursor-pointer transition-colors">
-                <LuPhone /> +250 788 123 456
+                <LuPhone /> +250 780 816 439
               </li>
               <li className="flex items-center gap-2 hover:text-white cursor-pointer transition-colors">
-                <CgMail /> gofixandclean@gmail.com
+                <CgMail /> gofixclean@gmail.com
               </li>
             </ul>
           </div>

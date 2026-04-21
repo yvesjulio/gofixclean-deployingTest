@@ -36,7 +36,7 @@ const Professionals: React.FC = () => {
     {
       title: "Want to Offer Services?",
       description:
-        "Join thousands of service providers earning money on Tasker. Set your own rates, manage your schedule, grow your business.",
+        "Join thousands of service providers earning money on GoFix&Clean. Set your own rates, manage your schedule, grow your business.",
       button: "Become a provider",
       icon: <FiGift className="text-2xl text-brandText" />,
       bgColor: "bg-[#B1CDC8]",

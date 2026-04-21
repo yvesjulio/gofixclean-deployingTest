@@ -32,7 +32,7 @@ const Process: React.FC = () => {
       titleKey: "process.bookSchedule",
       descKey: "process.bookScheduleDesc",
       title: "Book & Schedule",
-      description: "Pick a convenient date and time. Get instant confirmation and chat directly with your provider.",
+      description: "Pick a convenient date and time. Get instant confirmation and your provider be ready to come.",
       icon: <FaRegCalendarCheck className="text-2xl text-brandText" />,
     },
     {

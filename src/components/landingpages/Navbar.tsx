@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
+import logoImg from "/images/logo.png";
 
 interface LinkClassProps {
   isActive: boolean;
@@ -19,7 +20,7 @@ const Navbar: React.FC = () => {
       <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-16 h-16 bg-white shadow-sm">
         <NavLink to="/">
           <img
-            src="/images/logo.png"
+            src={logoImg}
             alt="GoFix&Clean Logo"
             className="h-7 cursor-pointer"
           />

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { FaStar } from "react-icons/fa";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import betImg from "/images/bet.png";
 
 interface Provider {
   name: string;
@@ -128,7 +129,7 @@ const Testimonials: React.FC = () => {
        
         <div className="flex justify-start">
           <img
-            src="/images/bet.png"
+            src={betImg}
             alt="GoFix&Clean Logo"
             className="w-12 h-12"
           />
