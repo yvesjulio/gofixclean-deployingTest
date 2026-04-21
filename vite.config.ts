@@ -5,7 +5,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/gofixclean-deployingTest/',
+  base: "/",
   plugins: [tailwind(), react()],
   resolve: {
     alias: {
