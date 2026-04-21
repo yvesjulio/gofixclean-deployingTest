@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
 import logoImg from "/images/logo.png";
@@ -9,15 +9,40 @@ interface LinkClassProps {
 
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const navbarRef = useRef<HTMLDivElement>(null);
 
   const linkClass = ({ isActive }: LinkClassProps): string =>
     isActive
       ? "text-brandOrange font-semibold"
       : "text-brandText hover:text-brandOrange transition";
 
+  // Close menu on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (menuOpen) {
+        setMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [menuOpen]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (navbarRef.current && !navbarRef.current.contains(event.target as Node) && menuOpen) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
+
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-16 h-16 bg-white shadow-sm">
+      <nav ref={navbarRef} className="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 md:px-16 h-16 bg-white shadow-sm">
         <NavLink to="/">
           <img
             src={logoImg}

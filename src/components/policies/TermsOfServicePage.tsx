@@ -13,7 +13,7 @@ export default function TermsOfServicePage() {
         <div className="prose prose-lg max-w-none text-gray-700 space-y-6">
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              GoFix&Clean – Simple Terms & Conditions
+              GoFix&Clean – Terms & Conditions
             </h2>
             <p className="text-gray-600 italic mb-6">Last Updated: April 2026</p>
 

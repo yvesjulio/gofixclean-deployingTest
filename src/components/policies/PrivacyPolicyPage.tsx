@@ -31,7 +31,7 @@ export default function PrivacyPolicyPage() {
                   <li>Location</li>
                   <li>Service details and preferences</li>
                   <li>Email address</li>
-                  <li>Payment information (handled securely through payment gateways)</li>
+                  <li>Payment information (handled securely through payment channel agreed)</li>
                 </ul>
               </div>
 
