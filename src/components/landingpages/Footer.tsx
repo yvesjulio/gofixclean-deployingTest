@@ -38,8 +38,6 @@ const Footer: React.FC = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const serviceLink = (category: string) => `/service-details/${encodeURIComponent(category)}`;
-
   return (
     <>
       {showTopBtn && (
