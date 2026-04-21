@@ -10,6 +10,8 @@ import ServiceDetails from "./components/landingpages/ServiceDetails";
 import PrivacyPolicyPage from "./components/policies/PrivacyPolicyPage";
 import TermsOfServicePage from "./components/policies/TermsOfServicePage";
 import ProviderRegistration from "./pages/ProviderRegistration";
+import CareersPage from "./pages/CareersPage";
+import ContactPage from "./pages/ContactPage";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import Bookings from "./pages/admin/Bookings";
 import Providers from "./pages/admin/Providers";
@@ -35,6 +37,8 @@ function AppWrapper() {
           <Route path="/become-provider" element={<BecomeProviderPage />} />  
           <Route path="/booking" element={<Booking />} />
           <Route path="/service-details/:category" element={<ServiceDetails />} />
+          <Route path="/careers" element={<CareersPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/terms-of-service" element={<TermsOfServicePage />} />
           <Route path="/provider/verification" element={<ProviderRegistration />} />

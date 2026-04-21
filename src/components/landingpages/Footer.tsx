@@ -139,7 +139,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-gray-300 text-sm">
               <li>
                 <Link
-                  to={serviceLink("Plumbing")}
+                  to="/services"
                   onClick={handleNavClick}
                   className="hover:text-white transition-colors"
                 >
@@ -148,7 +148,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <Link
-                  to={serviceLink("Electrical")}
+                  to="/services"
                   onClick={handleNavClick}
                   className="hover:text-white transition-colors"
                 >
@@ -157,7 +157,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <Link
-                  to={serviceLink("Cleaning")}
+                  to="/services"
                   onClick={handleNavClick}
                   className="hover:text-white transition-colors"
                 >
@@ -166,7 +166,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <Link
-                  to={serviceLink("Painting")}
+                  to="/services"
                   onClick={handleNavClick}
                   className="hover:text-white transition-colors"
                 >
@@ -175,7 +175,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <Link
-                  to={serviceLink("Handyman")}
+                  to="/services"
                   onClick={handleNavClick}
                   className="hover:text-white transition-colors"
                 >
@@ -240,7 +240,7 @@ const Footer: React.FC = () => {
 
         <div className="border-t border-gray-600 mt-10 pt-6 text-sm text-gray-400">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p>{"\u00a9 2024 GoFix&Clean. All rights reserved."}</p>
+            <p>{`\u00a9 ${new Date().getFullYear()} GoFix&Clean. All rights reserved.`}</p>
             <div className="flex gap-6">
               <Link
                 to="/privacy-policy"

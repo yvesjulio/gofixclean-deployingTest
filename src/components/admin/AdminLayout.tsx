@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Bell, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -23,9 +23,9 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
       <div className="w-64 bg-card border-r border-border p-4">
         <h2 className="font-bold mb-4">Admin Panel</h2>
         <nav className="space-y-2">
-          <a href="/admin" className="block p-2 hover:bg-muted rounded">Dashboard</a>
-          <a href="/admin/bookings" className="block p-2 hover:bg-muted rounded">Bookings</a>
-          <a href="/admin/providers" className="block p-2 hover:bg-muted rounded">Providers</a>
+          <Link to="/admin" className="block p-2 hover:bg-muted rounded">Dashboard</Link>
+          <Link to="/admin/bookings" className="block p-2 hover:bg-muted rounded">Bookings</Link>
+          <Link to="/admin/providers" className="block p-2 hover:bg-muted rounded">Providers</Link>
         </nav>
       </div>
 

@@ -10,20 +10,36 @@ const Questions: React.FC = () => {
 
   const faqs: FAQ[] = [
     {
-      question: "Got questions? We've got answers. If you don't find what you're looking for, feel free to contact our support team.",
-      answer: "GoFix&Clean connects you with trusted local professionals for all your home service needs. Whether it's plumbing, electrical work, cleaning, or handyman services, we've got you covered.",
+      question: "What is GoFix&Clean?",
+      answer: "GoFix&Clean connects you with trusted local professionals for all your home service needs. Whether it's plumbing, electrical work, cleaning, painting, or handyman services, we've got you covered with reliable and professional service providers in Kigali.",
     },
     {
-      question: "Got questions? We've got answers. If you don't find what you're looking for, feel free to contact our support team.",
-      answer: "GoFix&Clean offers secure payment options. You can pay through our app using credit/debit cards or mobile money. Payment is only processed after the service is completed to your satisfaction.",
+      question: "How do I book a service?",
+      answer: "It's simple! Go to our Services page, select the service category you need, choose your preferred provider, and follow the booking process. Our team will confirm your booking and assign a verified professional to help you.",
     },
     {
-      question: "Got questions? We've got answers. If you don't find what you're looking for, feel free to contact our support team.",
-      answer: "GoFix&Clean allows you to schedule services at your convenience. You can book appointments for the same day or choose a future date that works best for you.",
+      question: "What payment methods do you accept?",
+      answer: "We accept secure payments through Mobile Money and Bank transfers. Payment details will be confirmed during your booking. Payment is processed after the service is completed to your satisfaction.",
     },
     {
-      question: "Got questions? We've got answers. If you don't find what you're looking for, feel free to contact our support team.",
-      answer: "GoFix&Clean is committed to your satisfaction. If you're not happy with the service provided, please contact our support team within 24 hours. We will work to resolve the issue or provide a refund according to our guarantee terms.",
+      question: "Can I schedule services at a time that works for me?",
+      answer: "Absolutely! GoFix&Clean allows you to schedule services at your convenience. You can book for the same day or choose a future date that works best for you. Just provide your preferred time during booking.",
+    },
+    {
+      question: "What if I'm not satisfied with the service?",
+      answer: "Your satisfaction is our priority. If you're not happy with the service, please contact our support team within 24 hours. We will work to resolve the issue, arrange a replacement provider if needed, or provide a refund according to our satisfaction guarantee.",
+    },
+    {
+      question: "How quickly can a provider arrive?",
+      answer: "Response time depends on provider availability and your location. We work to assign a verified provider as soon as possible after booking confirmation. For urgent services, we prioritize faster assignments.",
+    },
+    {
+      question: "Are the service providers verified?",
+      answer: "Yes! All our service providers go through a verification process to ensure quality and reliability. We maintain high standards to ensure you get professional and trustworthy service.",
+    },
+    {
+      question: "What if the provider doesn't show up?",
+      answer: "If a provider fails to show up, we'll immediately arrange a replacement provider at no extra cost. If no replacement is available, we'll provide a full refund. Your satisfaction and time are important to us.",
     },
   ];
 
@@ -45,7 +61,7 @@ const Questions: React.FC = () => {
         </h2>
 
         <p className="text-sm sm:text-base text-gray-500 leading-relaxed">
-          {"Got questions? We've got answers. If you don't find what you're looking for, feel free to contact our support team."}
+          {"Find answers to common questions about GoFix&Clean services. If you need more help, contact our support team anytime."}
         </p>
       </div>
 
