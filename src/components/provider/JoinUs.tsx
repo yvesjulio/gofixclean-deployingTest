@@ -8,7 +8,7 @@ function JoinUs() {
   const categories = [
     {
       title: "Earn on Your Terms",
-      description: "Set your own rates and work when you want. Keep 85% of every booking.",
+      description: "Set your own rates and work when you want. Keep 90% of every booking.",
       icon: <FiTool />,
       bgColor: "bg-[#FCFDFC]",
       iconColor: "text-[#025E4C]",

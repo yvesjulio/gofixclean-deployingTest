@@ -17,10 +17,10 @@ const Work: React.FC = () => {
               01
             </div>
             <h4 className="text-lg sm:text-lg md:text-xl font-semibold mb-3 text-brandText">
-              Create an account
+            Register  your profile
             </h4>
             <p className="text-gray-600 text-base sm:text-base md:text-sm leading-relaxed">
-              Sign up and tell us about your skills, experience, and the services you offer.
+             Tell us about your skills, experience, and the services you offer.
             </p>
           </div>
 
