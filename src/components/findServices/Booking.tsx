@@ -261,13 +261,7 @@ function Booking() {
   const handleBooking = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Rate limiting: prevent spam submissions
-    const lastSubmit = localStorage.getItem("lastSubmit");
-    if (lastSubmit && Date.now() - parseInt(lastSubmit) < 30000) {
-      alert("Please wait 30 seconds before submitting another request.");
-      return;
-    }
-
+    // Validation
     if (!fullName.trim()) return alert("Please enter your full name");
     if (!phoneNumber.trim()) return alert("Please enter your phone number");
     if (!address.trim()) return alert("Please enter your address");
@@ -280,73 +274,44 @@ function Booking() {
     }
 
     setIsSubmitting(true);
-    let attemptCount = 0;
-    const maxRetries = 2;
+    setUploading(true);
+    setUploadStatus("Uploading files...");
 
     try {
-      // 1. Upload files to Cloudinary with progress
-      setUploading(true);
-      setUploadStatus("Uploading files...");
+      // 1. Upload files to Cloudinary (if any)
+      let mediaUrls: string[] = [];
+      
+      if (uploadedMedia.length > 0) {
+        const progressMap = new Array(uploadedMedia.length).fill(0);
+        const uploadPromises = uploadedMedia.map((media, index) =>
+          uploadSingle(media.file, index, progressMap)
+        );
+        mediaUrls = await Promise.all(uploadPromises);
+        setUploadStatus("Upload complete ✅");
+      }
 
-      const progressMap = new Array(uploadedMedia.length).fill(0);
-
-      const uploadPromises = uploadedMedia.map((media, index) =>
-        uploadSingle(media.file, index, progressMap)
-      );
-
-      const mediaUrls = await Promise.all(uploadPromises);
-
-      setUploadStatus("Upload complete ✅");
+      // 2. Prepare and submit form
+      setMediaJson(JSON.stringify(mediaUrls));
       setUploading(false);
 
-      // 2. Use native form submit through the hidden iframe with retry logic
-      setMediaJson(JSON.stringify(mediaUrls));
-      localStorage.setItem("lastSubmit", Date.now().toString());
-
-      // Retry logic for form submission
-      const submitFormWithRetry = async () => {
-        try {
-          if (bookingFormRef.current) {
-            bookingFormRef.current.submit();
-            
-            // Wait a bit to see if submission succeeds
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // If we get here, submission likely succeeded
-            setTimeout(() => {
-              setBookingSuccess(true);
-            }, 800);
-          } else {
-            throw new Error("Booking form not found");
-          }
-        } catch (error) {
-          attemptCount++;
-          if (attemptCount < maxRetries) {
-            setUploadStatus(`Retrying submission... (${attemptCount}/${maxRetries})`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            return submitFormWithRetry();
-          } else {
-            throw error;
-          }
+      // Submit via hidden iframe (most reliable method — no CORS issues)
+      setTimeout(() => {
+        if (bookingFormRef.current) {
+          bookingFormRef.current.submit();
+          
+          // Show success after brief delay for UX feedback
+          setTimeout(() => {
+            setBookingSuccess(true);
+            setIsSubmitting(false);
+          }, 1500);
         }
-      };
-
-      await submitFormWithRetry();
+      }, 200);
 
     } catch (error) {
       setUploading(false);
       setIsSubmitting(false);
-      
-      // Show specific error messages
-      if (uploading) {
-        alert("❌ Some uploads failed. Please check your internet connection and try again.");
-        return;
-      }
-      
-      alert("❌ Failed to submit booking after " + maxRetries + " attempts. Please try again or contact support.");
-    } finally {
-      setIsSubmitting(false);
-      setUploading(false);
+      alert("❌ Upload failed. Please check your internet connection and try again.");
+      console.error("Upload error:", error);
     }
   };
 
@@ -415,16 +380,25 @@ function Booking() {
               onSubmit={handleBooking}
               className="bg-white rounded-2xl p-6 border border-gray-200 sticky top-8"
             >
+              {/* Flat JSON payload for booking */}
+              <input type="hidden" name="type" value="booking" />
+              <input type="hidden" name="fullName" value={fullName} />
+              <input type="hidden" name="phoneNumber" value={phoneNumber} />
+              <input type="hidden" name="address" value={address} />
+              <input type="hidden" name="landmark" value={landmark} />
+              <input type="hidden" name="selectedDate" value={selectedDate} />
+              <input type="hidden" name="selectedTime" value={selectedTime} />
+              <input type="hidden" name="taskDescription" value={taskDescription} />
+              <input type="hidden" name="estimatedDuration" value={estimatedDuration} />
+              <input type="hidden" name="urgency" value={urgency} />
+              <input type="hidden" name="checklist" value={JSON.stringify(selectedChecklist)} />
+              <input type="hidden" name="media" value={mediaJson} />
+              
+              {/* Provider information for reference */}
               <input type="hidden" name="providerName" value={provider.name} />
               <input type="hidden" name="providerCategory" value={provider.category} />
               <input type="hidden" name="providerLocation" value={provider.location} />
-              <input type="hidden" name="urgency" value={urgency} />
-              <input type="hidden" name="checklist" value={JSON.stringify(selectedChecklist)} />
               <input type="hidden" name="otherInput" value={otherInput} />
-              <input type="hidden" name="media" value={mediaJson} />
-              <input type="hidden" name="selectedDate" value={selectedDate} />
-              <input type="hidden" name="selectedTime" value={selectedTime} />
-              <input type="hidden" name="estimatedDuration" value={estimatedDuration} />
               <iframe name="hidden_iframe" style={{ display: 'none' }} />
 
               <div className="flex items-center justify-between mb-6">
