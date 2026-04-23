@@ -97,7 +97,7 @@ const loadRawProviders = (): StoredProvider[] => {
 
   try {
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) {
+    if (!Array.isArray(parsed) || parsed.length === 0) {
       throw new Error("Invalid provider storage format");
     }
     return parsed.map((provider) => ensureProviderId(provider));

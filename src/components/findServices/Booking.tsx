@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiClock, FiUpload, FiX, FiCheckCircle, FiAlertTriangle, FiShield, FiPhone, FiUser } from 'react-icons/fi';
+import { FiMapPin, FiClock, FiStar, FiUpload, FiX, FiCheckCircle, FiAlertTriangle, FiShield, FiPhone, FiUser } from 'react-icons/fi';
 import { MdOutlineVerified } from "react-icons/md";
 import Footer from "../landingpages/Footer";
 
@@ -27,7 +27,7 @@ interface UploadedMedia {
   name: string;
   type: "image" | "video";
   preview: string;
-  file: File; // ✅ ADD THIS
+  file: File;
 }
 
 const SERVICE_CHECKLISTS: Record<string, string[]> = {
@@ -65,114 +65,14 @@ function Booking() {
   const [selectedChecklist, setSelectedChecklist] = useState<string[]>([]);
   const [uploadedMedia, setUploadedMedia] = useState<UploadedMedia[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [otherInput, setOtherInput] = useState<string>("");
-  const [showOtherInput, setShowOtherInput] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
-  const [mediaJson, setMediaJson] = useState("");
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [otherInput, setOtherInput] = useState<string>("");
+  const [showOtherInput, setShowOtherInput] = useState<boolean>(false);
 
   const mediaInputRef = useRef<HTMLInputElement>(null);
-  const bookingFormRef = useRef<HTMLFormElement | null>(null);
-
-  const compressImage = (file: File): Promise<File> => {
-    return new Promise((resolve) => {
-      if (!file.type.startsWith("image/")) {
-        resolve(file); // don't compress videos
-        return;
-      }
-
-      const img = new Image();
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        img.src = e.target?.result as string;
-      };
-
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const maxWidth = 1200;
-
-        const scale = Math.min(1, maxWidth / img.width);
-        canvas.width = img.width * scale;
-        canvas.height = img.height * scale;
-
-        const ctx = canvas.getContext("2d");
-        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              resolve(new File([blob], file.name, { type: "image/jpeg" }));
-            } else {
-              resolve(file);
-            }
-          },
-          "image/jpeg",
-          0.7 // quality (0.7 = good balance)
-        );
-      };
-
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const uploadSingle = (
-    file: File,
-    index: number,
-    progressMap: number[],
-    retries = 2
-  ): Promise<string> => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const compressedFile = await compressImage(file);
-
-        const xhr = new XMLHttpRequest();
-        const formData = new FormData();
-
-        formData.append("file", compressedFile);
-        formData.append("upload_preset", "GoFixandClean");
-
-        xhr.open(
-          "POST",
-          "https://api.cloudinary.com/v1_1/dufxdw0zr/upload"
-        );
-
-        xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) {
-            progressMap[index] = e.loaded / e.total;
-
-            const total =
-              progressMap.reduce((a, b) => a + b, 0) / progressMap.length;
-
-            setUploadProgress(Math.round(total * 100));
-          }
-        };
-
-        xhr.onload = () => {
-          const res = JSON.parse(xhr.responseText);
-          if (res.secure_url) {
-            resolve(res.secure_url);
-          } else {
-            throw new Error("Upload failed");
-          }
-        };
-
-        xhr.onerror = async () => {
-          if (retries > 0) {
-            resolve(uploadSingle(file, index, progressMap, retries - 1));
-          } else {
-            reject("Upload failed after retries");
-          }
-        };
-
-        xhr.send(formData);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
 
   const timeSlots: TimeSlot[] = [
     { time: '09:00', available: true },
@@ -202,7 +102,7 @@ function Booking() {
     
     const remainingSlots = Math.max(0, 3 - uploadedMedia.length);
     
-    if (remainingSlots > 0) {
+    if (uploadedMedia.length < 3 && remainingSlots > 0) {
       Array.from(files).slice(0, remainingSlots).forEach(file => {
         const isVideo = file.type.startsWith("video/");
         const isImage = file.type.startsWith("image/");
@@ -210,13 +110,10 @@ function Booking() {
           alert("Only images and videos are allowed");
           return;
         }
-
-        // ✅ ADD SIZE LIMIT
         if (file.size > 10 * 1024 * 1024) {
           alert("Each file must be under 10MB");
           return;
         }
-
         setUploadedMedia(prev => [
           ...prev,
           {
@@ -224,12 +121,12 @@ function Booking() {
             name: file.name,
             type: isVideo ? "video" : "image",
             preview: URL.createObjectURL(file),
-            file: file, // ✅ STORE THE FILE OBJECT
+            file,
           },
         ]);
       });
     } else {
-      alert(`${"You can upload up to 3 photos or videos. You have already uploaded"} ${uploadedMedia.length} ${"file(s)."}`);
+      alert("You can only upload up to 3 files.");
     }
   };
 
@@ -258,60 +155,180 @@ function Booking() {
     setOtherInput(e.target.value);
   };
 
-  const handleBooking = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      if (!file.type.startsWith("image/")) {
+        resolve(file);
+        return;
+      }
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+      };
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const scale = Math.min(1, 1200 / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          (blob) => resolve(blob ? new File([blob], file.name, { type: "image/jpeg" }) : file),
+          "image/jpeg",
+          0.7
+        );
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
-    // Validation
-    if (!fullName.trim()) return alert("Please enter your full name");
-    if (!phoneNumber.trim()) return alert("Please enter your phone number");
-    if (!address.trim()) return alert("Please enter your address");
-    if (!selectedDate || !selectedTime) return alert("Please select date and time");
-    if (!taskDescription.trim()) return alert("Please describe your task");
-    if (!estimatedDuration) return alert("Please select estimated duration");
+  const uploadSingle = (file: File, index: number, progressMap: number[], retries = 2): Promise<string> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const compressed = await compressImage(file);
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+        formData.append("file", compressed);
+        formData.append("upload_preset", "GoFixandClean");
+        xhr.open("POST", "https://api.cloudinary.com/v1_1/dufxdw0zr/upload");
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            progressMap[index] = e.loaded / e.total;
+            setUploadProgress(Math.round(progressMap.reduce((a, b) => a + b, 0) / progressMap.length * 100));
+          }
+        };
+        xhr.onload = () => {
+          const res = JSON.parse(xhr.responseText);
+          res.secure_url ? resolve(res.secure_url) : reject("No URL returned");
+        };
+        xhr.onerror = () => retries > 0
+          ? resolve(uploadSingle(file, index, progressMap, retries - 1))
+          : reject("Upload failed after retries");
+        xhr.send(formData);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
 
+  const handleBooking = async () => {
+    if (!fullName.trim()) {
+      alert("Please enter your full name");
+      return;
+    }
+    if (!phoneNumber.trim()) {
+      alert("Please enter your phone number");
+      return;
+    }
+    if (!address.trim()) {
+      alert("Please enter your address");
+      return;
+    }
+    if (!selectedDate || !selectedTime) {
+      alert("Please select date and time");
+      return;
+    }
+    if (!taskDescription.trim()) {
+      alert("Please describe your task");
+      return;
+    }
+    if (!estimatedDuration) {
+      alert("Please select estimated duration");
+      return;
+    }
     if (selectedChecklist.includes("Other") && !otherInput.trim()) {
-      return alert("Please specify 'Other'");
+      alert("Please specify what 'Other' service you need");
+      return;
+    }
+
+    if (!provider) {
+      alert("Provider information is missing");
+      return;
     }
 
     setIsSubmitting(true);
-    setUploading(true);
-    setUploadStatus("Uploading files...");
 
     try {
-      // 1. Upload files to Cloudinary (if any)
+      // 1. Upload to Cloudinary if files exist
       let mediaUrls: string[] = [];
-      
       if (uploadedMedia.length > 0) {
+        setUploading(true);
+        setUploadStatus("Uploading files...");
         const progressMap = new Array(uploadedMedia.length).fill(0);
-        const uploadPromises = uploadedMedia.map((media, index) =>
-          uploadSingle(media.file, index, progressMap)
+        mediaUrls = await Promise.all(
+          uploadedMedia.map((m, i) => uploadSingle(m.file, i, progressMap))
         );
-        mediaUrls = await Promise.all(uploadPromises);
         setUploadStatus("Upload complete ✅");
+        setUploading(false);
       }
 
-      // 2. Prepare and submit form
-      setMediaJson(JSON.stringify(mediaUrls));
-      setUploading(false);
+      console.log("📤 Submitting booking via hidden form...");
+      console.log("Data:", {
+        fullName,
+        phoneNumber,
+        address,
+        selectedDate,
+        selectedTime,
+        taskDescription,
+        providerName: provider.name,
+        checklist: selectedChecklist,
+        mediaUrls,
+      });
 
-      // Submit via hidden iframe (most reliable method — no CORS issues)
+      // Create hidden iframe for submission target to avoid redirecting the main page
+      let iframe = document.getElementById('hiddenFrame') as HTMLIFrameElement;
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'hiddenFrame';
+        iframe.name = 'hiddenFrame';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+
+      const hiddenForm = document.createElement('form');
+      hiddenForm.method = 'POST';
+      hiddenForm.action = 'https://submit-form.com/F0CHFKPyt';
+      hiddenForm.style.display = 'none';
+      hiddenForm.target = 'hiddenFrame';
+
+      const fields = [
+        { name: 'fullName', value: fullName },
+        { name: 'phoneNumber', value: phoneNumber },
+        { name: 'address', value: address },
+        { name: 'landmark', value: landmark },
+        { name: 'selectedDate', value: selectedDate },
+        { name: 'selectedTime', value: selectedTime },
+        { name: 'taskDescription', value: taskDescription },
+        { name: 'estimatedDuration', value: estimatedDuration },
+        { name: 'urgency', value: urgency },
+        { name: 'checklist', value: JSON.stringify(selectedChecklist) },
+        { name: 'otherInput', value: otherInput },
+        { name: 'mediaUrls', value: JSON.stringify(mediaUrls) },
+        { name: 'providerName', value: provider.name },
+        { name: 'providerCategory', value: provider.category },
+        { name: 'mediaCount', value: uploadedMedia.length.toString() },
+      ];
+
+      fields.forEach(field => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = field.name;
+        input.value = field.value;
+        hiddenForm.appendChild(input);
+      });
+
+      document.body.appendChild(hiddenForm);
+      hiddenForm.submit();
+
       setTimeout(() => {
-        if (bookingFormRef.current) {
-          bookingFormRef.current.submit();
-          
-          // Show success after brief delay for UX feedback
-          setTimeout(() => {
-            setBookingSuccess(true);
-            setIsSubmitting(false);
-          }, 1500);
-        }
-      }, 200);
+        setBookingSuccess(true);
+        setIsSubmitting(false);
+      }, 500);
 
     } catch (error) {
-      setUploading(false);
+      console.error("❌ Error submitting booking:", error);
+      alert("Error submitting booking. Please check your internet connection.");
       setIsSubmitting(false);
-      alert("❌ Upload failed. Please check your internet connection and try again.");
-      console.error("Upload error:", error);
     }
   };
 
@@ -325,38 +342,38 @@ function Booking() {
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <FiCheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{"Booking Request Sent!"}</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Booking Request Sent!</h3>
             <p className="text-gray-600 text-sm mb-4">
-              {"Your booking request has been sent to"} <strong>{provider.name}</strong>. {"They will review and respond shortly."}
+              Your booking request has been sent to <strong>{provider.name}</strong>. They will review and respond shortly.
             </p>
             <div className="bg-gray-50 rounded-lg p-4 text-left space-y-2 mb-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">{"Date"}</span>
+                <span className="text-gray-600">Date</span>
                 <span className="font-medium text-gray-900">{selectedDate}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">{"Time"}</span>
+                <span className="text-gray-600">Time</span>
                 <span className="font-medium text-gray-900">{selectedTime}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">{"Duration"}</span>
+                <span className="text-gray-600">Duration</span>
                 <span className="font-medium text-gray-900">{estimatedDuration}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">{"Urgency"}</span>
+                <span className="text-gray-600">Urgency</span>
                 <span className={`font-medium ${urgency === "urgent" ? "text-orange-600" : "text-gray-900"}`}>
                   {urgency === "urgent" ? "Urgent (Same Day)" : "Normal"}
                 </span>
               </div>
             </div>
             <p className="text-xs text-gray-500 mb-4">
-              {"You'll receive a notification once"} {provider.name} {"confirms your booking."}
+              You'll receive a notification once {provider.name} confirms your booking.
             </p>
             <button
-              onClick={() => setBookingSuccess(false)}
+              onClick={() => navigate('/services')}
               className="w-full bg-brandText hover:bg-brandText/90 text-white font-semibold py-3 rounded-lg transition-colors"
             >
-              {"Book Another Service"}
+              Book Another Service
             </button>
           </div>
         </div>
@@ -372,70 +389,43 @@ function Booking() {
           
          
           <div className="lg:col-span-1">
-            <form
-              ref={bookingFormRef}
-              action="https://submit.formspark.io/IH47AF19Y"
-              method="POST"
-              target="hidden_iframe"
-              onSubmit={handleBooking}
-              className="bg-white rounded-2xl p-6 border border-gray-200 sticky top-8"
-            >
-              {/* Flat JSON payload for booking */}
-              <input type="hidden" name="type" value="booking" />
-              <input type="hidden" name="fullName" value={fullName} />
-              <input type="hidden" name="phoneNumber" value={phoneNumber} />
-              <input type="hidden" name="address" value={address} />
-              <input type="hidden" name="landmark" value={landmark} />
-              <input type="hidden" name="selectedDate" value={selectedDate} />
-              <input type="hidden" name="selectedTime" value={selectedTime} />
-              <input type="hidden" name="taskDescription" value={taskDescription} />
-              <input type="hidden" name="estimatedDuration" value={estimatedDuration} />
-              <input type="hidden" name="urgency" value={urgency} />
-              <input type="hidden" name="checklist" value={JSON.stringify(selectedChecklist)} />
-              <input type="hidden" name="media" value={mediaJson} />
-              
-              {/* Provider information for reference */}
-              <input type="hidden" name="providerName" value={provider.name} />
-              <input type="hidden" name="providerCategory" value={provider.category} />
-              <input type="hidden" name="providerLocation" value={provider.location} />
-              <input type="hidden" name="otherInput" value={otherInput} />
-              <iframe name="hidden_iframe" style={{ display: 'none' }} />
-
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 sticky top-8">
+            
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <p className="text-3xl font-bold text-brandTealMedium">{provider.price}</p>
-                  <p className="text-sm text-gray-500">{"FROM"}</p>
+                  <p className="text-sm text-gray-500">FROM</p>
                 </div>
               </div>
 
              
               <div className="mb-6">
-                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">{"1. Your Info"}</p>
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">1. Your Info</p>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm  text-brandTealMedium mb-1">
-                      {"Full Name"} <span className="text-red-500m">*</span>
+                      Full Name <span className="text-red-500m">*</span>
                     </label>
                     <div className="relative">
                       <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brandTealMedium" />
                       <input
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        placeholder={"Enter your full name"}
+                        placeholder="Enter your full name"
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
                       />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm  text-brandTealMedium mb-1">
-                      {"Phone Number"} <span className="text-red-500">*</span>
+                      Phone Number <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brandTealMedium" />
                       <input
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
-                        placeholder={"+250 7XX XXX XXX"}
+                        placeholder="+250 7XX XXX XXX"
                         type="tel"
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
                       />
@@ -446,30 +436,30 @@ function Booking() {
 
              
               <div className="mb-6">
-                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">{"2. Location"}</p>
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">2. Location</p>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                      {"Exact Address"} <span className="text-red-500">*</span>
+                      Exact Address <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brandTealMedium" />
                       <input
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        placeholder={"Street, house number"}
+                        placeholder="Street, house number"
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
                       />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                      {"Landmark (Optional)"}
+                      Landmark (Optional)
                     </label>
                     <input
                       value={landmark}
                       onChange={(e) => setLandmark(e.target.value)}
-                      placeholder={"Near school, church, etc."}
+                      placeholder="Near school, church, etc."
                       className="w-full px-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
                     />
                   </div>
@@ -478,11 +468,11 @@ function Booking() {
 
             
               <div className="mb-6">
-                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">{"3. Date & Time"}</p>
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">3. Date & Time</p>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                      {"Select Date"} <span className="text-red-500">*</span>
+                      Select Date <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
@@ -494,7 +484,7 @@ function Booking() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                      {"Select Time"} <span className="text-red-500">*</span>
+                      Select Time <span className="text-red-500">*</span>
                     </label>
                     <div className="grid grid-cols-4 gap-2">
                       {timeSlots.map(slot => (
@@ -518,12 +508,12 @@ function Booking() {
 
              
               <div className="mb-6">
-                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">{"4. Service Details"}</p>
+                <p className="text-xs font-semibold text-brandText uppercase tracking-wider mb-3">4. Service Details</p>
 
                 
                 <div className="mb-3">
                   <label className="block text-sm font-medium text-brandTealMedium mb-2">
-                    {"What do you need help with?"}
+                    What do you need help with?
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {checklist.map(item => (
@@ -546,13 +536,13 @@ function Booking() {
                 {showOtherInput && (
                   <div className="mb-3">
                     <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                      {"Please specify your other requirement"} <span className="text-red-500">*</span>
+                      Please specify your other requirement <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={otherInput}
                       onChange={handleOtherInputChange}
-                      placeholder={"Enter your specific requirement..."}
+                      placeholder="Enter your specific requirement..."
                       className="w-full px-4 py-2.5 border border-gray-200 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText text-sm"
                     />
                   </div>
@@ -560,21 +550,27 @@ function Booking() {
 
                 <div className="mb-3">
                   <label className="block text-sm font-medium text-brandTealMedium mb-1">
-                    {"Describe Your Task"} <span className="text-red-500">*</span>
+                    Describe Your Task <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     value={taskDescription}
-                    onChange={(e) => setTaskDescription(e.target.value)}
-                    placeholder={"Describe what you need help with..."}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 300) setTaskDescription(e.target.value);
+                    }}
+                    placeholder="Describe what you need help with..."
                     rows={3}
+                    maxLength={300}
                     className="w-full px-4 py-2.5 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-brandText resize-none text-sm"
                   />
+                  <p className="text-xs text-gray-400 text-right mt-1">
+                    {taskDescription.length}/300 characters
+                  </p>
                 </div>
 
               
                 <div className="mb-3">
                   <label className="block text-sm font-medium text-brandTealMedium mb-2">
-                    {"Estimated Duration"} <span className="text-red-500">*</span>
+                    Estimated Duration <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {durationOptions.map(opt => (
@@ -597,9 +593,10 @@ function Booking() {
 
                 
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-brandTealMedium mb-2">{"Urgency"}</label>
+                  <label className="block text-sm font-medium text-brandTealMedium mb-2">Urgency</label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
+                      type="button"
                       onClick={() => handleUrgencyChange("normal")}
                       className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
                         urgency === "normal"
@@ -607,9 +604,10 @@ function Booking() {
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                     >
-                      {"Normal"}
+                      Normal
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleUrgencyChange("urgent")}
                       className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${
                         urgency === "urgent"
@@ -618,24 +616,30 @@ function Booking() {
                       }`}
                     >
                       <FiAlertTriangle className="h-3 w-3" />
-                      {"Urgent (Same Day)"}
+                      Urgent (Same Day)
                     </button>
                   </div>
                 </div>
 
                 {/* Media Upload */}
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <label className="block text-sm font-medium text-brandTealMedium">
-                      {"Add Photos/Videos"}
-                    </label>
-                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded">
-                      {"Recommend"}
+                  <label className="block text-sm font-medium text-brandTealMedium mb-1">
+                    Add Photos/Videos
+                    <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded ml-2">
+                      Recommended
                     </span>
-                  </div>
+                  </label>
                   <p className="text-xs text-gray-500 mb-2">
-                    {"Upload up to 3 images or videos to help describe your task (optional but recommended)"}
+                    Upload up to 3 images or videos to help describe your task (optional but recommended)
                   </p>
+                  {uploading && (
+                    <div className="mt-2 mb-3">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-brandText h-2 rounded-full transition-all" style={{ width: `${uploadProgress}%` }} />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{uploadStatus} ({uploadProgress}%)</p>
+                    </div>
+                  )}
                   {uploadedMedia.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mb-2">
                       {uploadedMedia.map(media => (
@@ -648,6 +652,7 @@ function Booking() {
                             </div>
                           )}
                           <button
+                            type="button"
                             onClick={() => removeMedia(media.id)}
                             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full"
                           >
@@ -658,24 +663,11 @@ function Booking() {
                     </div>
                   )}
                   <div className="text-sm text-gray-600 mb-2">
-                    {uploadedMedia.length}/3 {"files uploaded"}
+                    {uploadedMedia.length}/3 files uploaded
                   </div>
-                  {uploading && (
-                    <div className="mt-3 mb-3">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-brandText h-2 rounded-full transition-all"
-                          style={{ width: `${uploadProgress}%` }}
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {uploadStatus} ({uploadProgress}%)
-                      </p>
-                    </div>
-                  )}
                   <label className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                     <FiUpload className="h-4 w-4 text-gray-400" />
-                    <span className="text-sm text-gray-500">{"Upload media"}</span>
+                    <span className="text-sm text-gray-500">Upload media</span>
                     <input
                       type="file"
                       ref={mediaInputRef}
@@ -690,44 +682,49 @@ function Booking() {
 
          
               <button
-                type="submit"
-                className="w-full bg-brandText hover:bg-brandText/90 text-white font-semibold py-3 rounded-lg transition-colors mb-4"
+                type="button"
+                className="w-full bg-brandText hover:bg-brandText/90 text-white font-semibold py-3 rounded-lg transition-colors mb-4 disabled:bg-gray-400"
+                onClick={handleBooking}
                 disabled={isSubmitting || uploading}
               >
-                {isSubmitting ? "Sending Request..." : uploading ? "Uploading files..." : "Request Service"}
+                {isSubmitting ? "Sending Request..." : (uploading ? "Uploading files..." : "Request Service")}
               </button>
 
            
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <FiShield className="h-3.5 w-3.5 text-green-500" />
-                  <span>{"No payment upfront"}</span>
+                  <span>No payment upfront</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <FiCheckCircle className="h-3.5 w-3.5 text-green-500" />
-                  <span>{"Verified professionals"}</span>
+                  <span>Verified professionals</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <FiClock className="h-3.5 w-3.5 text-green-500" />
-                  <span>{"Fast response (within 1 hour)"}</span>
+                  <span>Fast response (within 1 hour)</span>
                 </div>
               </div>
 
              
               <p className="text-xs text-gray-500 text-center mt-3 border-t border-gray-200 pt-3">
-                {"\u26a0 Cancellation after worker dispatch may incur a fee."}
+                ⚠ Cancellation after worker dispatch may incur a fee.
               </p>
-            </form>
+            </div>
           </div>
 
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl p-6 border border-gray-200">
               <div className="flex items-start gap-4">
                 {provider.image ? (
-                  <img src={provider.image} alt={provider.name} className="w-20 h-20 rounded-xl object-cover" />
+                  <img
+                    src={provider.image}
+                    alt={provider.name}
+                    className="w-20 h-20 rounded-xl object-cover"
+                  />
                 ) : (
-                  <div className="w-20 h-20 rounded-xl bg-gray-200 flex items-center justify-center text-lg font-semibold text-gray-600">
-                    {provider.name.charAt(0)}
+                  <div className="w-20 h-20 rounded-xl bg-brandText flex items-center justify-center text-2xl font-bold text-white">
+                    {provider.name.charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div className="flex-1">
@@ -738,12 +735,16 @@ function Booking() {
                   <p className="text-gray-500 text-sm mb-3">{provider.category}</p>
                   <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                     <div className="flex items-center gap-1">
+                      <FiStar className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                      <span className="font-semibold text-gray-900">{provider.rating}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
                       <FiMapPin className="w-4 h-4" />
                       <span>{provider.location}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <FiClock className="w-4 h-4" />
-                      <span>{"Responds within 1 hour"}</span>
+                      <span>Responds within 1 hour</span>
                     </div>
                   </div>
                 </div>
@@ -751,12 +752,12 @@ function Booking() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 border border-gray-200">
-              <h2 className="text-xl font-bold text-brandTealMedium mb-4">{"About"}</h2>
+              <h2 className="text-xl font-bold text-brandTealMedium mb-4">About</h2>
               <p className="text-gray-500 leading-relaxed text-sm">{provider.description}</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 border border-gray-200">
-              <h2 className="text-xl font-bold text-brandTealMedium mb-4">{"Skills & Services"}</h2>
+              <h2 className="text-xl font-bold text-brandTealMedium mb-4">Skills & Services</h2>
               <div className="flex flex-wrap gap-2">
                 {provider.services.map((service, idx) => (
                   <span key={idx} className="px-4 py-2 bg-gray-100 text-brandText rounded-lg text-sm font-medium">
