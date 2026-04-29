@@ -230,7 +230,10 @@ const Footer: React.FC = () => {
                 <LuPhone /> +250 780 816 439
               </li>
               <li className="flex items-center gap-2 hover:text-white cursor-pointer transition-colors">
-                <CgMail /> gofixclean@gmail.com
+                <CgMail /> info@gofixandclean.rw
+              </li>
+              <li className="flex items-center gap-2 hover:text-white cursor-pointer transition-colors">
+                <CgMail /> booking@gofixandclean.rw
               </li>
             </ul>
           </div>

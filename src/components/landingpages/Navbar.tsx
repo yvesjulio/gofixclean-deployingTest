@@ -53,11 +53,11 @@ const Navbar: React.FC = () => {
 
         <div className="hidden md:flex items-center gap-10 font-medium">
           <NavLink to="/services" className={linkClass}>
-            Find a service
+            Find a Service
           </NavLink>
 
           <NavLink to="/become-provider" className={linkClass}>
-            Become a provider
+            Become a Provider
           </NavLink>
         </div>
 
@@ -99,7 +99,7 @@ const Navbar: React.FC = () => {
               onClick={() => setMenuOpen(false)}
               className={linkClass}
             >
-              Find a service
+              Find a Service
             </NavLink>
 
             <NavLink
@@ -107,7 +107,7 @@ const Navbar: React.FC = () => {
               onClick={() => setMenuOpen(false)}
               className={linkClass}
             >
-              Become a provider
+              Become a Provider
             </NavLink>
           </div>
 

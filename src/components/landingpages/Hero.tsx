@@ -75,13 +75,13 @@ const Hero: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-12 mb-12">
         <Link to="/services" onClick={handleNavClick}>
           <button className="bg-brandOrange text-brandWhite px-6 py-3 rounded-md transition-all duration-400 ease-out hover:bg-[#e05e2e] hover:scale-[1.03]">
-            {"Book a provider"}
+            {"Book a Provider"}
           </button>
         </Link>
 
         <Link to="/become-provider" onClick={handleNavClick}>
           <button className="bg-brandWhite px-6 py-3 rounded-md font-medium text-brandText transition-all duration-400 ease-out hover:scale-[1.03]">
-            {"Become a provider"}
+            {"Become a Provider"}
           </button>
         </Link>
       </div>

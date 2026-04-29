@@ -3,6 +3,7 @@ import { FiGift, FiArrowRight } from "react-icons/fi";
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
+import { prefetchProviderMarketplace } from "@/lib/provider-marketplace";
 
 interface Category {
   title: string;
@@ -19,6 +20,10 @@ const Professionals: React.FC = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth"
+    });
+
+    prefetchProviderMarketplace().catch(() => {
+      // prefetch best-effort, don't block landing page render
     });
   }, []);
 

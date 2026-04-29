@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BiErrorCircle } from "react-icons/bi";
 import { GrStatusGood } from "react-icons/gr";
 import { useNavigate } from 'react-router-dom';
+import { supabase } from "@/lib/supabase";
 
 interface ApplicationSubmittedProps {
   onBackToProvider: () => void;
@@ -129,32 +130,24 @@ function Review({ onBack, formData }: ReviewProps) {
         return;
       }
 
-      const payload = {
-        type: "provider",
-        fullLegalName: submitData.fullLegalName,
-        phoneNumber: submitData.phoneNumber,
-        residentialAddress: submitData.residentialAddress,
-        serviceType: submitData.serviceType,
-        otherService: submitData.otherService || "",
-        serviceTags: Array.isArray(submitData.serviceTags) ? submitData.serviceTags.join(", ") : "",
-        aboutYou: submitData.aboutYou,
-      };
+      const { error } = await supabase
+        .from('provider_verifications')
+        .insert({
+          full_name: submitData.fullLegalName,
+          phone: submitData.phoneNumber,
+          address: submitData.residentialAddress,
+          service_type: submitData.serviceType,
+          about: submitData.aboutYou,
+        });
 
-      const response = await fetch("https://submit-form.com/boL1oVWXQ", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const responseText = await response.text();
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status} - ${responseText}`);
+      if (error) {
+        console.error('Error submitting provider verification:', error);
+        alert('Failed to submit application. Please try again.');
+        setIsSubmitting(false);
+        return;
       }
 
+      alert('Application submitted successfully!');
       setIsSubmitted(true);
       localStorage.removeItem('personalInfoFormData');
 

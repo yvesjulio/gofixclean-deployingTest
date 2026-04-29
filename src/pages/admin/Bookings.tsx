@@ -1,209 +1,217 @@
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, MessageSquare, Trash2, UserPlus, Download, Copy } from "lucide-react";
-import { getBookings, assignProvider, updateBookingStatus } from "@/lib/admin-api";
-import { ToastContainer, useToast } from "@/components/ui/toast";
-import type { BookingCardData } from "@/types/admin";
 
-const formatDate = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? value
-    : date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+interface Booking {
+  id: string;
+  customer_name: string;
+  phone: string;
+  address: string;
+  service_type: string;
+  task_description: string;
+  status: string;
+  scheduled_date: string;
+  scheduled_time: string;
+  provider_id?: string;
+}
+
+interface Provider {
+  id: string;
+  full_name: string;
+}
+
+const statusClasses: Record<string, string> = {
+  pending: "bg-yellow-100 text-yellow-800",
+  assigned: "bg-blue-100 text-blue-800",
+  in_progress: "bg-orange-100 text-orange-800",
+  completed: "bg-green-100 text-green-800",
 };
 
-const formatTime = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? value
-    : date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+const statusLabels: Record<string, string> = {
+  pending: "Pending",
+  assigned: "Assigned",
+  in_progress: "In Progress",
+  completed: "Completed",
 };
 
 export default function Bookings() {
-  const [bookings, setBookings] = useState<BookingCardData[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { toasts, addToast, removeToast } = useToast();
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   useEffect(() => {
-    getBookings()
-      .then((data) => setBookings(data))
-      .catch((err) => setError(err instanceof Error ? err.message : "Unable to load bookings."))
-      .finally(() => setLoading(false));
+    fetchData();
   }, []);
 
-  // Auto-reload bookings every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      getBookings()
-        .then((data) => setBookings(data))
-        .catch((err) => {
-          // Only set error if it's not already set to avoid overwriting existing errors
-          if (!error) setError(err instanceof Error ? err.message : "Unable to load bookings.");
-        })
-        .finally(() => setLoading(false));
-    }, 30000); // 30 seconds
+  const fetchData = async () => {
+    try {
+      const [bookingsRes, providersRes] = await Promise.all([
+        supabase.from("bookings").select("*").order("created_at", { ascending: false }),
+        supabase.from("providers").select("id, full_name"),
+      ]);
 
-    return () => clearInterval(interval);
-  }, [error]);
+      if (bookingsRes.error) throw bookingsRes.error;
+      if (providersRes.error) throw providersRes.error;
 
-  const updateBooking = (updated: BookingCardData) => {
-    setBookings((current) => current.map((booking) => (booking.id === updated.id ? updated : booking)));
-  };
-
-  const handleAssign = async (booking: BookingCardData) => {
-    const result = await assignProvider(booking.id, "Assigned Provider");
-    if (result.success) {
-      updateBooking({ ...booking, assignedTo: "Assigned Provider", status: "Assigned" });
-      addToast("Provider assigned successfully!", "success");
-    } else {
-      addToast("Failed to assign provider.", "error");
+      setBookings(bookingsRes.data || []);
+      setProviders(providersRes.data || []);
+    } catch (err) {
+      console.error("Error fetching bookings:", err);
+      setError("Failed to load bookings.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleComplete = async (booking: BookingCardData) => {
-    const result = await updateBookingStatus(booking.id, "Completed");
-    if (result.success) {
-      updateBooking({ ...booking, status: "Completed" });
-      addToast("Booking marked as completed!", "success");
-    } else {
-      addToast("Failed to update booking status.", "error");
+  const handleAssignProvider = async (bookingId: string, providerId: string) => {
+    setProcessingId(bookingId);
+
+    try {
+      const { error } = await supabase
+        .from("bookings")
+        .update({ provider_id: providerId, status: "assigned" })
+        .eq("id", bookingId);
+
+      if (error) throw error;
+      await fetchData();
+    } catch (err) {
+      console.error("Error assigning provider:", err);
+      setError("Could not assign provider.");
+    } finally {
+      setProcessingId(null);
     }
   };
 
-  const handleWhatsApp = (booking: BookingCardData) => {
-    if (!booking.whatsappNumber) {
-      addToast("Invalid phone number for WhatsApp.", "error");
-      return;
+  const handleUpdateStatus = async (bookingId: string, newStatus: string) => {
+    setProcessingId(bookingId);
+
+    try {
+      const { error } = await supabase
+        .from("bookings")
+        .update({ status: newStatus })
+        .eq("id", bookingId);
+
+      if (error) throw error;
+      await fetchData();
+    } catch (err) {
+      console.error("Error updating status:", err);
+      setError("Could not update booking status.");
+    } finally {
+      setProcessingId(null);
     }
-    window.open(`https://wa.me/${booking.whatsappNumber}?text=${encodeURIComponent(`Hello ${booking.fullName}, we received your request.`)}`);
-  };
-
-  const handleCopyPhone = (phone: string) => {
-    navigator.clipboard.writeText(phone);
-    addToast("Phone number copied to clipboard!", "success");
-  };
-
-  const handleDownloadMedia = (url: string) => {
-    window.open(url, '_blank');
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading bookings...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-2xl font-bold mb-6">Bookings</h1>
+          <div className="text-center">Loading bookings...</div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center py-8 text-red-500">Error loading bookings: {error}</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-2xl font-bold mb-6">Bookings</h1>
+          <div className="text-center text-red-600">{error}</div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <>
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Bookings</h1>
-          <p className="text-sm text-muted-foreground">Action-ready booking cards for your operations team.</p>
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Bookings</h1>
+            <p className="text-sm text-gray-600">Manage booking assignments and status updates.</p>
+          </div>
+          <Badge className="rounded-full px-3 py-1 uppercase">{bookings.length} total</Badge>
         </div>
-        <Badge className="rounded-full px-3 py-1 uppercase">{bookings.length} total</Badge>
-      </div>
 
-      {bookings.length === 0 ? (
-        <div className="rounded-3xl border border-border bg-background p-8 text-center text-sm text-muted-foreground">No bookings available.</div>
-      ) : (
-        <div className="grid gap-4">
-          {bookings.map((booking) => (
-            <div key={booking.id} className="rounded-3xl border border-border bg-card p-5 shadow-sm">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <div className="text-lg font-semibold">{booking.fullName}</div>
-                  <div className="text-sm text-muted-foreground flex items-center gap-1">
-                    📞 {booking.phoneNumber}
-                    <Button variant="ghost" size="sm" onClick={() => handleCopyPhone(booking.phoneNumber)}>
-                      <Copy className="h-3 w-3" />
-                    </Button>
+        {bookings.length === 0 ? (
+          <div className="rounded-3xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
+            No bookings available.
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {bookings.map((booking) => (
+              <div key={booking.id} className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-lg font-semibold">{booking.customer_name}</h2>
+                      <span className={`rounded-full px-2 py-1 text-xs font-medium ${statusClasses[booking.status] ?? "bg-gray-100 text-gray-800"}`}>
+                        {statusLabels[booking.status] ?? booking.status}
+                      </span>
+                    </div>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <div className="text-sm text-gray-600">📞 {booking.phone}</div>
+                      <div className="text-sm text-gray-600">📍 {booking.address}</div>
+                      <div className="text-sm text-gray-600">Service: {booking.service_type}</div>
+                      <div className="text-sm text-gray-600">Scheduled: {booking.scheduled_date} · {booking.scheduled_time}</div>
+                    </div>
+                    <p className="text-sm text-gray-700">{booking.task_description}</p>
                   </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={booking.status === "Pending" ? "destructive" : booking.status === "Completed" ? "secondary" : "default"} className="rounded-full px-3 py-1 uppercase">
-                    {booking.status}
-                  </Badge>
-                  <Badge variant={booking.urgency.toLowerCase() === "urgent" ? "destructive" : "secondary"} className="rounded-full px-3 py-1 uppercase">
-                    {booking.urgency}
-                  </Badge>
-                </div>
-              </div>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div>
-                  <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Task type</div>
-                  <div className="font-medium">{booking.taskType}</div>
-                </div>
-                <div>
-                  <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Date / time</div>
-                  <div className="font-medium">{formatDate(booking.selectedDate)} | {formatTime(booking.selectedTime)}</div>
-                </div>
-                <div>
-                  <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Location</div>
-                  <div className="font-medium">{booking.address}{booking.landmark ? ` · ${booking.landmark}` : ""}</div>
-                </div>
-                <div>
-                  <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Assigned provider</div>
-                  <div className="font-medium">{booking.assignedTo || "Not assigned"}</div>
-                </div>
-              </div>
+                  <div className="flex flex-col gap-3 min-w-[220px]">
+                    {!booking.provider_id && booking.status === "pending" && (
+                      <select
+                        defaultValue=""
+                        onChange={(e) => handleAssignProvider(booking.id, e.target.value)}
+                        disabled={processingId === booking.id}
+                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+                      >
+                        <option value="" disabled>
+                          Assign provider
+                        </option>
+                        {providers.map((provider) => (
+                          <option key={provider.id} value={provider.id}>
+                            {provider.full_name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
 
-              <div className="mt-4 rounded-2xl border border-border bg-background p-4 text-sm">
-                <div className="font-medium">Description</div>
-                <p className="mt-2 text-sm text-muted-foreground">{booking.taskDescription}</p>
-              </div>
-
-              {booking.media.length > 0 && (
-                <div className="mt-4">
-                  <div className="text-sm text-muted-foreground mb-2">Media</div>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    {booking.media.map((item, index) => (
-                      <div key={index} className="relative overflow-hidden rounded-2xl border border-border bg-background p-2 transition hover:shadow-lg">
-                        <img src={item} alt={`media-${index}`} className="h-24 w-full object-cover" />
+                    <div className="space-y-2">
+                      {booking.status === "assigned" && (
                         <Button
-                          variant="secondary"
-                          size="sm"
-                          className="absolute top-1 right-1 h-6 w-6 p-0"
-                          onClick={() => handleDownloadMedia(item)}
+                          onClick={() => handleUpdateStatus(booking.id, "in_progress")}
+                          disabled={processingId === booking.id}
                         >
-                          <Download className="h-3 w-3" />
+                          Start job
                         </Button>
-                      </div>
-                    ))}
+                      )}
+                      {booking.status === "in_progress" && (
+                        <Button
+                          onClick={() => handleUpdateStatus(booking.id, "completed")}
+                          disabled={processingId === booking.id}
+                        >
+                          Mark completed
+                        </Button>
+                      )}
+                      {booking.provider_id && (
+                        <div className="text-sm text-gray-600">Provider: {booking.provider_id}</div>
+                      )}
+                      {processingId === booking.id && (
+                        <div className="text-sm text-gray-500">Saving...</div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              )}
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                <Button variant="secondary" size="sm" onClick={() => handleAssign(booking)}>
-                  <UserPlus className="mr-2 h-4 w-4" /> Assign Provider
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => handleWhatsApp(booking)}>
-                  <MessageSquare className="mr-2 h-4 w-4" /> WhatsApp Client
-                </Button>
-                <Button variant="default" size="sm" onClick={() => handleComplete(booking)}>
-                  <CheckCircle2 className="mr-2 h-4 w-4" /> Mark Completed
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => {
-                  if (confirm("Are you sure you want to delete this booking? This action cannot be undone.")) {
-                    setBookings((current) => current.filter((b) => b.id !== booking.id));
-                    addToast("Booking deleted successfully!", "success");
-                  }
-                }}>
-                  <Trash2 className="mr-2 h-4 w-4" /> Delete
-                </Button>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
-    </>
   );
 }

@@ -31,12 +31,20 @@ export default function ContactPage() {
               </div>
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Email</h3>
-            <a
-              href="mailto:gofixclean@gmail.com"
-              className="text-orange-500 hover:text-orange-600 font-semibold break-all"
-            >
-              gofixclean@gmail.com
-            </a>
+            <div className="space-y-1">
+              <a
+                href="mailto:info@gofixandclean.rw"
+                className="text-orange-500 hover:text-orange-600 font-semibold break-all block"
+              >
+                info@gofixandclean.rw
+              </a>
+              <a
+                href="mailto:booking@gofixandclean.rw"
+                className="text-orange-500 hover:text-orange-600 font-semibold break-all block"
+              >
+                booking@gofixandclean.rw
+              </a>
+            </div>
           </div>
 
           {/* Phone */}

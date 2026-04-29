@@ -132,7 +132,8 @@ export default function PrivacyPolicyPage() {
                   If you have questions about this privacy policy or how we handle your information, contact us at:
                 </p>
                 <div className="mt-3 text-gray-700 space-y-2">
-                  <p><strong>Email:</strong> gofixclean@gmail.com</p>
+                  <p><strong>Email:</strong> info@gofixandclean.rw</p>
+                  <p><strong>Email:</strong> booking@gofixandclean.rw</p>
                   <p><strong>Phone:</strong> +250 780 816 439</p>
                   <p><strong>Location:</strong> Kigali, Rwanda</p>
                 </div>
