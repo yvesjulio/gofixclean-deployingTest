@@ -1,3 +1,4 @@
+import RecordActions from "@/components/admin/RecordActions";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { allRows, errorText, phone } from "@/lib/operations";
@@ -17,13 +18,14 @@ export default function Providers() {
     [error, setError] = useState(""),
     [query, setQuery] = useState(""),
     [service, setService] = useState("all"),
+    [view, setView] = useState("active"),
     [editing, setEditing] = useState<string | null>(null),
     [form, setForm] = useState(empty),
     [busy, setBusy] = useState(false),
     [loading, setLoading] = useState(true);
   const load = useCallback(async () => {
     try {
-      setRows(await allRows<Provider>("providers", "full_name"));
+      setRows(await allRows<Provider>("providers", "full_name", true));
       setError("");
     } catch (e) {
       setError(errorText(e));
@@ -60,6 +62,7 @@ export default function Providers() {
   }
   const visible = rows.filter(
     (p) =>
+      (view === "archived" ? !!p.archived_at : !p.archived_at) &&
       (service === "all" || p.service_type === service) &&
       `${p.full_name} ${p.phone} ${p.base_location}`
         .toLowerCase()
@@ -163,6 +166,20 @@ export default function Providers() {
           </div>
         </form>
       )}
+      <div className="ops-tabs" aria-label="Provider view">
+        <button
+          aria-pressed={view === "active"}
+          onClick={() => setView("active")}
+        >
+          Workspace ({rows.filter((p) => !p.archived_at).length})
+        </button>
+        <button
+          aria-pressed={view === "archived"}
+          onClick={() => setView("archived")}
+        >
+          Archived ({rows.filter((p) => p.archived_at).length})
+        </button>
+      </div>
       <div className="ops-toolbar">
         <input
           aria-label="Search providers"
@@ -204,6 +221,13 @@ export default function Providers() {
                 {p.phone} · Rating {p.rating || 0}
               </p>
               <div className="ops-actions">
+                <RecordActions
+                  entity="provider"
+                  id={p.id}
+                  name={p.full_name}
+                  archived={!!p.archived_at}
+                  onDone={load}
+                />
                 <a className="ops-button" href={`tel:+${phone(p.phone)}`}>
                   Call
                 </a>
@@ -216,6 +240,7 @@ export default function Providers() {
                   WhatsApp
                 </a>
                 <button
+                  disabled={!!p.archived_at}
                   onClick={() => {
                     setEditing(p.id);
                     setForm({

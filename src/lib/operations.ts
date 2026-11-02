@@ -1,5 +1,6 @@
 import { supabase } from "./supabaseClient";
 export interface Booking {
+  archived_at?: string | null;
   id: string;
   customer_name: string;
   phone: string;
@@ -18,6 +19,7 @@ export interface Booking {
   internal_notes: string | null;
 }
 export interface Provider {
+  archived_at?: string | null;
   id: string;
   full_name: string;
   phone: string;
@@ -74,12 +76,17 @@ export const errorText = (e: unknown) =>
 export async function allRows<T>(
   table: string,
   order = "created_at",
+  includeArchived = false,
 ): Promise<T[]> {
   const rows: T[] = [];
   for (let start = 0; ; start += 500) {
-    const { data, error } = await supabase
-      .from(table)
-      .select("*")
+    let request = supabase.from(table).select("*");
+    if (
+      !includeArchived &&
+      ["bookings", "providers", "provider_verifications"].includes(table)
+    )
+      request = request.is("archived_at", null);
+    const { data, error } = await request
       .order(order, { ascending: false })
       .order("id")
       .range(start, start + 499);

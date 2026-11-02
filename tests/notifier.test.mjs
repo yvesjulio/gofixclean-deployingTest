@@ -194,3 +194,23 @@ test("rejects malformed records", async () => {
     400,
   );
 });
+
+test("admin settings check sends no alerts and exposes no tokens", async () => {
+  const s = setup();
+  const r = await s.invoke(
+    { action: "health" },
+    { Authorization: "Bearer admin" },
+  );
+  assert.equal(r.status, 200);
+  const data = await r.json();
+  assert.equal(data.channels.telegram, true);
+  assert.equal(data.channels.email, true);
+  assert.equal(data.channels.ntfy, true);
+  assert.equal(s.sent.length, 0);
+  assert(!JSON.stringify(data).includes("test-token"));
+});
+test("webhook cannot use the admin settings check", async () => {
+  const s = setup();
+  assert.equal((await s.invoke({ action: "health" })).status, 403);
+  assert.equal(s.sent.length, 0);
+});

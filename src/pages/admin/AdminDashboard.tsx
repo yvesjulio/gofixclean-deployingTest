@@ -16,7 +16,7 @@ export default function AdminDashboard() {
         supabase
           .from("provider_verifications")
           .select("id", { count: "exact", head: true })
-          .eq("status", "pending"),
+          .eq("status", "pending").is("archived_at", null),
       ]);
       if (a.error) throw a.error;
       setRows(b);

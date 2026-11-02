@@ -1,164 +1,169 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-
-interface VerificationRequest {
+import { allRows, errorText, label, phone } from "@/lib/operations";
+import RecordActions from "@/components/admin/RecordActions";
+interface Application {
   id: string;
   full_name: string;
   phone: string;
   address: string;
   service_type: string;
-  about: string;
+  about: string | null;
+  status: string;
   created_at: string;
+  archived_at: string | null;
 }
-
 export default function ProviderVerification() {
-  const [verifications, setVerifications] = useState<VerificationRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [processing, setProcessing] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchVerifications();
-  }, []);
-
-  const fetchVerifications = async () => {
+  const [rows, setRows] = useState<Application[]>([]),
+    [error, setError] = useState(""),
+    [view, setView] = useState("pending"),
+    [busy, setBusy] = useState(""),
+    [loading, setLoading] = useState(true);
+  const load = useCallback(async () => {
+    setError("");
     try {
-      setError(null);
-      const { data, error } = await supabase
-        .from("provider_verifications")
-        .select("*")
-        .eq("status", "pending")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setVerifications(data || []);
-    } catch (err) {
-      console.error("Error fetching verifications:", err);
-      setError("Failed to load verification requests");
+      setRows(
+        await allRows<Application>(
+          "provider_verifications",
+          "created_at",
+          true,
+        ),
+      );
+    } catch (e) {
+      setError(errorText(e));
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleApprove = async (verification: VerificationRequest) => {
-    setProcessing(verification.id);
+  }, []);
+  useEffect(() => {
+    void load();
+  }, [load]);
+  async function review(row: Application, approve: boolean) {
+    if (
+      !approve &&
+      !confirm(
+        `Reject ${row.full_name}'s application? You can keep it in reviewed history.`,
+      )
+    )
+      return;
+    setBusy(row.id);
+    setError("");
     try {
       const { error } = await supabase.rpc("review_provider_application", {
-        application_id: verification.id,
-        approve: true,
+        application_id: row.id,
+        approve,
       });
       if (error) throw error;
-
-      alert("Provider approved successfully!");
-      await fetchVerifications();
-    } catch (err) {
-      console.error("Error approving provider:", err);
-      alert("Failed to approve provider");
+      await load();
+    } catch (e) {
+      setError(errorText(e));
     } finally {
-      setProcessing(null);
+      setBusy("");
     }
-  };
-
-  const handleReject = async (verification: VerificationRequest) => {
-    if (!confirm("Are you sure you want to reject this application?")) return;
-
-    setProcessing(verification.id);
-    try {
-      const { error } = await supabase.rpc("review_provider_application", {
-        application_id: verification.id,
-        approve: false,
-      });
-      if (error) throw error;
-
-      alert("Application rejected");
-      await fetchVerifications();
-    } catch (err) {
-      console.error("Error rejecting application:", err);
-      alert("Failed to reject application");
-    } finally {
-      setProcessing(null);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">Provider Verifications</h1>
-          <div className="text-center">Loading...</div>
-        </div>
-      </div>
-    );
   }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">Provider Verifications</h1>
-          <div className="text-center text-red-600">{error}</div>
-        </div>
-      </div>
-    );
-  }
-
+  const visible = rows.filter((r) =>
+    view === "archived"
+      ? !!r.archived_at
+      : !r.archived_at &&
+        (view === "pending" ? r.status === "pending" : r.status !== "pending"),
+  );
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Provider Verifications</h1>
-
-        {verifications.length === 0 ? (
-          <div className="bg-white rounded-lg p-8 text-center">
-            <p className="text-gray-500">No pending verifications</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {verifications.map((verification) => (
-              <div
-                key={verification.id}
-                className="bg-white rounded-lg p-6 shadow-sm"
-              >
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold">
-                      {verification.full_name}
-                    </h3>
-                    <p className="text-gray-600">📞 {verification.phone}</p>
-                    <p className="text-gray-600">📍 {verification.address}</p>
-                    <p className="text-blue-600 font-medium">
-                      {verification.service_type}
-                    </p>
-                    <p className="text-gray-700 mt-2">{verification.about}</p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Applied:{" "}
-                      {new Date(verification.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2">
+    <>
+      <div className="ops-row">
+        <div>
+          <h2>Meet your next service professional.</h2>
+          <p className="ops-description">
+            Review applicants, approve the right people, and clear out old
+            requests.
+          </p>
+        </div>
+        <button onClick={() => void load()}>Refresh</button>
+      </div>
+      <div className="ops-tabs">
+        {["pending", "reviewed", "archived"].map((v) => (
+          <button key={v} aria-pressed={v === view} onClick={() => setView(v)}>
+            {label(v)}
+          </button>
+        ))}
+      </div>
+      {error && (
+        <div className="ops-error" role="alert">
+          {error}
+        </div>
+      )}
+      {loading ? (
+        <div
+          className="ops-loading"
+          role="status"
+          aria-label="Loading applications"
+        />
+      ) : visible.length ? (
+        visible.map((r) => (
+          <article className="ops-card" key={r.id}>
+            <div className="ops-row">
+              <div>
+                <h3>
+                  {r.full_name}{" "}
+                  <span className="ops-pill">{label(r.status)}</span>
+                </h3>
+                <p>{r.service_type}</p>
+                <p className="ops-muted">
+                  {r.phone} · {r.address}
+                </p>
+                <p style={{ marginTop: 12, whiteSpace: "pre-wrap" }}>
+                  {r.about}
+                </p>
+                <p className="ops-muted">
+                  Applied{" "}
+                  {new Date(
+                    r.created_at.endsWith("Z")
+                      ? r.created_at
+                      : r.created_at + "Z",
+                  ).toLocaleDateString("en-GB", { timeZone: "Africa/Kigali" })}
+                </p>
+              </div>
+              <div className="ops-actions">
+                <a className="ops-button" href={`tel:+${phone(r.phone)}`}>
+                  Call applicant
+                </a>
+                {!r.archived_at && r.status === "pending" && (
+                  <>
                     <button
-                      onClick={() => handleApprove(verification)}
-                      disabled={processing === verification.id}
-                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+                      className="primary"
+                      disabled={!!busy}
+                      onClick={() => void review(r, true)}
                     >
-                      {processing === verification.id
-                        ? "Processing..."
-                        : "Approve"}
+                      {busy === r.id ? "Saving…" : "Approve"}
                     </button>
                     <button
-                      onClick={() => handleReject(verification)}
-                      disabled={processing === verification.id}
-                      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
+                      disabled={!!busy}
+                      onClick={() => void review(r, false)}
                     >
                       Reject
                     </button>
-                  </div>
-                </div>
+                  </>
+                )}
+                <RecordActions
+                  entity="application"
+                  id={r.id}
+                  name={r.full_name}
+                  archived={!!r.archived_at}
+                  onDone={load}
+                />
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+            </div>
+          </article>
+        ))
+      ) : (
+        <div className="ops-card ops-empty">
+          <h3>No {view} applications</h3>
+          <p>
+            {view === "pending"
+              ? "New applications will appear here for review."
+              : "This view is clear."}
+          </p>
+        </div>
+      )}
+    </>
   );
 }

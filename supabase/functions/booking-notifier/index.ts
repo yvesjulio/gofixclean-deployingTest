@@ -46,6 +46,20 @@ Deno.serve(async (req) => {
   } catch {
     return response({ error: "Invalid JSON" }, 400);
   }
+  if (payload.action === "health") {
+    if (!admin) return response({ error: "Admin access required" }, 403);
+    return response({
+      ok: true,
+      channels: {
+        telegram:
+          !!Deno.env.get("TELEGRAM_BOT_TOKEN") &&
+          !!Deno.env.get("TELEGRAM_CHAT_ID"),
+        email:
+          !!Deno.env.get("RESEND_API_KEY") && !!Deno.env.get("ADMIN_EMAIL"),
+        ntfy: !!Deno.env.get("NTFY_TOPIC"),
+      },
+    });
+  }
   let booking = payload.record;
   const retry = payload.action === "retry";
   if (retry) {
@@ -60,6 +74,11 @@ Deno.serve(async (req) => {
       .single();
     if (error) return response({ error: "Booking unavailable" }, 404);
     booking = data;
+    if (booking.archived_at)
+      return response(
+        { error: "Restore this booking before resending alerts" },
+        409,
+      );
   } else if (
     webhook &&
     (payload.type !== "INSERT" ||
@@ -233,14 +252,12 @@ Deno.serve(async (req) => {
         }
         const result = await send(channel);
         results[channel] = result;
-        const logged = await db
-          .from("notification_deliveries")
-          .insert({
-            booking_id: id,
-            channel,
-            ok: result.ok,
-            error: result.error || null,
-          });
+        const logged = await db.from("notification_deliveries").insert({
+          booking_id: id,
+          channel,
+          ok: result.ok,
+          error: result.error || null,
+        });
         if (logged.error) {
           console.error("Could not record delivery result", channel);
           results[channel] = {

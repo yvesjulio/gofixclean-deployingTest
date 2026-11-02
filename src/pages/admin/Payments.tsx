@@ -26,7 +26,7 @@ export default function Payments() {
     try {
       const [p, b] = await Promise.all([
         allRows<Payment>("booking_payments"),
-        allRows<Booking>("bookings"),
+        allRows<Booking>("bookings", "created_at", true),
       ]);
       setRows(p);
       setBookings(b);

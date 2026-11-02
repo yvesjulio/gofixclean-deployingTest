@@ -1,3 +1,4 @@
+import RecordActions from "@/components/admin/RecordActions";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -148,7 +149,10 @@ function BookingDetail({
           </div>
           <small>Booking {booking.id}</small>
         </div>
-        <div className="ops-fields">
+        <fieldset
+          disabled={!!booking.archived_at || busy}
+          className="ops-fields"
+        >
           <label>
             Status
             <select
@@ -256,9 +260,13 @@ function BookingDetail({
               })
             }
           >
-            {busy ? "Saving…" : "Save details"}
+            {booking.archived_at
+              ? "Archived · restore to edit"
+              : busy
+                ? "Saving…"
+                : "Save details"}
           </button>
-        </div>
+        </fieldset>
       </div>
       <Activity key={JSON.stringify(booking)} id={booking.id} />
     </div>
@@ -272,6 +280,7 @@ export default function Bookings() {
     [busy, setBusy] = useState(""),
     [query, setQuery] = useState(""),
     [status, setStatus] = useState("all"),
+    [view, setView] = useState("active"),
     [service, setService] = useState("all"),
     [date, setDate] = useState(""),
     [success, setSuccess] = useState("");
@@ -281,7 +290,7 @@ export default function Bookings() {
     setError("");
     try {
       const [b, p] = await Promise.all([
-        allRows<Booking>("bookings"),
+        allRows<Booking>("bookings", "created_at", true),
         allRows<Provider>("providers", "full_name"),
       ]);
       setRows(b);
@@ -299,6 +308,7 @@ export default function Bookings() {
     () =>
       rows.filter(
         (b) =>
+          (view === "archived" ? !!b.archived_at : !b.archived_at) &&
           (status === "all" || b.status === status) &&
           (service === "all" || b.service_type === service) &&
           (!date || b.scheduled_date === date) &&
@@ -307,7 +317,7 @@ export default function Bookings() {
             .toLowerCase()
             .includes(query.toLowerCase()),
       ),
-    [rows, status, service, date, query, params],
+    [rows, status, service, date, query, params, view],
   );
   async function save(b: Booking, changes: Partial<Booking>) {
     setBusy(b.id);
@@ -343,6 +353,20 @@ export default function Bookings() {
           {success}
         </div>
       )}
+      <div className="ops-tabs" aria-label="Booking view">
+        <button
+          aria-pressed={view === "active"}
+          onClick={() => setView("active")}
+        >
+          Workspace ({rows.filter((b) => !b.archived_at).length})
+        </button>
+        <button
+          aria-pressed={view === "archived"}
+          onClick={() => setView("archived")}
+        >
+          Archived ({rows.filter((b) => b.archived_at).length})
+        </button>
+      </div>
       <div className="ops-toolbar">
         <input
           aria-label="Search bookings"
@@ -415,7 +439,14 @@ export default function Bookings() {
                 </p>
               </div>
               <div className="ops-actions">
-                {!b.acknowledged_at && (
+                <RecordActions
+                  entity="booking"
+                  id={b.id}
+                  name={b.customer_name}
+                  archived={!!b.archived_at}
+                  onDone={load}
+                />
+                {!b.acknowledged_at && !b.archived_at && (
                   <button
                     disabled={busy === b.id}
                     onClick={() =>

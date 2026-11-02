@@ -1,5 +1,7 @@
 # GoFix&Clean — admin operations update
 
+**Already deployed the first admin update? Use `UPGRADE_UI.md` instead. Run only its new workspace-refresh migration before deploying this UI.**
+
 This is your existing React/Vite project, updated in place. Your public website routes are retained. Nothing has been deployed to your live website or Supabase from this archive.
 
 ## 1. Set up the database

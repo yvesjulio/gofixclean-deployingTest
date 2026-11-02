@@ -10,7 +10,7 @@ Explicit server-role read grants were also added for the admin membership and bo
 
 ## Automated checks
 
-`npm run test:regression` — **18 passed, 0 failed**.
+`npm run test:regression` — **21 passed, 0 failed**.
 
 | Area | Coverage |
 | --- | --- |
@@ -28,7 +28,7 @@ The notification services and Supabase client in these unit tests are mocked. No
 
 ## Isolated database regression checks
 
-**15 check groups passed** using PGlite, a PostgreSQL-compatible test database. Auth users/roles and supplied table definitions were reconstructed locally. The admin SQL migration executed twice successfully.
+**25 check groups passed** using PGlite, a PostgreSQL-compatible test database. Auth users/roles and supplied table definitions were reconstructed locally. The admin SQL migration executed twice successfully.
 
 1. Migration executes and is rerunnable.
 2. Public booking insert allowed; public booking read blocked.
@@ -77,3 +77,11 @@ A browser automation date-fill issue required committing a date through native k
 - Legacy `/service-details/:category` still reads the existing local provider store, while `/services` reads Supabase. The main Supabase booking path was exercised; legacy service-detail rendering was checked, not its complete booking flow.
 
 Do not interpret a passing local build or simulated test as a guarantee against every production regression. Nothing in the live database, hosting or notification accounts was changed by this test run.
+
+## Workspace UI refresh regression checks
+
+The latest update keeps the 65 public baseline files unchanged. Three additional automated checks cover archive filtering and the admin-only, token-free settings check (21 automated tests total). Ten additional isolated database groups cover rerunnable archive migration, booking restore, payment-linked deletion refusal, provider visibility after archive/restore, active-job and history guards, junk-booking cleanup, application cleanup/review guard, non-admin archive refusal and blocking public pre-archived submissions (25 database groups total).
+
+Browser QA with sample data verified the redesigned notification cards, result labels and filters, desktop sidebar collapse and persistence across navigation, archive confirmation, Archived counts and restoring a sample booking. No live customer data was modified. Native S23 Ultra drawer behavior remains a deployment check.
+
+The new provider foreign key is NOT VALID for existing rows, so it does not reject old orphan assignments during migration. New assignments are checked and cannot select an archived/inactive provider. Existing historical assignments remain readable. Permanent deletion still preserves the financial/history protections described in UPGRADE_UI.md.
