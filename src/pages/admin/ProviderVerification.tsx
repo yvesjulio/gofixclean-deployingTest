@@ -23,16 +23,18 @@ export default function ProviderVerification() {
 
   const fetchVerifications = async () => {
     try {
+      setError(null);
       const { data, error } = await supabase
-        .from('provider_verifications')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("provider_verifications")
+        .select("*")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setVerifications(data || []);
     } catch (err) {
-      console.error('Error fetching verifications:', err);
-      setError('Failed to load verification requests');
+      console.error("Error fetching verifications:", err);
+      setError("Failed to load verification requests");
     } finally {
       setLoading(false);
     }
@@ -41,56 +43,38 @@ export default function ProviderVerification() {
   const handleApprove = async (verification: VerificationRequest) => {
     setProcessing(verification.id);
     try {
-      // Insert into providers table
-      const { error: insertError } = await supabase
-        .from('providers')
-        .insert({
-          full_name: verification.full_name,
-          phone: verification.phone,
-          service_type: verification.service_type,
-          base_location: verification.address,
-          notes: verification.about,
-          status: 'active',
-          is_approved: true,
-        });
+      const { error } = await supabase.rpc("review_provider_application", {
+        application_id: verification.id,
+        approve: true,
+      });
+      if (error) throw error;
 
-      if (insertError) throw insertError;
-
-      // Remove from verifications
-      const { error: deleteError } = await supabase
-        .from('provider_verifications')
-        .delete()
-        .eq('id', verification.id);
-
-      if (deleteError) throw deleteError;
-
-      alert('Provider approved successfully!');
-      fetchVerifications();
+      alert("Provider approved successfully!");
+      await fetchVerifications();
     } catch (err) {
-      console.error('Error approving provider:', err);
-      alert('Failed to approve provider');
+      console.error("Error approving provider:", err);
+      alert("Failed to approve provider");
     } finally {
       setProcessing(null);
     }
   };
 
   const handleReject = async (verification: VerificationRequest) => {
-    if (!confirm('Are you sure you want to reject this application?')) return;
+    if (!confirm("Are you sure you want to reject this application?")) return;
 
     setProcessing(verification.id);
     try {
-      const { error } = await supabase
-        .from('provider_verifications')
-        .delete()
-        .eq('id', verification.id);
-
+      const { error } = await supabase.rpc("review_provider_application", {
+        application_id: verification.id,
+        approve: false,
+      });
       if (error) throw error;
 
-      alert('Application rejected');
-      fetchVerifications();
+      alert("Application rejected");
+      await fetchVerifications();
     } catch (err) {
-      console.error('Error rejecting application:', err);
-      alert('Failed to reject application');
+      console.error("Error rejecting application:", err);
+      alert("Failed to reject application");
     } finally {
       setProcessing(null);
     }
@@ -130,16 +114,24 @@ export default function ProviderVerification() {
         ) : (
           <div className="space-y-4">
             {verifications.map((verification) => (
-              <div key={verification.id} className="bg-white rounded-lg p-6 shadow-sm">
+              <div
+                key={verification.id}
+                className="bg-white rounded-lg p-6 shadow-sm"
+              >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold">{verification.full_name}</h3>
+                    <h3 className="text-lg font-semibold">
+                      {verification.full_name}
+                    </h3>
                     <p className="text-gray-600">📞 {verification.phone}</p>
                     <p className="text-gray-600">📍 {verification.address}</p>
-                    <p className="text-blue-600 font-medium">{verification.service_type}</p>
+                    <p className="text-blue-600 font-medium">
+                      {verification.service_type}
+                    </p>
                     <p className="text-gray-700 mt-2">{verification.about}</p>
                     <p className="text-sm text-gray-500 mt-2">
-                      Applied: {new Date(verification.created_at).toLocaleDateString()}
+                      Applied:{" "}
+                      {new Date(verification.created_at).toLocaleDateString()}
                     </p>
                   </div>
 
@@ -149,7 +141,9 @@ export default function ProviderVerification() {
                       disabled={processing === verification.id}
                       className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
                     >
-                      {processing === verification.id ? 'Processing...' : 'Approve'}
+                      {processing === verification.id
+                        ? "Processing..."
+                        : "Approve"}
                     </button>
                     <button
                       onClick={() => handleReject(verification)}

@@ -1,61 +1,64 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import { useNavigate } from "react-router-dom";
-
-const AUTHORIZED_ADMINS = ["gofixclean@gmail.com", "yvesjulio3@gmail.com"];
-
-export default function ProtectedRoute({ children }: any) {
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const navigate = useNavigate();
-
+import type { ReactNode } from "react";
+import { Navigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
+export default function ProtectedRoute({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<
+    "loading" | "login" | "allowed" | "denied"
+  >("loading");
+  const [error, setError] = useState("");
   useEffect(() => {
-    const checkAuth = async () => {
+    let current = true;
+    async function check() {
       try {
-        const { data } = await supabase.auth.getSession();
-        
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
         if (!data.session) {
-          navigate("/admin-login");
+          if (current) setState("login");
           return;
         }
-        
-        setSession(data.session);
-        
-        if (data.session?.user?.email) {
-          const isAdmin = AUTHORIZED_ADMINS.includes(data.session.user.email);
-          setIsAuthorized(isAdmin);
-          if (!isAdmin) {
-            navigate("/");
-          }
-        } else {
-          navigate("/admin-login");
+        const result = await supabase.rpc("is_operations_admin");
+        if (result.error) throw result.error;
+        if (current) setState(result.data ? "allowed" : "denied");
+      } catch (e) {
+        if (current) {
+          setError(
+            e && typeof e === "object" && "message" in e
+              ? String(e.message)
+              : "Access check failed",
+          );
+          setState("denied");
         }
-      } catch (error) {
-        console.error("Auth check failed:", error);
-        navigate("/admin-login");
-      } finally {
-        setLoading(false);
       }
+    }
+    void check();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session && current) setState("login");
+      else
+        setTimeout(() => {
+          if (current) void check();
+        }, 0);
+    });
+    return () => {
+      current = false;
+      subscription.unsubscribe();
     };
-
-    checkAuth();
-  }, [navigate]);
-
-  if (loading) {
+  }, []);
+  if (state === "loading") return <p className="p-8">Checking admin access…</p>;
+  if (state === "login") return <Navigate to="/admin-login" replace />;
+  if (state === "denied")
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
+      <div className="p-8">
+        <h1>Admin access unavailable</h1>
+        <p>{error || "This account is not an approved administrator."}</p>
+        <p>
+          Apply the included admin operations SQL migration and check your admin
+          membership.
+        </p>
+        <a href="#/admin-login">Back to login</a>
       </div>
     );
-  }
-
-  if (!session || !isAuthorized) {
-    return null; // Navigation will happen in useEffect
-  }
-
   return children;
 }

@@ -1,56 +1,61 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-
-interface AdminLayoutProps {
+import type { ReactNode } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
+import "./admin.css";
+export function AdminLayout({
+  title,
+  children,
+}: {
   title: string;
-  children: React.ReactNode;
-}
-
-const AdminLayout: React.FC<AdminLayoutProps> = ({ title, children }) => {
-  const location = useLocation();
-
-  const navItems = [
-    { path: '/admin', label: 'Dashboard' },
-    { path: '/admin/bookings', label: 'Bookings' },
-    { path: '/admin/providers', label: 'Providers' },
-    { path: '/admin/verifications', label: 'Verifications' },
-  ];
-
+  children: ReactNode;
+}) {
+  const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-800">Admin Panel</h2>
-        </div>
-        <nav className="mt-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`block px-6 py-3 text-gray-700 hover:bg-gray-200 ${
-                location.pathname === item.path ? 'bg-gray-200 border-r-4 border-blue-500' : ''
-              }`}
-            >
-              {item.label}
-            </Link>
+    <div className="ops">
+      <aside className="ops-side">
+        <a className="ops-brand" href="#/admin">
+          GoFix<span>&Clean</span>
+          <small>OPERATIONS DESK</small>
+        </a>
+        <nav>
+          {[
+            ["/admin", "Overview"],
+            ["/admin/bookings", "Bookings"],
+            ["/admin/providers", "Providers"],
+            ["/admin/customers", "Customers"],
+            ["/admin/payments", "Payments"],
+            ["/admin/verifications", "Applications"],
+            ["/admin/notifications", "Notifications"],
+          ].map(([to, text]) => (
+            <NavLink key={to} to={to} end={to === "/admin"}>
+              {text}
+            </NavLink>
           ))}
         </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1">
-        <header className="bg-white shadow">
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
+        <a href="#/">View website ↗</a>
+        <button
+          onClick={async () => {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+              alert(error.message);
+              return;
+            }
+            navigate("/admin-login");
+          }}
+        >
+          Sign out
+        </button>
+      </aside>
+      <section className="ops-content">
+        <header className="ops-header">
+          <div>
+            <small>GOFIX&CLEAN / ADMIN</small>
+            <h1>{title}</h1>
           </div>
+          <span className="ops-pill">Kigali · RWF</span>
         </header>
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          {children}
-        </main>
-      </div>
+        <main>{children}</main>
+      </section>
     </div>
   );
-};
-
-export { AdminLayout };
+}

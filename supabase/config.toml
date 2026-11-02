@@ -1,0 +1,3 @@
+[functions.booking-notifier]
+# Authentication is enforced in index.ts: dedicated webhook secret or admin JWT.
+verify_jwt = false

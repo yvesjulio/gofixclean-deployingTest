@@ -1,131 +1,243 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Badge } from "@/components/ui/badge";
-
-interface Provider {
-  id: string;
-  full_name: string;
-  service_type: string;
-  phone: string;
-  base_location?: string;
-  rating?: number;
-  status?: string;
-}
-
+import { allRows, errorText, phone } from "@/lib/operations";
+import type { Provider } from "@/lib/operations";
+const empty = {
+  full_name: "",
+  phone: "",
+  service_type: "",
+  base_location: "",
+  availability: "available",
+  provider_bio: "",
+  status: "active",
+  is_approved: false,
+};
 export default function Providers() {
-  const [providers, setProviders] = useState<Provider[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState("All");
-
-  useEffect(() => {
-    fetchProviders();
-  }, []);
-
-  const fetchProviders = async () => {
+  const [rows, setRows] = useState<Provider[]>([]),
+    [error, setError] = useState(""),
+    [query, setQuery] = useState(""),
+    [service, setService] = useState("all"),
+    [editing, setEditing] = useState<string | null>(null),
+    [form, setForm] = useState(empty),
+    [busy, setBusy] = useState(false),
+    [loading, setLoading] = useState(true);
+  const load = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from("providers")
-        .select("*")
-        .order("full_name", { ascending: true });
-
-      if (error) throw error;
-      setProviders(data || []);
-    } catch (err) {
-      console.error("Error fetching providers:", err);
-      setError("Failed to load providers.");
+      setRows(await allRows<Provider>("providers", "full_name"));
+      setError("");
+    } catch (e) {
+      setError(errorText(e));
     } finally {
       setLoading(false);
     }
-  };
-
-  const serviceTypes = useMemo(
-    () => ["All", ...Array.from(new Set(providers.map((provider) => provider.service_type))).filter(Boolean)],
-    [providers]
-  );
-
-  const visibleProviders = useMemo(
-    () => (filter === "All" ? providers : providers.filter((provider) => provider.service_type === filter)),
-    [providers, filter]
-  );
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">Providers</h1>
-          <div className="text-center">Loading providers...</div>
-        </div>
-      </div>
-    );
+  }, []);
+  useEffect(() => {
+    void load();
+  }, [load]);
+  async function save() {
+    setBusy(true);
+    setError("");
+    try {
+      const values = {
+        ...form,
+        full_name: form.full_name.trim(),
+        phone: form.phone.trim(),
+        service_type: form.service_type.trim(),
+      };
+      const request =
+        editing === "new"
+          ? supabase.from("providers").insert(values)
+          : supabase.from("providers").update(values).eq("id", editing!);
+      const { error } = await request.select("id").single();
+      if (error) throw error;
+      setEditing(null);
+      await load();
+    } catch (e) {
+      setError(errorText(e));
+    } finally {
+      setBusy(false);
+    }
   }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">Providers</h1>
-          <div className="text-center text-red-600">{error}</div>
-        </div>
-      </div>
-    );
-  }
-
+  const visible = rows.filter(
+    (p) =>
+      (service === "all" || p.service_type === service) &&
+      `${p.full_name} ${p.phone} ${p.base_location}`
+        .toLowerCase()
+        .includes(query.toLowerCase()),
+  );
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Providers</h1>
-            <p className="text-sm text-gray-600">Browse and filter approved providers.</p>
-          </div>
-          <Badge className="rounded-full px-3 py-1 uppercase">{providers.length} total</Badge>
-        </div>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <select
-            value={filter}
-            onChange={(event) => setFilter(event.target.value)}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
-          >
-            {serviceTypes.map((type) => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
-
-          <div className="text-sm text-gray-500">
-            Showing {visibleProviders.length} of {providers.length} providers
-          </div>
-        </div>
-
-        {visibleProviders.length === 0 ? (
-          <div className="rounded-3xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-            No providers match this filter.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {visibleProviders.map((provider) => (
-              <div key={provider.id} className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-semibold">{provider.full_name}</h2>
-                    <p className="text-sm text-gray-500">{provider.service_type}</p>
-                  </div>
-                  <Badge className="rounded-full px-3 py-1 uppercase">
-                    {provider.status || "Unknown"}
-                  </Badge>
-                </div>
-
-                <div className="mt-4 space-y-2 text-sm text-gray-600">
-                  <p>📍 {provider.base_location || "–"}</p>
-                  <p>📞 {provider.phone || "–"}</p>
-                  <p>⭐ {provider.rating ?? 0}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+    <>
+      <div className="ops-row">
+        <p className="ops-muted">
+          Manage your team, availability and approval.
+        </p>
+        <button
+          className="primary"
+          onClick={() => {
+            setForm(empty);
+            setEditing("new");
+          }}
+        >
+          Add provider
+        </button>
       </div>
-    </div>
+      {error && (
+        <div className="ops-error" role="alert">
+          {error}
+        </div>
+      )}
+      {editing && (
+        <form
+          className="ops-card"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void save();
+          }}
+        >
+          <h2>{editing === "new" ? "New provider" : "Edit provider"}</h2>
+          <div className="ops-fields">
+            {(
+              [
+                "full_name",
+                "phone",
+                "service_type",
+                "base_location",
+                "provider_bio",
+              ] as const
+            ).map((k) => (
+              <label key={k}>
+                {k.replaceAll("_", " ")}
+                <input
+                  required={["full_name", "phone", "service_type"].includes(k)}
+                  value={form[k]}
+                  onChange={(e) => setForm({ ...form, [k]: e.target.value })}
+                />
+              </label>
+            ))}
+            <label>
+              Availability
+              <select
+                value={form.availability}
+                onChange={(e) =>
+                  setForm({ ...form, availability: e.target.value })
+                }
+              >
+                <option value="available">Available</option>
+                <option value="unavailable">Unavailable</option>
+              </select>
+            </label>
+            <label>
+              Status
+              <select
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </label>
+            <label>
+              Approval
+              <select
+                value={String(form.is_approved)}
+                onChange={(e) =>
+                  setForm({ ...form, is_approved: e.target.value === "true" })
+                }
+              >
+                <option value="false">Not approved</option>
+                <option value="true">Approved</option>
+              </select>
+            </label>
+          </div>
+          <div className="ops-actions">
+            <button disabled={busy} className="primary">
+              {busy ? "Saving…" : "Save provider"}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setEditing(null)}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
+      <div className="ops-toolbar">
+        <input
+          aria-label="Search providers"
+          placeholder="Search name, phone or location…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <select
+          aria-label="Provider service"
+          value={service}
+          onChange={(e) => setService(e.target.value)}
+        >
+          <option value="all">All services</option>
+          {[...new Set(rows.map((p) => p.service_type))].map((s) => (
+            <option key={s}>{s}</option>
+          ))}
+        </select>
+        <button onClick={() => void load()}>Refresh</button>
+      </div>
+      {loading ? (
+        <p>Loading providers…</p>
+      ) : (
+        <div
+          className="ops-grid"
+          style={{ gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))" }}
+        >
+          {visible.map((p) => (
+            <article className="ops-card" key={p.id}>
+              <span className="ops-pill">
+                {p.is_approved ? "Approved" : "Not approved"} · {p.status}
+              </span>
+              <h3 style={{ marginTop: 14 }}>{p.full_name}</h3>
+              <p>{p.service_type}</p>
+              <p className="ops-muted">
+                {p.base_location || "Location not set"} ·{" "}
+                {p.availability || "Availability not set"}
+              </p>
+              <p className="ops-muted">
+                {p.phone} · Rating {p.rating || 0}
+              </p>
+              <div className="ops-actions">
+                <a className="ops-button" href={`tel:+${phone(p.phone)}`}>
+                  Call
+                </a>
+                <a
+                  className="ops-button"
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`https://wa.me/${phone(p.phone)}`}
+                >
+                  WhatsApp
+                </a>
+                <button
+                  onClick={() => {
+                    setEditing(p.id);
+                    setForm({
+                      full_name: p.full_name,
+                      phone: p.phone,
+                      service_type: p.service_type,
+                      base_location: p.base_location || "",
+                      availability: p.availability || "available",
+                      provider_bio: p.provider_bio || "",
+                      status: p.status || "active",
+                      is_approved: !!p.is_approved,
+                    });
+                  }}
+                >
+                  Edit
+                </button>
+              </div>
+            </article>
+          ))}
+          {!visible.length && <p>No matching providers.</p>}
+        </div>
+      )}
+    </>
   );
 }

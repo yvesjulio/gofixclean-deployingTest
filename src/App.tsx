@@ -1,4 +1,9 @@
-import { HashRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  HashRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import Navbar from "./components/landingpages/Navbar";
 import Landingpage from "./pages/LandingPage";
 import ServicesPage from "./pages/ServicesPage";
@@ -17,15 +22,16 @@ import Bookings from "./pages/admin/Bookings";
 import Providers from "./pages/admin/Providers";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProviderVerification from "./pages/admin/ProviderVerification";
+import Customers from "./pages/admin/Customers";
+import Payments from "./pages/admin/Payments";
+import Notifications from "./pages/admin/Notifications";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { TooltipProvider } from "./components/ui/tooltip";
 
-
-
 function AppWrapper() {
   const location = useLocation();
-  const isAdminPage = location.pathname.startsWith('/admin');
+  const isAdminPage = location.pathname.startsWith("/admin");
   const showNavbarAndFooter = !isAdminPage;
 
   return (
@@ -36,35 +42,141 @@ function AppWrapper() {
         <Routes>
           <Route path="/" element={<Landingpage />} />
           <Route path="/services" element={<ServicesPage />} />
-          <Route path="/about" element={<AboutPage />} /> 
-          <Route path="/become-provider" element={<BecomeProviderPage />} />  
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/become-provider" element={<BecomeProviderPage />} />
           <Route path="/booking" element={<Booking />} />
-          <Route path="/service-details/:category" element={<ServiceDetails />} />
+          <Route
+            path="/service-details/:category"
+            element={<ServiceDetails />}
+          />
           <Route path="/careers" element={<CareersPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-          <Route path="/provider/verification" element={<ProviderRegistration />} />
+          <Route
+            path="/provider/verification"
+            element={<ProviderRegistration />}
+          />
           <Route path="/admin-login" element={<AdminLogin />} />
-          
+
           {/* Admin Routes */}
-          <Route path="/admin" element={<ProtectedRoute><AdminLayout title="Dashboard"><AdminDashboard /></AdminLayout></ProtectedRoute>} />
-          <Route path="/admin/dashboard" element={<ProtectedRoute><AdminLayout title="Dashboard"><AdminDashboard /></AdminLayout></ProtectedRoute>} />
-          <Route path="/admin/bookings" element={<ProtectedRoute><AdminLayout title="Bookings"><Bookings /></AdminLayout></ProtectedRoute>} />
-          <Route path="/admin/booking" element={<ProtectedRoute><AdminLayout title="Bookings"><Bookings /></AdminLayout></ProtectedRoute>} />
-          <Route path="/admin/providers" element={<ProtectedRoute><AdminLayout title="Providers"><Providers /></AdminLayout></ProtectedRoute>} />
-          <Route path="/admin/provider" element={<ProtectedRoute><AdminLayout title="Providers"><Providers /></AdminLayout></ProtectedRoute>} />
-          <Route path="/admin/verifications" element={<ProtectedRoute><AdminLayout title="Verifications"><ProviderVerification /></AdminLayout></ProtectedRoute>} />
-          <Route path="/admin/verification" element={<ProtectedRoute><AdminLayout title="Verifications"><ProviderVerification /></AdminLayout></ProtectedRoute>} />
-          
+          <Route
+            path="/admin/customers"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Customers">
+                  <Customers />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/payments"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Payments">
+                  <Payments />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/notifications"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Notifications">
+                  <Notifications />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Dashboard">
+                  <AdminDashboard />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Dashboard">
+                  <AdminDashboard />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/bookings"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Bookings">
+                  <Bookings />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/booking"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Bookings">
+                  <Bookings />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/providers"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Providers">
+                  <Providers />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/provider"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Providers">
+                  <Providers />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/verifications"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Verifications">
+                  <ProviderVerification />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/verification"
+            element={
+              <ProtectedRoute>
+                <AdminLayout title="Verifications">
+                  <ProviderVerification />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+
           {/* Catch-all route */}
           <Route path="*" element={<Landingpage />} />
         </Routes>
       </div>
-      
-  
-      
-      <WhatsAppButton />
+
+      {!isAdminPage && <WhatsAppButton />}
     </>
   );
 }
